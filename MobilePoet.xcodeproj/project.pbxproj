@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2436B5B9192EBE510047110C /* MathKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 2436B5B8192EBE510047110C /* MathKeyboard.m */; };
 		24ED7D78192A810F00C9A150 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D77192A810F00C9A150 /* Foundation.framework */; };
 		24ED7D7A192A810F00C9A150 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D79192A810F00C9A150 /* CoreGraphics.framework */; };
 		24ED7D7C192A810F00C9A150 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D7B192A810F00C9A150 /* UIKit.framework */; };
@@ -34,6 +35,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2436B5B7192EBE510047110C /* MathKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathKeyboard.h; sourceTree = "<group>"; };
+		2436B5B8192EBE510047110C /* MathKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MathKeyboard.m; sourceTree = "<group>"; };
 		24ED7D74192A810F00C9A150 /* MobilePoet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobilePoet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24ED7D77192A810F00C9A150 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24ED7D79192A810F00C9A150 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -117,6 +120,8 @@
 				24ED7D89192A810F00C9A150 /* Main.storyboard */,
 				24ED7D8C192A810F00C9A150 /* MenuViewController.h */,
 				24ED7D8D192A810F00C9A150 /* MenuViewController.m */,
+				2436B5B7192EBE510047110C /* MathKeyboard.h */,
+				2436B5B8192EBE510047110C /* MathKeyboard.m */,
 				24ED7D8F192A810F00C9A150 /* Images.xcassets */,
 				24ED7D7E192A810F00C9A150 /* Supporting Files */,
 			);
@@ -248,6 +253,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2436B5B9192EBE510047110C /* MathKeyboard.m in Sources */,
 				24ED7D8E192A810F00C9A150 /* MenuViewController.m in Sources */,
 				24ED7D88192A810F00C9A150 /* AppDelegate.m in Sources */,
 				24ED7D84192A810F00C9A150 /* main.m in Sources */,
@@ -459,6 +465,7 @@
 				24ED7DA8192A810F00C9A150 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		24ED7DA9192A810F00C9A150 /* Build configuration list for PBXNativeTarget "MobilePoetTests" */ = {
 			isa = XCConfigurationList;
@@ -467,6 +474,7 @@
 				24ED7DAB192A810F00C9A150 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
