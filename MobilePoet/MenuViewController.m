@@ -7,6 +7,7 @@
 //
 
 #import "MenuViewController.h"
+#import "TaskViewController.h"
 
 @interface MenuViewController ()
 @property(nonatomic, strong) UILabel *titleLabel;
@@ -25,10 +26,10 @@
 {
     [super viewDidLoad];
 	
-    self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 300, 60)];
-    self.titleLabel.center = CGPointMake(self.view.center.x, 80);
+    self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 300.0f, 60.0f)];
+    self.titleLabel.center = CGPointMake(self.view.center.x, 80.0f);
     self.titleLabel.backgroundColor = [UIColor clearColor];
-    self.titleLabel.font = [UIFont fontWithName:@"Avenir-Light" size:34.0];
+    self.titleLabel.font = [UIFont fontWithName:@"Avenir-Light" size:34.0f];
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.text = @"Poet Mobile";
     [self.view addSubview:self.titleLabel];
@@ -40,7 +41,6 @@
     [super viewDidLayoutSubviews];
     
     //Setup for intro animation
-    
     
 }
 

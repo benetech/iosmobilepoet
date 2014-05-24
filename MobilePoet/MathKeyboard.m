@@ -8,7 +8,7 @@
 
 #import "MathKeyboard.h"
 
-const CGFloat kPortaitKeyboardHeight = 216.f;
+const CGFloat kPortaitKeyboardHeight = 216.0f;
 const CGFloat kNormalButtonWidth = 30.f - 6.0f;
 const CGFloat kNormalButtonHeight = 38.f;
 const CGFloat kNormalButtonSpacing = 7.5f;
@@ -54,10 +54,10 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* Row 1 */
     for (int i = 0; i<10; i++) {
-        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7 + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10, kNormalButtonWidth, kNormalButtonHeight)];
+        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
         [button setTitle:[NSString stringWithFormat:@"%d", i] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 3.f;
+        button.layer.cornerRadius = 3.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self addSubview:button];
@@ -65,9 +65,9 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* Row 2 */
     for (int i = 0; i<10; i++) {
-        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7 + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10 + kNormalButtonHeight + 10, kNormalButtonWidth, kNormalButtonHeight)];
+        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f + kNormalButtonHeight + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
-        button.layer.cornerRadius = 2.f;
+        button.layer.cornerRadius = 2.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self addSubview:button];
@@ -75,9 +75,9 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* Row 3 - Big button test */
     for (int i = 0; i<10; i++) {
-        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(5 + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10 + kNormalButtonHeight + kNormalButtonHeight + 10 + 10, kBigButtonWidth, kNormalButtonHeight)];
+        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(5.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f + kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f, kBigButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
-        button.layer.cornerRadius = 2.f;
+        button.layer.cornerRadius = 2.0f;
         [button setTitle:@"Sin" forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -86,9 +86,9 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* Row 4 */
     for (int i = 0; i<10; i++) {
-        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(10 + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10 + kNormalButtonHeight + kNormalButtonHeight + kNormalButtonHeight + 10 + 10 + 10, kNormalButtonWidth, kNormalButtonHeight)];
+        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(10.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f + kNormalButtonHeight + kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
-        button.layer.cornerRadius = 2.f;
+        button.layer.cornerRadius = 2.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self addSubview:button];

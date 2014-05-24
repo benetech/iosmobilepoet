@@ -25,6 +25,7 @@
                                 </state>
                                 <connections>
                                     <action selector="beginButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="w7h-ww-Yhd"/>
+                                    <segue destination="olL-ec-wey" kind="push" id="d88-1g-oQN"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhd-Jd-hjD">
@@ -95,8 +96,10 @@
         <scene sceneID="tqd-zX-yy5">
             <objects>
                 <navigationController definesPresentationContext="YES" navigationBarHidden="YES" id="Lqc-UG-g0N" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Nv4-rm-A4D">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Nv4-rm-A4D">
+                        <rect key="frame" x="0.0" y="0.0" width="0.0" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <color key="barTintColor" red="0.40000000596046448" green="0.80000001192092896" blue="1" alpha="0.0" colorSpace="calibratedRGB"/>
                     </navigationBar>
                     <connections>
                         <segue destination="vXZ-lx-hvc" kind="relationship" relationship="rootViewController" id="YdO-ci-Tlm"/>
@@ -105,6 +108,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yZE-0u-PvT" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-454" y="60"/>
+        </scene>
+        <!--Task View Controller-->
+        <scene sceneID="hLl-il-sTo">
+            <objects>
+                <viewController id="olL-ec-wey" customClass="TaskViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="JPE-f2-90I"/>
+                        <viewControllerLayoutGuide type="bottom" id="kQJ-bO-Cvr"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="y9V-cm-aw7">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="TRH-5x-jjz"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dPN-xW-qzw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="483" y="85"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
