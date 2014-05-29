@@ -32,6 +32,9 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     if (self) {
         _textView = textView;
         _buttonCharcters = characters;
+        if (!characters) {
+            _buttonCharcters = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"+", @"-", @"*", @"/", @"=", @".", @"<", @">", @"\u221A", @"\u221B", @"\u00B0", @"%", @"\u03C0", @"!", @"a", @"b", @"c", @"x", @"y", @"z"];
+        }
         [self setUpKeyboard];
     }
     return self;
@@ -56,7 +59,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     for (int i = 0; i<10; i++) {
         UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
-        [button setTitle:[NSString stringWithFormat:@"%d", i] forState:UIControlStateNormal];
+        [button setTitle:self.buttonCharcters[i] forState:UIControlStateNormal];
         button.layer.cornerRadius = 3.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -65,9 +68,10 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* Row 2 */
     for (int i = 0; i<10; i++) {
-        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f + kNormalButtonHeight + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
+        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + 10.0f + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
         button.layer.cornerRadius = 2.0f;
+        [button setTitle:self.buttonCharcters[10+i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self addSubview:button];
@@ -75,10 +79,10 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* Row 3 - Big button test */
     for (int i = 0; i<10; i++) {
-        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(5.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f + kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f, kBigButtonWidth, kNormalButtonHeight)];
+        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
         button.layer.cornerRadius = 2.0f;
-        [button setTitle:@"Sin" forState:UIControlStateNormal];
+        [button setTitle:self.buttonCharcters[20 + i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self addSubview:button];
@@ -86,9 +90,10 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* Row 4 */
     for (int i = 0; i<10; i++) {
-        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(10.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f + kNormalButtonHeight + kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
+        UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(5.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f + 10.0f + 10.0f, kBigButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
         button.layer.cornerRadius = 2.0f;
+        [button setTitle:@"Sin" forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self addSubview:button];
