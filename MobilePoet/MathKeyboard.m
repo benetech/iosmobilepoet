@@ -18,6 +18,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
 @property (strong, nonatomic) UITextView *textView;
 @property (strong, nonatomic) NSArray *buttonCharcters;
 /* all characters on the keyboard */
+@property (strong, nonatomic) NSDictionary *buttonValues;
+/* all asciimath values of each character */
 @property (strong, nonatomic) NSMutableArray *buttons;
 /* all buttons on the keyboard */
 @end
@@ -33,7 +35,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
         _textView = textView;
         _buttonCharcters = characters;
         if (!characters) {
-            _buttonCharcters = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"+", @"-", @"*", @"/", @"=", @".", @"<", @">", @"\u221A", @"\u221B", @"\u00B0", @"%", @"\u03C0", @"!", @"a", @"b", @"c", @"x", @"y", @"z"];
+            _buttonCharcters = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"+", @"-", @"*", @"/", @"=", @".", @"(", @")", @"[", @"]", @"<", @">", @"\u221A", @"\u221B", @"\u00B0", @"%", @"\u03C0", @"!", @"a", @"b", @"x\u2044y", @"x\u207f"];
+            _buttonValues = @{@"0" : @"0", @"1" : @"1", @"2" : @"2", @"3" : @"3", @"4" : @"4", @"5" : @"5", @"6" : @"6", @"7" : @"7", @"8" : @"8", @"9" : @"9", @"+" : @"+", @"-" : @"-", @"*" : @"*", @"/" : @"/", @"=" : @"=", @"." : @".", @"(" : @"(", @")" : @")", @"[" : @"[", @"]" : @"]", @"<" : @"<", @">" : @">", @"\u221A" : @"sqrt", @"\u221B" : @"sqrt^3()", @"\u00B0" : @"degree", @"%" : @"%", @"\u03C0" : @"pi", @"!" : @"!", @"a" : @"a", @"b" : @"b", @"x\u2044y" : @" / ", @"x\u207f" : @" ^ "};
         }
         [self setUpKeyboard];
     }
@@ -53,12 +56,13 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     /* This is pretty messy, but it's just for testing the button layout. It will be improved once keyboard specifications are solidified */
     
     self.frame = CGRectMake(0, [[UIScreen mainScreen] bounds].size.height - kPortaitKeyboardHeight, [[UIScreen mainScreen] bounds].size.width, kPortaitKeyboardHeight);
-    self.backgroundColor = [UIColor blueColor];
+    self.backgroundColor = [UIColor grayColor];
     
     /* Row 1 */
     for (int i = 0; i<10; i++) {
         UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor redColor];
+        button.backgroundColor = [UIColor whiteColor];
+        button.titleLabel.textColor = [UIColor blackColor];
         [button setTitle:self.buttonCharcters[i] forState:UIControlStateNormal];
         button.layer.cornerRadius = 3.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -69,7 +73,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     /* Row 2 */
     for (int i = 0; i<10; i++) {
         UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + 10.0f + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor redColor];
+        button.backgroundColor = [UIColor whiteColor];
+        button.titleLabel.textColor = [UIColor blackColor];
         button.layer.cornerRadius = 2.0f;
         [button setTitle:self.buttonCharcters[10+i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -80,7 +85,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     /* Row 3 - Big button test */
     for (int i = 0; i<10; i++) {
         UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(7.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f + 10.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor redColor];
+        button.backgroundColor = [UIColor whiteColor];
+        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         button.layer.cornerRadius = 2.0f;
         [button setTitle:self.buttonCharcters[20 + i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
@@ -93,14 +99,16 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
         UIButton *button = [[UIButton alloc]initWithFrame:CGRectMake(5.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + kNormalButtonHeight + 10.0f + 10.0f + 10.0f + 10.0f, kBigButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor redColor];
         button.layer.cornerRadius = 2.0f;
-        [button setTitle:@"Sin" forState:UIControlStateNormal];
+        if ((30 + i) < [self.buttonCharcters count]) {
+            [button setTitle:self.buttonCharcters[30+i] forState:UIControlStateNormal];
+        }else
+            [button setTitle:@"sin" forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self addSubview:button];
     }
     
     
-    //_textView.inputView = self;
 }
 
 #pragma mark - Action
@@ -110,7 +118,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 3.5f;
     
     /* each button has it's own way of inserting its content, because the cursor placement is differnt for different math functions/symbols/etc. To determine each buttons type, I may make a UIButton subclass or catergory with a type property. */
     
-    [self.textView insertText:button.titleLabel.text];
+    [self.textView insertText:[self.buttonValues objectForKey:button.titleLabel.text]];
     NSLog(@"%@", button.titleLabel.text);
 }
 

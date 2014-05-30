@@ -10,6 +10,8 @@
 #import "MathKeyboard.h"
 
 NSString * const HTMLFileName = @"userhtml.html";
+const CGFloat kImageCenterYPostion = 110.0f;
+const CGFloat kPreviewCenterYPostion = 220.0f;
 
 @interface TaskViewController () <UITextViewDelegate>
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
@@ -17,6 +19,8 @@ NSString * const HTMLFileName = @"userhtml.html";
 @property (nonatomic, strong) UIButton *submitButton;
 @property (nonatomic, strong) UITextView *textInputView;
 @property (nonatomic, strong) UIWebView *previewView;
+@property (nonatomic) BOOL imageIsEnlarged;
+//used for the tap gesture to make the fetched image bigger
 @end
 
 @implementation TaskViewController
@@ -63,7 +67,8 @@ NSString * const HTMLFileName = @"userhtml.html";
     /* center is calculated after image is fetched */
     self.previewView.backgroundColor = [UIColor blackColor];
     self.previewView.hidden = YES;
-    [self setupPreviewView];
+    [self setupPreviewViewHtml];
+    self.previewView.userInteractionEnabled = NO;
     [self.view addSubview:self.previewView];
     
     self.activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
@@ -81,7 +86,7 @@ NSString * const HTMLFileName = @"userhtml.html";
     [self.activityIndicator startAnimating];
 }
 
--(void)setupPreviewView
+-(void)setupPreviewViewHtml
 {
     /* Setups html */
     NSString *tempDir = NSTemporaryDirectory();
@@ -108,12 +113,58 @@ NSString * const HTMLFileName = @"userhtml.html";
     /* current 'task' session shouldn't be released */
 }
 
+#pragma mark Gestures
+
+-(void)enlargeImage:(UITapGestureRecognizer *)gesture
+{
+    UIView *image = gesture.view;
+    [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        if (self.imageIsEnlarged) {
+            /* Image has already been enlarged, so scale it back to its original size. This is the same way the image's original scaling is calulcuted when its first scaled to fit in the ui. */
+            CGAffineTransform imageTransform;
+            if (image.frame.size.height > 100.0f){
+                // Image is too big
+                imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+            }else{
+                // Image is an ideal size, meaning it's below the max height
+                imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+            }
+            image.transform = imageTransform;
+            self.imageIsEnlarged  =NO;
+        }else{
+            /* Image is scaled so that it's width is just slightly less than the width of the screen */
+            image.transform = CGAffineTransformScale(image.transform,(self.view.frame.size.width/image.frame.size.width)-0.1f, (self.view.frame.size.width/image.frame.size.width)-0.1f);
+            self.imageIsEnlarged = YES;
+        }
+        
+    }completion:^(BOOL finished){
+        if (finished) {
+            ;
+        }
+    }];
+    
+}
+
+-(void)dragImage:(UIPanGestureRecognizer *)gesture
+{
+    if (gesture.state == UIGestureRecognizerStateChanged) {
+        gesture.view.center = CGPointMake(gesture.view.center.x, gesture.view.center.y + [gesture translationInView:self.view].y);
+        [gesture setTranslation:CGPointZero inView:self.view];
+    }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
+        [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+            gesture.view.center = CGPointMake(gesture.view.center.x, kImageCenterYPostion);
+        }completion:^(BOOL finished){
+            
+        }];
+    }
+}
+
 #pragma mark System
 
 -(void)fetchPic:(id)sender
 {
     /* This will evetually handle fetching pictures from the mathml cloud servers. For now this will simulate that using local pics */
-    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg1.jpg"]];
+    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg2.jpg"]];
     
     /* prepare image for animation */
     image.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
@@ -141,21 +192,36 @@ NSString * const HTMLFileName = @"userhtml.html";
             }completion:^(BOOL finished){
                 if (finished) {
                     
+                    /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
+                    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
+                    CGAffineTransform imageTransform;
+                    if (image.frame.size.height > 100.0f){
+                        // Image is too big
+                        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+                    }else{
+                        // Image is an ideal size, meaning it's below the max height
+                        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+                    }
+ 
+                    
                     /* animate image to the top */
                     [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-                        image.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
-                        image.center = CGPointMake(image.center.x, 100.f);
+                        image.transform = imageTransform;
+                        image.center = CGPointMake(image.center.x, kImageCenterYPostion);
                         self.backButton.alpha = 1.0f;
                         self.textInputView.alpha = 1.0f;
                         self.submitButton.alpha = 1.0f;
                     }completion:^(BOOL finished){
                         if (finished) {
-                            /* calculate position of the preview view */
-                            self.previewView.center = CGPointMake(self.view.frame.size.width/2, (image.frame.origin.y + image.frame.size.height + self.previewView.frame.size.height/2 + 50.0f));
+                            
+                            /* calculate position of the preview view. It's y position in the ui is predefined and constant. */
+                            //self.previewView.center = CGPointMake(self.view.frame.size.width/2, (image.frame.origin.y + image.frame.size.height + self.previewView.frame.size.height/2 + 50.0f));
+                            self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
                             self.previewView.hidden = NO;
                             
                             [self.textInputView becomeFirstResponder];
                             [image addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(enlargeImage:)]];
+                            [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
                             image.userInteractionEnabled = YES;
                         }
                     }];
@@ -164,21 +230,6 @@ NSString * const HTMLFileName = @"userhtml.html";
         }
     }];
     
-    
-}
-
--(void)enlargeImage:(UITapGestureRecognizer *)gesture
-{
-    UIView *image = gesture.view;
-    [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-        /* Image is scaled so that it's width is just slightly less than the width of the screen */
-         image.transform = CGAffineTransformScale(image.transform,(self.view.frame.size.width/image.frame.size.width)-0.1f, (self.view.frame.size.width/image.frame.size.width)-0.1f);
-        
-    }completion:^(BOOL finished){
-        if (finished) {
-            ;
-        }
-    }];
     
 }
 
@@ -206,10 +257,11 @@ NSString * const HTMLFileName = @"userhtml.html";
 {
     NSString *html1 = @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
     
-    /*The following string is the same HTML as above except it sets the 'scale' in a mathjax configuration.*/
-    /* It works, but the scaling takes about a second to take effect. If I use a div CSS (as done in the above string) then it takes effect immediately. Which in my opinion is better. */
+    //<style>body{background-color:black;}</style>
     
-    /*
+    /*The following string is the same HTML as above except it sets the 'scale' in a mathjax configuration.*/
+    /* It works, but the scaling takes about a second to take effect. If I use a div CSS (as done in the above string) then it takes effect immediately.
+    
      NSString *foo = @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({ 'HTML-CSS':{scale: 300}});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body>";
      */
     
