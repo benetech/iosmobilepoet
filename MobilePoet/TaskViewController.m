@@ -37,6 +37,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [backButton sizeToFit];
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     backButton.center = CGPointMake(30.0f, 40.0f);
+    backButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
     backButton.alpha = 0;
     self.backButton = backButton;
     [self.view addSubview:self.backButton];
@@ -46,6 +47,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [submitButton sizeToFit];
     [submitButton addTarget:self action:@selector(submitPressed:) forControlEvents:UIControlEventTouchUpInside];
     submitButton.center = CGPointMake(self.view.frame.size.width-35.0f, 40.0f);
+    submitButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
     submitButton.alpha = 0;
     self.submitButton = submitButton;
     [self.view addSubview:self.submitButton];
@@ -164,7 +166,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 -(void)fetchPic:(id)sender
 {
     /* This will evetually handle fetching pictures from the mathml cloud servers. For now this will simulate that using local pics */
-    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg2.jpg"]];
+    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg3.jpg"]];
     
     /* prepare image for animation */
     image.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
