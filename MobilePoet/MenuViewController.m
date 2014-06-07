@@ -9,7 +9,7 @@
 #import "MenuViewController.h"
 #import "TaskViewController.h"
 
-@interface MenuViewController () <UINavigationControllerDelegate>
+@interface MenuViewController ()
 @property(nonatomic, strong) UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UIButton *beginButton;
 @property (weak, nonatomic) IBOutlet UIButton *trainingModeButton;
@@ -39,9 +39,6 @@
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.text = @"Poet Mobile";
     [self.view addSubview:self.titleLabel];
-    
-    /* Assign this class, being the root view controller, as the uinavigationcontroller's delegate */
-    self.navigationController.delegate = self;
     
 }
 
