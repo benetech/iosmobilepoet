@@ -35,7 +35,7 @@
     self.titleLabel.center = CGPointMake(self.view.center.x, 80.0f);
     self.titleLabel.backgroundColor = [UIColor clearColor];
     self.titleLabel.textColor = [UIColor whiteColor];
-    self.titleLabel.font = [UIFont fontWithName:@"Avenir-Light" size:34.0f];
+    self.titleLabel.font = [UIFont fontWithName:@"Avenir-Medium" size:34.0f];
     self.titleLabel.textAlignment = NSTextAlignmentCenter;
     self.titleLabel.text = @"Poet Mobile";
     [self.view addSubview:self.titleLabel];

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		241142DC1947AABB003CFB4E /* MathKeyboardKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 241142DB1947AABB003CFB4E /* MathKeyboardKey.m */; };
+		241142DF194A5918003CFB4E /* TaskModePickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 241142DE194A5918003CFB4E /* TaskModePickerViewController.m */; };
 		2436B5B9192EBE510047110C /* MathKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 2436B5B8192EBE510047110C /* MathKeyboard.m */; };
 		2436B5BF192FC67D0047110C /* TaskViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2436B5BE192FC67D0047110C /* TaskViewController.m */; };
 		2436B5C1192FD1100047110C /* testimg1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2436B5C0192FD1100047110C /* testimg1.jpg */; };
@@ -39,6 +41,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		241142DA1947AABB003CFB4E /* MathKeyboardKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathKeyboardKey.h; sourceTree = "<group>"; };
+		241142DB1947AABB003CFB4E /* MathKeyboardKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MathKeyboardKey.m; sourceTree = "<group>"; };
+		241142DD194A5918003CFB4E /* TaskModePickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TaskModePickerViewController.h; sourceTree = "<group>"; };
+		241142DE194A5918003CFB4E /* TaskModePickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TaskModePickerViewController.m; sourceTree = "<group>"; };
 		2436B5B7192EBE510047110C /* MathKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathKeyboard.h; sourceTree = "<group>"; };
 		2436B5B8192EBE510047110C /* MathKeyboard.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MathKeyboard.m; sourceTree = "<group>"; };
 		2436B5BD192FC67D0047110C /* TaskViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TaskViewController.h; sourceTree = "<group>"; };
@@ -131,6 +137,10 @@
 				24ED7D8D192A810F00C9A150 /* MenuViewController.m */,
 				2436B5B7192EBE510047110C /* MathKeyboard.h */,
 				2436B5B8192EBE510047110C /* MathKeyboard.m */,
+				241142DA1947AABB003CFB4E /* MathKeyboardKey.h */,
+				241142DB1947AABB003CFB4E /* MathKeyboardKey.m */,
+				241142DD194A5918003CFB4E /* TaskModePickerViewController.h */,
+				241142DE194A5918003CFB4E /* TaskModePickerViewController.m */,
 				2436B5BD192FC67D0047110C /* TaskViewController.h */,
 				2436B5BE192FC67D0047110C /* TaskViewController.m */,
 				24ED7D8F192A810F00C9A150 /* Images.xcassets */,
@@ -270,8 +280,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				241142DF194A5918003CFB4E /* TaskModePickerViewController.m in Sources */,
 				2436B5B9192EBE510047110C /* MathKeyboard.m in Sources */,
 				24ED7D8E192A810F00C9A150 /* MenuViewController.m in Sources */,
+				241142DC1947AABB003CFB4E /* MathKeyboardKey.m in Sources */,
 				2436B5BF192FC67D0047110C /* TaskViewController.m in Sources */,
 				24ED7D88192A810F00C9A150 /* AppDelegate.m in Sources */,
 				24ED7D84192A810F00C9A150 /* main.m in Sources */,

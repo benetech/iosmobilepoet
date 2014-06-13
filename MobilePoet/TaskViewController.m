@@ -13,7 +13,7 @@ NSString * const HTMLFileName = @"userhtml.html";
 const CGFloat kImageCenterYPostion = 110.0f;
 const CGFloat kPreviewCenterYPostion = 220.0f;
 
-@interface TaskViewController () <UITextViewDelegate>
+@interface TaskViewController () <UITextViewDelegate, UIAlertViewDelegate>
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, strong) UIButton *submitButton;
@@ -110,11 +110,16 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 -(void)submitPressed:(UIButton *)button
 {
-    self.textInputView.editable = NO;
-    self.backButton.enabled = NO;
-    self.submitButton.enabled = NO;
-    
-    [self constructAndShowSubmissionView];
+    if (![self.textInputView.text isEqualToString:@""]) {
+        self.textInputView.editable = NO;
+        self.backButton.enabled = NO;
+        self.submitButton.enabled = NO;
+        [self constructAndShowSubmissionView];
+    }else{
+        /* no text entered */
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Empty Translation" message:@"You need to translate the image before you can submit it!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
+        [alert show];
+    }
     
 }
 
@@ -122,23 +127,33 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 {
     UILabel *button = (UILabel *)gesture.view;
     if ([button.text isEqualToString:@"Yes"]) {
-        /* submit */;
+        /* Submit */;
+        [self animateAwaySubmissionViewAndSubmitDescription];
     }else{
-        [self removeSubmissionView];
+        /* Go back to the task view */
+        [self removeSubmissionViewAndGoBackToTaskView];
     }
 }
 
 -(void)backButtonPressed:(UIButton *)button
 {
-    [self.navigationController popViewControllerAnimated:YES];
-    /* current 'task' session shouldn't be released */
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Leave Image" message:@"Are you sure you want to abandon this image?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
+    alert.delegate = self;
+    [alert show];
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 #pragma mark Submission View
 
 -(void)constructAndShowSubmissionView
 {
-    /* Constructs, and animates, the submission view when the 'submit' buttun is pressed. The user is promted to decide if their translation is ready for submission */
+    /* Constructs, and animates, the 'submission view' when the 'submit' button is pressed. The user is promted to decide if their translation is ready for submission */
     
     /* Setup views. View center postions are set to their beginning position in the animation where they will be animated in */
     //Labels
@@ -204,9 +219,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     }completion:^(BOOL finished){}];
 }
 
--(void)removeSubmissionView
+-(void)removeSubmissionViewAndGoBackToTaskView
 {
     /* Remove the submission/decision subview and go back to the taskViewController view */
+    
     /* Calculate proper image scaling so the image fits properly in the UI */
     CGAffineTransform imageTransform;
     if (self.currentImage.frame.size.height > 100.0f){
@@ -236,8 +252,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.backButton.enabled = YES;
     self.submitButton.enabled = YES;
     
+    /* Animate out submission view subviews and animate task view subviews back into place */
     [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-        /* Animate out submission view subviews and animate task view subviews back into place */
         self.previewView.center = CGPointMake(self.previewView.center.x, kPreviewCenterYPostion);
         self.currentImage.transform = imageTransform;
         self.currentImage.center = CGPointMake(self.currentImage.center.x, kImageCenterYPostion);
@@ -262,6 +278,60 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     }];
 }
 
+-(void)animateAwaySubmissionViewAndSubmitDescription
+{
+    /* Animate away 'submission' subviews, and task image and mathml preview */
+    
+    /* Get references to all 'submission view' subviews */
+    UILabel *submissionTextView;
+    UILabel *yesButton;
+    UILabel *noButton;
+    for (UILabel *subview in self.submissionViewSubviews) {
+        if ([subview isKindOfClass:[UILabel class]]) {
+            if ([subview.text isEqualToString: @"Yes"]) {
+                yesButton = subview;
+            }else if ([subview.text isEqualToString:@"No"]){
+                noButton = subview;
+            }else
+                submissionTextView = subview;
+        }
+    }
+    
+    /* Animate away submission subviews */
+    [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        submissionTextView.center = CGPointMake(submissionTextView.center.x, submissionTextView.center.y - 120.0f);
+        yesButton.center = CGPointMake(yesButton.center.x, yesButton.center.y + 150.0f);
+        noButton.center = CGPointMake(noButton.center.x, noButton.center.y + 150.0f);
+
+    }completion:^(BOOL finished){
+        if (finished) {
+            [submissionTextView removeFromSuperview];
+            [yesButton removeFromSuperview];
+            [noButton removeFromSuperview];
+            [self.submissionViewSubviews removeAllObjects];
+            /* set 'imageIsEnlarged' to 'NO' since the image has shrunk to its scaled size, regardless if the image was enlarged in the 'submission view' */
+            self.imageIsEnlarged = NO;
+        }
+    }];
+    
+    /* Animate away task views */
+    [UIView animateWithDuration:0.8f delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        
+        self.previewView.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+        self.currentImage.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+        self.previewView.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+        self.currentImage.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+        self.previewView.alpha = 0.0;
+        self.currentImage.alpha = 0.0;
+        
+    }completion:^(BOOL finished){
+        if (finished) {
+            [self submitImageAndMathmlToCloud];
+        }
+    }];
+    
+}
+
 #pragma mark Gestures
 
 -(void)enlargeImage:(UITapGestureRecognizer *)gesture
@@ -279,7 +349,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                 imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
             }
             image.transform = imageTransform;
-            self.imageIsEnlarged  =NO;
+            self.imageIsEnlarged = NO;
         }else{
             /* Image is scaled so that it's width is just slightly less than the width of the screen */
             image.transform = CGAffineTransformScale(image.transform,(self.view.frame.size.width/image.frame.size.width)-0.1f, (self.view.frame.size.width/image.frame.size.width)-0.1f);
@@ -310,6 +380,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 -(void)fetchPic:(id)sender
 {
+    [self resetSubviewsForNewImageFetch];
     /* This will evetually handle fetching pictures from the mathml cloud servers. For now this will simulate that using local pics */
     UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg3.jpg"]];
     self.currentImage = image;
@@ -359,6 +430,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                         self.backButton.alpha = 1.0f;
                         self.textInputView.alpha = 1.0f;
                         self.submitButton.alpha = 1.0f;
+                        self.previewView.alpha = 1.0f;
                     }completion:^(BOOL finished){
                         if (finished) {
                             
@@ -378,9 +450,35 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         }
     }];
     
+}
+
+-(void)submitImageAndMathmlToCloud
+{
+    /* This will eventually give the user feedback when the image is or is not submitted */
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator startAnimating];
+    
+    /* For now, just gonna load another image */
+    [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
     
 }
 
+-(void)resetSubviewsForNewImageFetch
+{
+    self.previewView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    [self updatePreviewViewWithText:@""];
+    
+    self.currentImage.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    self.currentImage.alpha = 1.0;
+    [self.currentImage removeFromSuperview];
+    self.currentImage = nil;
+    
+    self.textInputView.text = @"";
+    self.textInputView.editable = YES;
+    self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
+    self.backButton.enabled = YES;
+    self.submitButton.enabled = YES;
+}
 
 #pragma mark TextView and Preview View
 
@@ -419,9 +517,5 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     return fullHtmlString;
 
 }
-
-
-
-
 
 @end

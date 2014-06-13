@@ -16,4 +16,6 @@
 +(void)addMathKeyboardToTextView:(UITextView *)textView;
 /* Creates and attaches a math keyboard to the textview without having to intialize one. */
 
+-(void)animateIn;
+
 @end
