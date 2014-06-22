@@ -9,7 +9,7 @@
 #import "TaskViewController.h"
 #import "MathKeyboard.h"
 
-NSString * const HTMLFileName = @"userhtml.html";
+NSString * const HTMLFileName = @"asciimathhtml.html";
 const CGFloat kImageCenterYPostion = 110.0f;
 const CGFloat kPreviewCenterYPostion = 220.0f;
 
@@ -65,6 +65,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.textInputView.alpha = 0;
     self.textInputView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self.textInputView.autocorrectionType = UITextAutocapitalizationTypeNone;
+    self.textInputView.textAlignment = NSTextAlignmentCenter;
     self.textInputView.delegate = self;
     [self.view addSubview:self.textInputView];
     
@@ -120,7 +121,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Empty Translation" message:@"You need to translate the image before you can submit it!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
         [alert show];
     }
-    
 }
 
 -(void)decisionButtonPressed:(UITapGestureRecognizer *)gesture
@@ -290,7 +290,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         if ([subview isKindOfClass:[UILabel class]]) {
             if ([subview.text isEqualToString: @"Yes"]) {
                 yesButton = subview;
-            }else if ([subview.text isEqualToString:@"No"]){
+            }else if ([subview.text isEqualToString: @"No"]){
                 noButton = subview;
             }else
                 submissionTextView = subview;
@@ -319,10 +319,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         
         self.previewView.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
         self.currentImage.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
-        self.previewView.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
-        self.currentImage.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
-        self.previewView.alpha = 0.0;
-        self.currentImage.alpha = 0.0;
+        self.previewView.center = CGPointMake(self.view.frame.size.width/2.0f, self.view.frame.size.height/2.0f);
+        self.currentImage.center = CGPointMake(self.view.frame.size.width/2.0f, self.view.frame.size.height/2.0f);
+        self.previewView.alpha = 0;
+        self.currentImage.alpha = 0;
         
     }completion:^(BOOL finished){
         if (finished) {
@@ -422,7 +422,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                         imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
                     }
  
-                    
                     /* animate image to the top */
                     [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
                         image.transform = imageTransform;
@@ -488,6 +487,17 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [self updatePreviewViewWithText:textView.text];
 }
 
+//-(void)textViewDidChangeSelection:(UITextView *)textView
+//{
+//    NSRangePointer range = malloc(sizeof(NSRangePointer));
+//    range->location = 0;
+//    range->length = 0;
+//    NSLog(@"%lu", (unsigned long)textView.selectedRange.location);
+//    
+//    if ([[textView.textStorage attributesAtIndex:textView.selectedRange.location effectiveRange:range] objectForKey:NSBackgroundColorAttributeName]) {
+//    }
+//}
+
 -(void)updatePreviewViewWithText:(NSString *)text
 {
     /* Updates the preview view with whatever ASCIIMath is in the textview */
@@ -515,7 +525,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     NSString *html2 = [html1 stringByAppendingString:asciimath];
     NSString *fullHtmlString = [html2 stringByAppendingString:@"</div></body></html>"];
     return fullHtmlString;
-
 }
 
 @end
