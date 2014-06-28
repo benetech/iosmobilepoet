@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface TaskViewController : UIViewController
-
+-(void)setTask:(UIImageView *)image;
 @end

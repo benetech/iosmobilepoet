@@ -35,6 +35,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 @property (strong, nonatomic) UIPageControl *pageControl;
 @property (strong, nonatomic) UIButton *leftCursorButton;
 @property (strong, nonatomic) UIButton *rightCursorButton;
+@property (nonatomic) BOOL cursorKeyAnimationEnabled;
+/* This permits the cursor keys to animate out horizontally when the keyboard is dismissed */
 @end
 
 @implementation MathKeyboard
@@ -50,7 +52,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         if (!characters) {
             _buttonCharcters = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"+", @"-", @"*", @"/", @"=", @"\u2260", @"<", @">", @"\u2264", @"\u2265", @"(", @")", @"[", @"]", @".", @"^", @"\u00B1", @"\u00B0", @"%", @"\u03C0", @"\u221E", @"!", @"\u221A", @"\u221B", @"x\u2044y", @"x\u207f", @"logx", @"lnx", @"sinx", @"cosx", @"tanx", @"sin.x", @"cos.x", @"tan.x"];
             _operationButtonCharcters = @[@"\u221A", @"\u221B", @"x\u2044y", @"x\u207f", @"sinx", @"cosx", @"tanx"];
-            _buttonValues = @{@"0" : @"0", @"1" : @"1", @"2" : @"2", @"3" : @"3", @"4" : @"4", @"5" : @"5", @"6" : @"6", @"7" : @"7", @"8" : @"8", @"9" : @"9", @"+" : @"+", @"-" : @"-", @"*" : @"*", @"/" : @"/", @"=" : @"=", @"." : @".", @"(" : @"(", @")" : @")", @"[" : @"[", @"]" : @"]", @"<" : @"<", @">" : @">", @"\u2264" : @"<=", @"\u2265" : @">=",@"^" : @"^",  @"\u00B0" : @"degree", @"\u2260" : @"!=", @"\u221A" : @"sqrt() ", @"\u221B" : @"sqrt^3() ", @"%" : @"%", @"\u03C0" : @"pi", @"!" : @"!", @"x\u2044y" : @"()/() ", @"\u221E" : @"infty", @"x\u207f" : @"()^() ", @"\u00B1" : @"+-", @"space" : @" ", @"return" : @"\n", @"sinx" : @"sin() ", @"cosx" : @"cos() ", @"tanx" : @"tan() "};
+            _buttonValues = @{@"+" : @"+", @"-" : @"-", @"*" : @"*", @"/" : @"/", @"=" : @"=", @"." : @".", @"(" : @"(", @")" : @")", @"[" : @"[", @"]" : @"]", @"<" : @"<", @">" : @">", @"\u2264" : @"<=", @"\u2265" : @">=",@"^" : @"^",  @"\u00B0" : @"degree", @"\u2260" : @"!=", @"\u221A" : @"sqrt() ", @"\u221B" : @"sqrt^3() ", @"%" : @"%", @"\u03C0" : @"pi", @"!" : @"!", @"x\u2044y" : @"()/() ", @"\u221E" : @"infty", @"x\u207f" : @"()^() ", @"\u00B1" : @"+-", @"space" : @" ", @"return" : @"\n", @"sinx" : @"sin() ", @"cosx" : @"cos() ", @"tanx" : @"tan() "};
         }
         [self setUpKeyboard];
     }
@@ -227,6 +229,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         if (i == 0) {
             /* help button */
             button.frame = CGRectMake(button.frame.origin.x, button.frame.origin.y, (button.frame.size.width * 2.0f) + kNormalButtonSpacing, button.frame.size.height);
+            [button setBackgroundColor:[UIColor colorWithRed:121/255.0f green:121/255.0f blue:121/255.0f alpha:1.0f]];
+            [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             [button setTitle:@"help" forState:UIControlStateNormal];
             i = 1;
         }else if (i == 2) {
@@ -237,11 +241,14 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         }else if (i == 6) {
             /* return key */
             button.frame = CGRectMake(button.frame.origin.x, button.frame.origin.y, (button.frame.size.width * 2.0f) + (kNormalButtonSpacing * 2.0f), button.frame.size.height);
+            [button setBackgroundColor:[UIColor colorWithRed:121/255.0f green:121/255.0f blue:121/255.0f alpha:1.0f]];
+            [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
             [button setTitle:@"return" forState:UIControlStateNormal];
         }else if (i == 8){
             /* backspace */
             button.frame = CGRectMake(button.frame.origin.x + kNormalButtonSpacing, button.frame.origin.y, button.frame.size.width + 10.0f, button.frame.size.height);
-            [button setTitle:@"backspace" forState:UIControlStateNormal];
+            [button setBackgroundColor:[UIColor colorWithRed:121/255.0f green:121/255.0f blue:121/255.0f alpha:1.0f]];
+            [button setImage:[UIImage imageNamed:@"backspace.png"] forState:UIControlStateNormal];
             button.type = MathKeyboardKeyTypeOperation;
         }else{
             continue;
@@ -254,10 +261,10 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     
     
     /* Add cursor buttons in the inputAccessoryView */
-    _cursorControlView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, 30)];
+    _cursorControlView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, 30.0f)];
     _cursorControlView.backgroundColor = [UIColor clearColor];
     
-    UIButton *leftButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 30.0f, 33.0f)];
+    UIButton *leftButton = [[UIButton alloc]initWithFrame:CGRectMake(-5.0f, 0, 35.0f, 33.0f)];
     leftButton.backgroundColor = [UIColor lightGrayColor];
     leftButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:25.0f];
     [leftButton setTitle:@"<" forState:UIControlStateNormal];
@@ -268,7 +275,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         _leftCursorButton = leftButton;
     [_cursorControlView addSubview:_leftCursorButton];
     
-    UIButton *rightButton = [[UIButton alloc]initWithFrame:CGRectMake(_cursorControlView.frame.size.width - 30.0f, 0, 30.0f, 33.0f)];
+    UIButton *rightButton = [[UIButton alloc]initWithFrame:CGRectMake(_cursorControlView.frame.size.width - 30.0f, 0, 35.0f, 33.0f)];
     rightButton.backgroundColor = [UIColor lightGrayColor];
     rightButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:25.0f];
     [rightButton setTitle:@">" forState:UIControlStateNormal];
@@ -277,16 +284,26 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     _rightCursorButton = rightButton;
     [_cursorControlView addSubview:_rightCursorButton];
     self.textView.inputAccessoryView = _cursorControlView;
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(animateOutCursorButtons:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(resetCursorButtonPositionsAfterKeyboardIsOffScreen:) name:UIKeyboardDidHideNotification object:nil];
+    
+    _cursorKeyAnimationEnabled = YES;
 
    
 }
 
 -(void)animateIn
 {
+    self.leftCursorButton.center = CGPointMake(self.leftCursorButton.center.x - 50.0f, self.leftCursorButton.center.y);
+    self.rightCursorButton.center = CGPointMake(self.rightCursorButton.center.x + 50.0f, self.rightCursorButton.center.y);
+    
     /* Helps indicate you can swipe on the keyboard to get to other keys */
     self.scrollView.contentOffset = CGPointMake(self.frame.size.width + 120.0f, 0);
-    [UIView animateWithDuration:1.0 delay:0.0 usingSpringWithDamping:0.8 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseOut  animations:^{
+    [UIView animateWithDuration:1.0f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut  animations:^{
         self.scrollView.contentOffset = CGPointMake(self.frame.size.width, 0);
+        self.leftCursorButton.center = CGPointMake(self.leftCursorButton.center.x + 50.0f, self.leftCursorButton.center.y);
+        self.rightCursorButton.center = CGPointMake(self.rightCursorButton.center.x - 50.0f, self.rightCursorButton.center.y);
     }completion:^(BOOL finished){}];
 }
 
@@ -304,7 +321,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 -(void)buttonTapped:(MathKeyboardKey *)button
 {
     /* Test if the key is the backspace key */
-    if ([button.titleLabel.text isEqualToString:@"backspace"] && (self.textView.selectedRange.length == 0)){
+    if (!button.titleLabel.text && (self.textView.selectedRange.length == 0)){
         self.textView.text = self.textView.text.length > 0 ? [self.textView.text substringWithRange:NSMakeRange(0, self.textView.text.length -1)] : @"";
         return;
     }
@@ -353,14 +370,52 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         self.textView.selectedRange = NSMakeRange(self.textView.selectedRange.location - 2, 0);
 }
 
+#pragma mark Keyboard Notifications
+
+-(void)animateOutCursorButtons:(NSNotification *)notification
+{
+    if (self.cursorKeyAnimationEnabled) {
+        [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            self.leftCursorButton.center = CGPointMake(self.leftCursorButton.center.x - (self.leftCursorButton.frame.size.width), self.leftCursorButton.center.y);
+            self.rightCursorButton.center = CGPointMake(self.rightCursorButton.center.x + (self.leftCursorButton.frame.size.width), self.rightCursorButton.center.y);
+        }completion:nil];
+    }else{
+        self.cursorKeyAnimationEnabled = YES;
+        /*  Parts of the cursor key's views hang off the side of the keyboard. Meaning their bounds exceed the bounds of the keyboard. So when the keyboard is dismissed while being pushed off a navigation stack, you can see the key hanging off the view as the nagivation controller animates it out. This prevents that by fading them out. */ 
+        [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            self.leftCursorButton.alpha = 0;
+            self.rightCursorButton.alpha = 0;
+        }completion:^(BOOL finished){
+            if (finished) {
+                //self.leftCursorButton.alpha = 1.0;
+                //self.rightCursorButton.alpha = 1.0;
+                /* No alpha reset because the only reason the cursor key animation is ever disabled is if this keyboard's textview view is being pushed off the navigaton stack, so the keyboard instance will be freed */
+            }
+        }];
+    }
+}
+
+-(void)resetCursorButtonPositionsAfterKeyboardIsOffScreen:(NSNotification *)notification
+{
+    self.leftCursorButton.center = CGPointMake(self.leftCursorButton.center.x + (self.leftCursorButton.frame.size.width), self.leftCursorButton.center.y);
+    self.rightCursorButton.center = CGPointMake(self.rightCursorButton.center.x - (self.leftCursorButton.frame.size.width), self.rightCursorButton.center.y);
+
+}
+
+-(void)disableCursorKeyHorizontalAnimationForNextKeyboardDismissal
+{
+    self.cursorKeyAnimationEnabled = NO;
+}
+
 #pragma mark Guidance Mode
 
 -(void)enableGuidanceModeForOperation:(NSString *)operationString
 {
-    /* if the operation starts with "()", than the operation is guranteed to have another pair of "()" (otherwise the operation would have just one pair of parenthesis at the beginning, which makes no sense ). By identifying this, we can adjust guidance mode to guide the user through 1 or 2 sets of parenthesis. This result is stored in 'inOperationGuidanceMode'  */
+    /* if the operation starts with "()", than the operation is guranteed to have another pair of "()" (otherwise the operation would have just one pair of parenthesis at the beginning, which makes no sense). By identifying this, we can adjust guidance mode to guide the user through 1 or 2 sets of parenthesis. This result is stored in 'inOperationGuidanceMode'  */
     
     self.inOperationGuidanceMode = [self.buttonValues[operationString] hasPrefix:@"()"] ? 2 : 1;
     [self.textView.textStorage addAttribute:NSBackgroundColorAttributeName value:[UIColor colorWithRed:1.0f green:256/255.0f blue:0 alpha:0.5f] range:NSMakeRange(self.textView.selectedRange.location-1, 2)];
+    self.leftCursorButton.enabled = NO;
     
     [UIView animateWithDuration:0.5f animations:^{
         [self.leftCursorButton setTitleColor:[UIColor colorWithRed:0 green:0.5f blue:1.0f alpha:1.0f] forState:UIControlStateNormal];
@@ -372,8 +427,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 -(void)guidanceModeButtonPressed:(UIButton *)button
 {
     static int guidanceModeValue = 0;
-    /* 'guidanceModeValue value keeps track of where the cursor is in the existing positions it can go to in guidance mode. Most buttons allow 3 locations: in the first set of parenthsis, the second pair of paremthesis, and outside the math function. First value is 0, second is 1, and the last is 2 */
-    /* Using the 'inOperationGuidanceMode value, we can move the guidance mode up to the last 'step' if there is only on e pair of parenthesis */
+    /* 'guidanceModeValue value keeps track of where the cursor is in the existing positions it can go to in guidance mode. Most buttons allow 3 locations: in the first set of parenthsis, the second pair of parenthesis, and outside the math function. First value is 0, second is 1, and the last is 2 */
+    /* Using the 'inOperationGuidanceMode value, we can move the guidance mode up to the 2nd 'step' if there is only one pair of parenthesis (there are 3 max steps allowed - 1st is in the first set of parenthesis, 2nd is in the possible second pair of parenthesis, 3rd being outside the function which ends guidance mode) */
     if (guidanceModeValue == 0 && self.inOperationGuidanceMode == 1) {
         guidanceModeValue = 1;
     }

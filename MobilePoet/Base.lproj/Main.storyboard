@@ -113,7 +113,7 @@
         <!--Task View Controller-->
         <scene sceneID="hLl-il-sTo">
             <objects>
-                <viewController id="olL-ec-wey" customClass="TaskViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="taskViewController" id="olL-ec-wey" customClass="TaskViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="JPE-f2-90I"/>
                         <viewControllerLayoutGuide type="bottom" id="kQJ-bO-Cvr"/>
@@ -127,7 +127,26 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dPN-xW-qzw" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1173" y="47"/>
+            <point key="canvasLocation" x="1137" y="-387"/>
+        </scene>
+        <!--Gallery View Controller-->
+        <scene sceneID="FJf-8f-RE9">
+            <objects>
+                <viewController id="Gw3-N9-bWT" customClass="GalleryViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Xwo-F7-zuE"/>
+                        <viewControllerLayoutGuide type="bottom" id="wzR-sj-r5y"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="dby-Td-j5N">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="PFC-Zm-h0v"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="lF4-zh-nc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1077" y="292"/>
         </scene>
         <!--Task Mode Picker View Controller-->
         <scene sceneID="gN7-rz-eKh">
@@ -161,6 +180,9 @@
                                     <color key="titleColor" red="0.09803922474" green="0.1411764771" blue="0.32549020649999999" alpha="1" colorSpace="deviceRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <segue destination="Gw3-N9-bWT" kind="push" id="sUf-ma-WJC"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lNF-Eu-8Gv">
                                 <rect key="frame" x="117" y="339" width="86" height="30"/>

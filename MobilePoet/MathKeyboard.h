@@ -17,5 +17,6 @@
 /* Creates and attaches a math keyboard to the textview without having to intialize one. */
 
 -(void)animateIn;
+-(void)disableCursorKeyHorizontalAnimationForNextKeyboardDismissal;
 
 @end

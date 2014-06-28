@@ -14,6 +14,11 @@
 		2436B5C1192FD1100047110C /* testimg1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2436B5C0192FD1100047110C /* testimg1.jpg */; };
 		2457EB691937F1FD005C32D1 /* testimg2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2457EB671937F1FD005C32D1 /* testimg2.jpg */; };
 		2457EB6A1937F1FD005C32D1 /* testimg3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2457EB681937F1FD005C32D1 /* testimg3.jpg */; };
+		24A64115195CA4F6000DF735 /* 1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64110195CA4F6000DF735 /* 1.jpg */; };
+		24A64116195CA4F6000DF735 /* 2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64111195CA4F6000DF735 /* 2.jpg */; };
+		24A64117195CA4F6000DF735 /* 3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64112195CA4F6000DF735 /* 3.jpg */; };
+		24A64118195CA4F6000DF735 /* 4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64113195CA4F6000DF735 /* 4.jpg */; };
+		24A64119195CA4F6000DF735 /* 15.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64114195CA4F6000DF735 /* 15.jpg */; };
 		24ED7D78192A810F00C9A150 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D77192A810F00C9A150 /* Foundation.framework */; };
 		24ED7D7A192A810F00C9A150 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D79192A810F00C9A150 /* CoreGraphics.framework */; };
 		24ED7D7C192A810F00C9A150 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D7B192A810F00C9A150 /* UIKit.framework */; };
@@ -28,6 +33,10 @@
 		24ED7D99192A810F00C9A150 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D7B192A810F00C9A150 /* UIKit.framework */; };
 		24ED7DA1192A810F00C9A150 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 24ED7D9F192A810F00C9A150 /* InfoPlist.strings */; };
 		24ED7DA3192A810F00C9A150 /* MobilePoetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 24ED7DA2192A810F00C9A150 /* MobilePoetTests.m */; };
+		24F7596119575D7000AF0856 /* backspace.png in Resources */ = {isa = PBXBuildFile; fileRef = 24F7595F19575D7000AF0856 /* backspace.png */; };
+		24F7596219575D7000AF0856 /* backspace@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 24F7596019575D7000AF0856 /* backspace@2x.png */; };
+		24F75965195C9D0500AF0856 /* GalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24F75964195C9D0500AF0856 /* GalleryViewController.m */; };
+		24F7596B195C9E2800AF0856 /* ImageCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 24F7596A195C9E2800AF0856 /* ImageCollectionViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +61,11 @@
 		2436B5C0192FD1100047110C /* testimg1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = testimg1.jpg; sourceTree = "<group>"; };
 		2457EB671937F1FD005C32D1 /* testimg2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = testimg2.jpg; sourceTree = "<group>"; };
 		2457EB681937F1FD005C32D1 /* testimg3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = testimg3.jpg; sourceTree = "<group>"; };
+		24A64110195CA4F6000DF735 /* 1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 1.jpg; sourceTree = "<group>"; };
+		24A64111195CA4F6000DF735 /* 2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 2.jpg; sourceTree = "<group>"; };
+		24A64112195CA4F6000DF735 /* 3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 3.jpg; sourceTree = "<group>"; };
+		24A64113195CA4F6000DF735 /* 4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 4.jpg; sourceTree = "<group>"; };
+		24A64114195CA4F6000DF735 /* 15.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 15.jpg; sourceTree = "<group>"; };
 		24ED7D74192A810F00C9A150 /* MobilePoet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobilePoet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24ED7D77192A810F00C9A150 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24ED7D79192A810F00C9A150 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -71,6 +85,12 @@
 		24ED7D9E192A810F00C9A150 /* MobilePoetTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MobilePoetTests-Info.plist"; sourceTree = "<group>"; };
 		24ED7DA0192A810F00C9A150 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		24ED7DA2192A810F00C9A150 /* MobilePoetTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MobilePoetTests.m; sourceTree = "<group>"; };
+		24F7595F19575D7000AF0856 /* backspace.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backspace.png; sourceTree = "<group>"; };
+		24F7596019575D7000AF0856 /* backspace@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "backspace@2x.png"; sourceTree = "<group>"; };
+		24F75963195C9D0500AF0856 /* GalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GalleryViewController.h; sourceTree = "<group>"; };
+		24F75964195C9D0500AF0856 /* GalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GalleryViewController.m; sourceTree = "<group>"; };
+		24F75969195C9E2800AF0856 /* ImageCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCollectionViewCell.h; sourceTree = "<group>"; };
+		24F7596A195C9E2800AF0856 /* ImageCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCollectionViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +117,29 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		24A6410F195CA4A8000DF735 /* Gallery Sample Images */ = {
+			isa = PBXGroup;
+			children = (
+				24A64110195CA4F6000DF735 /* 1.jpg */,
+				24A64111195CA4F6000DF735 /* 2.jpg */,
+				24A64112195CA4F6000DF735 /* 3.jpg */,
+				24A64113195CA4F6000DF735 /* 4.jpg */,
+				24A64114195CA4F6000DF735 /* 15.jpg */,
+			);
+			name = "Gallery Sample Images";
+			sourceTree = "<group>";
+		};
+		24A6411A195F3530000DF735 /* Math Keyboard */ = {
+			isa = PBXGroup;
+			children = (
+				2436B5B7192EBE510047110C /* MathKeyboard.h */,
+				2436B5B8192EBE510047110C /* MathKeyboard.m */,
+				241142DA1947AABB003CFB4E /* MathKeyboardKey.h */,
+				241142DB1947AABB003CFB4E /* MathKeyboardKey.m */,
+			);
+			name = "Math Keyboard";
+			sourceTree = "<group>";
+		};
 		24ED7D6B192A810F00C9A150 = {
 			isa = PBXGroup;
 			children = (
@@ -135,14 +178,15 @@
 				24ED7D89192A810F00C9A150 /* Main.storyboard */,
 				24ED7D8C192A810F00C9A150 /* MenuViewController.h */,
 				24ED7D8D192A810F00C9A150 /* MenuViewController.m */,
-				2436B5B7192EBE510047110C /* MathKeyboard.h */,
-				2436B5B8192EBE510047110C /* MathKeyboard.m */,
-				241142DA1947AABB003CFB4E /* MathKeyboardKey.h */,
-				241142DB1947AABB003CFB4E /* MathKeyboardKey.m */,
 				241142DD194A5918003CFB4E /* TaskModePickerViewController.h */,
 				241142DE194A5918003CFB4E /* TaskModePickerViewController.m */,
 				2436B5BD192FC67D0047110C /* TaskViewController.h */,
 				2436B5BE192FC67D0047110C /* TaskViewController.m */,
+				24A6411A195F3530000DF735 /* Math Keyboard */,
+				24F75963195C9D0500AF0856 /* GalleryViewController.h */,
+				24F75964195C9D0500AF0856 /* GalleryViewController.m */,
+				24F75969195C9E2800AF0856 /* ImageCollectionViewCell.h */,
+				24F7596A195C9E2800AF0856 /* ImageCollectionViewCell.m */,
 				24ED7D8F192A810F00C9A150 /* Images.xcassets */,
 				24ED7D7E192A810F00C9A150 /* Supporting Files */,
 			);
@@ -152,9 +196,12 @@
 		24ED7D7E192A810F00C9A150 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				24A6410F195CA4A8000DF735 /* Gallery Sample Images */,
 				2436B5C0192FD1100047110C /* testimg1.jpg */,
 				2457EB671937F1FD005C32D1 /* testimg2.jpg */,
 				2457EB681937F1FD005C32D1 /* testimg3.jpg */,
+				24F7595F19575D7000AF0856 /* backspace.png */,
+				24F7596019575D7000AF0856 /* backspace@2x.png */,
 				24ED7D7F192A810F00C9A150 /* MobilePoet-Info.plist */,
 				24ED7D80192A810F00C9A150 /* InfoPlist.strings */,
 				24ED7D83192A810F00C9A150 /* main.m */,
@@ -256,10 +303,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24A64119195CA4F6000DF735 /* 15.jpg in Resources */,
+				24A64118195CA4F6000DF735 /* 4.jpg in Resources */,
+				24A64117195CA4F6000DF735 /* 3.jpg in Resources */,
 				2457EB691937F1FD005C32D1 /* testimg2.jpg in Resources */,
+				24F7596119575D7000AF0856 /* backspace.png in Resources */,
+				24A64116195CA4F6000DF735 /* 2.jpg in Resources */,
+				24F7596219575D7000AF0856 /* backspace@2x.png in Resources */,
 				24ED7D90192A810F00C9A150 /* Images.xcassets in Resources */,
 				2436B5C1192FD1100047110C /* testimg1.jpg in Resources */,
 				2457EB6A1937F1FD005C32D1 /* testimg3.jpg in Resources */,
+				24A64115195CA4F6000DF735 /* 1.jpg in Resources */,
 				24ED7D82192A810F00C9A150 /* InfoPlist.strings in Resources */,
 				24ED7D8B192A810F00C9A150 /* Main.storyboard in Resources */,
 			);
@@ -281,8 +335,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				241142DF194A5918003CFB4E /* TaskModePickerViewController.m in Sources */,
+				24F75965195C9D0500AF0856 /* GalleryViewController.m in Sources */,
 				2436B5B9192EBE510047110C /* MathKeyboard.m in Sources */,
 				24ED7D8E192A810F00C9A150 /* MenuViewController.m in Sources */,
+				24F7596B195C9E2800AF0856 /* ImageCollectionViewCell.m in Sources */,
 				241142DC1947AABB003CFB4E /* MathKeyboardKey.m in Sources */,
 				2436B5BF192FC67D0047110C /* TaskViewController.m in Sources */,
 				24ED7D88192A810F00C9A150 /* AppDelegate.m in Sources */,

@@ -40,6 +40,8 @@
     self.titleLabel.text = @"Poet Mobile";
     [self.view addSubview:self.titleLabel];
     
+    /* All other views are defined in the storyboard */
+    
 }
 
 -(void)viewDidLayoutSubviews

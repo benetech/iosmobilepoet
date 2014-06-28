@@ -9,6 +9,13 @@
 #import "TaskViewController.h"
 #import "MathKeyboard.h"
 
+typedef NS_ENUM(NSInteger, ImageSelectionMode){
+    ImageSelectionModeRandom,
+    /* Random endless images */
+    ImageSelectionModeSpecificImage
+    /* For a specific image chosen by the user earlier on */
+};
+
 NSString * const HTMLFileName = @"asciimathhtml.html";
 const CGFloat kImageCenterYPostion = 110.0f;
 const CGFloat kPreviewCenterYPostion = 220.0f;
@@ -25,6 +32,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 /* currently fetched image */
 @property(nonatomic, strong)NSMutableArray *submissionViewSubviews;
 /* All subviews of the translation submission view */
+@property (nonatomic) ImageSelectionMode mode;
+/* Either shows continous random images or a specific image. Default mode is Random*/
 @end
 
 @implementation TaskViewController
@@ -35,7 +44,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 {
     [super viewDidLoad];
     
-    /* top Buttons */
+    /* top buttons */
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [backButton setTitle:@"Back" forState:UIControlStateNormal];
     [backButton sizeToFit];
@@ -83,15 +92,19 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
     [self.view addSubview:self.activityIndicator];
     
-    
-    /* Fake delay to simulate server fetch of image */
-    [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:1.0f];
+    self.mode = ImageSelectionModeRandom;
 }
 
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [self.activityIndicator startAnimating];
+    if (self.mode == ImageSelectionModeRandom) {
+        [self.activityIndicator startAnimating];
+        /* Fake delay to simulate server fetch of image */
+        [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:1.0f];
+    }else{
+        [self animateInWithExistingTaskImageAlreadySet];
+    }
 }
 
 -(void)setupPreviewViewHtml
@@ -105,6 +118,13 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     NSURL* url = [NSURL fileURLWithPath:path];
     NSURLRequest* req = [[NSURLRequest alloc] initWithURL:url];
     [self.previewView loadRequest:req];
+}
+
+-(void)setTask:(UIImageView *)image
+{
+    self.currentImage = image;
+    [self.view addSubview:image];
+    self.mode = ImageSelectionModeSpecificImage;
 }
 
 #pragma mark Button actions
@@ -145,6 +165,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if (buttonIndex == 1) {
+        MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
+        [keyboard disableCursorKeyHorizontalAnimationForNextKeyboardDismissal];
         [self.navigationController popViewControllerAnimated:YES];
     }
 }
@@ -451,14 +473,57 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
 }
 
+-(void)animateInWithExistingTaskImageAlreadySet
+{
+    /* This is called when a TaskViewController is pushed when an image is already chosen and is already on screen (AKA the mode is 'ImageSelectionModeSpecificImage' ) */
+    UIImageView *image = self.currentImage;
+    /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
+    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
+    CGAffineTransform imageTransform;
+    if (image.frame.size.height > 100.0f){
+        // Image is too big
+        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+    }else{
+        // Image is an ideal size, meaning it's below the max height
+        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+    }
+    
+    self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
+    self.previewView.hidden = NO;
+    [self.textInputView becomeFirstResponder];
+    
+    /* animate image to the top */
+    [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.9f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        image.transform = imageTransform;
+        image.center = CGPointMake(image.center.x, kImageCenterYPostion);
+        self.backButton.alpha = 1.0f;
+        self.textInputView.alpha = 1.0f;
+        self.submitButton.alpha = 1.0f;
+        self.previewView.alpha = 1.0f;
+    }completion:^(BOOL finished){
+        if (finished) {
+            [image addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(enlargeImage:)]];
+            [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
+            image.userInteractionEnabled = YES;
+        }
+    }];
+
+}
+
 -(void)submitImageAndMathmlToCloud
 {
     /* This will eventually give the user feedback when the image is or is not submitted */
     [self.view addSubview:self.activityIndicator];
     [self.activityIndicator startAnimating];
     
-    /* For now, just gonna load another image */
-    [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
+    /* For now if we're in random mode, just gonna load another image */
+    if (self.mode == ImageSelectionModeRandom) {
+        [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
+    }else{
+        /* Specific Image */
+        [self.activityIndicator stopAnimating];
+        [self.navigationController popViewControllerAnimated:NO];
+    }
     
 }
 
@@ -513,9 +578,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 -(NSString *)makeHtmlFromAsciimath:(NSString *)asciimath
 {
     NSString *html1 = @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
-    
-    //<style>body{background-color:black;}</style>
-    
+        
     /*The following string is the same HTML as above except it sets the 'scale' in a mathjax configuration.*/
     /* It works, but the scaling takes about a second to take effect. If I use a div CSS (as done in the above string) then it takes effect immediately.
     
