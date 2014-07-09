@@ -10,4 +10,6 @@
 
 @interface TaskViewController : UIViewController
 -(void)setTask:(UIImageView *)image;
+-(void)enableGuidanceMode;
+-(void)disableGuidanceMode;
 @end

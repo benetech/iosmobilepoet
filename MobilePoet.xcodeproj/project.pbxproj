@@ -19,6 +19,7 @@
 		24A64117195CA4F6000DF735 /* 3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64112195CA4F6000DF735 /* 3.jpg */; };
 		24A64118195CA4F6000DF735 /* 4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64113195CA4F6000DF735 /* 4.jpg */; };
 		24A64119195CA4F6000DF735 /* 15.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 24A64114195CA4F6000DF735 /* 15.jpg */; };
+		24A6411D19608054000DF735 /* TrainingModeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 24A6411C19608054000DF735 /* TrainingModeViewController.m */; };
 		24ED7D78192A810F00C9A150 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D77192A810F00C9A150 /* Foundation.framework */; };
 		24ED7D7A192A810F00C9A150 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D79192A810F00C9A150 /* CoreGraphics.framework */; };
 		24ED7D7C192A810F00C9A150 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 24ED7D7B192A810F00C9A150 /* UIKit.framework */; };
@@ -66,6 +67,8 @@
 		24A64112195CA4F6000DF735 /* 3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 3.jpg; sourceTree = "<group>"; };
 		24A64113195CA4F6000DF735 /* 4.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 4.jpg; sourceTree = "<group>"; };
 		24A64114195CA4F6000DF735 /* 15.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 15.jpg; sourceTree = "<group>"; };
+		24A6411B19608054000DF735 /* TrainingModeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrainingModeViewController.h; sourceTree = "<group>"; };
+		24A6411C19608054000DF735 /* TrainingModeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrainingModeViewController.m; sourceTree = "<group>"; };
 		24ED7D74192A810F00C9A150 /* MobilePoet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobilePoet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24ED7D77192A810F00C9A150 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		24ED7D79192A810F00C9A150 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -187,6 +190,8 @@
 				24F75964195C9D0500AF0856 /* GalleryViewController.m */,
 				24F75969195C9E2800AF0856 /* ImageCollectionViewCell.h */,
 				24F7596A195C9E2800AF0856 /* ImageCollectionViewCell.m */,
+				24A6411B19608054000DF735 /* TrainingModeViewController.h */,
+				24A6411C19608054000DF735 /* TrainingModeViewController.m */,
 				24ED7D8F192A810F00C9A150 /* Images.xcassets */,
 				24ED7D7E192A810F00C9A150 /* Supporting Files */,
 			);
@@ -335,6 +340,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				241142DF194A5918003CFB4E /* TaskModePickerViewController.m in Sources */,
+				24A6411D19608054000DF735 /* TrainingModeViewController.m in Sources */,
 				24F75965195C9D0500AF0856 /* GalleryViewController.m in Sources */,
 				2436B5B9192EBE510047110C /* MathKeyboard.m in Sources */,
 				24ED7D8E192A810F00C9A150 /* MenuViewController.m in Sources */,

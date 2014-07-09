@@ -9,7 +9,7 @@
 #import "TaskModePickerViewController.h"
 
 @interface TaskModePickerViewController ()
-
+@property (strong, nonatomic) UIButton *backButton;
 @end
 
 @implementation TaskModePickerViewController
@@ -26,7 +26,37 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    /*
+     NSMutableAttributedString *backString = [[NSMutableAttributedString alloc]initWithString:@"< Back"];
+     [backString addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"HelveticaNeue-Bold" size:20.0f] range:NSMakeRange(0, 1)];
+     */
+    [backButton setTitle:@"Back" forState:UIControlStateNormal];
+    [backButton sizeToFit];
+    [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    backButton.center = CGPointMake(25.0f, 40.0f);
+    backButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
+    backButton.alpha = 0;
+    self.backButton = backButton;
+    [self.view addSubview:self.backButton];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    self.backButton.alpha = 0;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
+        self.backButton.alpha = 1.0f;
+    }completion:nil];
+}
+
+-(void)backButtonPressed:(id)sender
+{
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)didReceiveMemoryWarning

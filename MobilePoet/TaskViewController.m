@@ -34,6 +34,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 /* All subviews of the translation submission view */
 @property (nonatomic) ImageSelectionMode mode;
 /* Either shows continous random images or a specific image. Default mode is Random*/
+@property (nonatomic) BOOL guidanceModeEnabled;
+/* Guidance mode is handled by the keyboard, but the textView's (self.textInputView) delegate is handled by TaskViewController */
+/* To restrict the textview's user interaction during guidance mode, the bool is required to know if its enabled */
+@property (nonatomic) MathKeyboard *mathKeyboard;
 @end
 
 @implementation TaskViewController
@@ -52,6 +56,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     backButton.center = CGPointMake(30.0f, 40.0f);
     backButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
     backButton.alpha = 0;
+    backButton.showsTouchWhenHighlighted = YES;
     self.backButton = backButton;
     [self.view addSubview:self.backButton];
     
@@ -62,6 +67,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     submitButton.center = CGPointMake(self.view.frame.size.width-35.0f, 40.0f);
     submitButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
     submitButton.alpha = 0;
+    submitButton.showsTouchWhenHighlighted = YES;
     self.submitButton = submitButton;
     [self.view addSubview:self.submitButton];
     
@@ -75,13 +81,16 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.textInputView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self.textInputView.autocorrectionType = UITextAutocapitalizationTypeNone;
     self.textInputView.textAlignment = NSTextAlignmentCenter;
+    self.textInputView.userInteractionEnabled = NO;
     self.textInputView.delegate = self;
     [self.view addSubview:self.textInputView];
     
     /* preview view */
-    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 65.0f)];
     /* center is calculated after image is fetched */
     self.previewView.backgroundColor = [UIColor blackColor];
+    self.previewView.layer.shadowOpacity = 0;
+    self.previewView.layer.shadowOffset = CGSizeMake(0,0);
     self.previewView.hidden = YES;
     [self setupPreviewViewHtml];
     self.previewView.userInteractionEnabled = NO;
@@ -125,6 +134,14 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.currentImage = image;
     [self.view addSubview:image];
     self.mode = ImageSelectionModeSpecificImage;
+}
+
+-(MathKeyboard *)mathKeyboard
+{
+    if (!_mathKeyboard) {
+        _mathKeyboard = (MathKeyboard *)self.textInputView.inputView;
+    }
+    return _mathKeyboard;
 }
 
 #pragma mark Button actions
@@ -183,6 +200,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     confirmInstructionTextView.center = CGPointMake(self.view.frame.size.width/2.0f, -(confirmInstructionTextView.frame.size.height/2.0f) + 20.0f);
     confirmInstructionTextView.numberOfLines = 0;
     confirmInstructionTextView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    //confirmInstructionTextView.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:18.0f];
     confirmInstructionTextView.textAlignment = NSTextAlignmentCenter;
     confirmInstructionTextView.text = @"Is your translation identical to the image?";
     [self.submissionViewSubviews removeAllObjects];
@@ -199,9 +217,9 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     UILabel *yesButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, decisionButtonHeight)];
     yesButton.center = CGPointMake(self.view.frame.size.width/2.0f, noButtonYCenterPosition + 150.0f);
-    yesButton.backgroundColor = [UIColor colorWithRed:222/255.0f green:236/255.0f blue:222/255.0f alpha:1.0f];
+    yesButton.backgroundColor = [UIColor colorWithRed:10/255.0f green:191/255.0f blue:0/255.0f alpha:1.0f];
     yesButton.textAlignment = NSTextAlignmentCenter;
-    yesButton.textColor = [UIColor greenColor];
+    yesButton.textColor = [UIColor whiteColor];
     yesButton.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     yesButton.text = @"Yes";
     [yesButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(decisionButtonPressed:)]];
@@ -210,9 +228,9 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     UILabel *noButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.height, decisionButtonHeight)];
     noButton.center = CGPointMake(self.view.frame.size.width/2.0f, yesButtonYCenterPosition + 150.0f);
-    noButton.backgroundColor = [UIColor colorWithRed:245/255.0f green:222/255.0f blue:222/255.0f alpha:1.0f];
+    noButton.backgroundColor = [UIColor colorWithRed:194/255.0f green:4/255.0f blue:0/255.0f alpha:1.0f];;
     noButton.textAlignment = NSTextAlignmentCenter;
-    noButton.textColor = [UIColor redColor];
+    noButton.textColor = [UIColor whiteColor];
     noButton.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     noButton.text = @"No";
     [noButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(decisionButtonPressed:)]];
@@ -230,6 +248,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         self.previewView.center = CGPointMake(self.previewView.center.x, self.previewView.center.y + 150.0f);
         self.textInputView.center = CGPointMake(self.textInputView.center.x, self.textInputView.center.y + 300.0f);
         self.textInputView.alpha = 0;
+        self.previewView.layer.shadowOpacity = 0;
         
         /* animate in new submission subviews */
         confirmInstructionTextView.center = CGPointMake(confirmInstructionTextView.center.x, confirmInstructionTextView.center.y + confirmInstructionTextView.frame.size.height);
@@ -238,7 +257,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         
         self.submitButton.alpha = 0;
         self.backButton.alpha = 0;
-    }completion:^(BOOL finished){}];
+    }completion:nil];
 }
 
 -(void)removeSubmissionViewAndGoBackToTaskView
@@ -283,6 +302,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         self.textInputView.alpha = 1.0f;
         self.backButton.alpha = 1.0f;
         self.submitButton.alpha = 1.0f;
+        self.previewView.layer.shadowOpacity = 0.2f;
         
         submissionTextView.center = CGPointMake(submissionTextView.center.x, submissionTextView.center.y - 120.0f);
         yesButton.center = CGPointMake(yesButton.center.x, yesButton.center.y + 150.0f);
@@ -356,7 +376,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 #pragma mark Gestures
 
--(void)enlargeImage:(UITapGestureRecognizer *)gesture
+-(void)enlargeImage:(UIGestureRecognizer *)gesture
 {
     UIView *image = gesture.view;
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -380,6 +400,23 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         
     }completion:^(BOOL finished){}];
     
+}
+
+-(void)pinchImage:(UIPinchGestureRecognizer *)gesture
+{
+    if (!self.imageIsEnlarged) {
+        return;
+    }
+    if (gesture.state == UIGestureRecognizerStateChanged) {
+        gesture.view.transform = CGAffineTransformScale(gesture.view.transform, gesture.scale, gesture.scale);
+        gesture.scale = 1.0f;
+    }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
+        if (((self.view.frame.size.width/gesture.view.frame.size.width)-0.1f) > 1.0f) {
+            [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                gesture.view.transform = CGAffineTransformScale(gesture.view.transform,(self.view.frame.size.width/gesture.view.frame.size.width)-0.1f, (self.view.frame.size.width/gesture.view.frame.size.width)-0.1f);
+                }completion:nil];
+        }
+    }
 }
 
 -(void)dragImage:(UIPanGestureRecognizer *)gesture
@@ -463,6 +500,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                             [self.textInputView becomeFirstResponder];
                             [image addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(enlargeImage:)]];
                             [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
+                            [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
                             image.userInteractionEnabled = YES;
                         }
                     }];
@@ -550,10 +588,19 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 {
     /* Refresh the MathML preview everytime a new charcter is typed */
     [self updatePreviewViewWithText:textView.text];
+    
+    if (![self.textInputView.text isEqualToString:@""] && self.previewView.layer.shadowOpacity == 0) {
+        CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
+        anim.fromValue = [NSNumber numberWithFloat:0];
+        anim.toValue = [NSNumber numberWithFloat:0.2f];
+        anim.duration = 0.5f;
+        [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
+        self.previewView.layer.shadowOpacity = 0.2f;
+    }
 }
 
-//-(void)textViewDidChangeSelection:(UITextView *)textView
-//{
+-(void)textViewDidChangeSelection:(UITextView *)textView
+{
 //    NSRangePointer range = malloc(sizeof(NSRangePointer));
 //    range->location = 0;
 //    range->length = 0;
@@ -561,7 +608,12 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 //    
 //    if ([[textView.textStorage attributesAtIndex:textView.selectedRange.location effectiveRange:range] objectForKey:NSBackgroundColorAttributeName]) {
 //    }
-//}
+//    if (self.guidanceModeEnabled) {
+//        if ([self.mathKeyboard cursorButtonJustChangedCursorPosition]) {
+//            <#statements#>
+//        }
+//    }
+}
 
 -(void)updatePreviewViewWithText:(NSString *)text
 {
@@ -588,6 +640,16 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     NSString *html2 = [html1 stringByAppendingString:asciimath];
     NSString *fullHtmlString = [html2 stringByAppendingString:@"</div></body></html>"];
     return fullHtmlString;
+}
+
+-(void)enableGuidanceMode
+{
+    self.guidanceModeEnabled = YES;
+}
+
+-(void)disableGuidanceMode
+{
+    self.guidanceModeEnabled = NO;
 }
 
 @end

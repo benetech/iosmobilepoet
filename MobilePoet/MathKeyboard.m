@@ -52,7 +52,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         if (!characters) {
             _buttonCharcters = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"+", @"-", @"*", @"/", @"=", @"\u2260", @"<", @">", @"\u2264", @"\u2265", @"(", @")", @"[", @"]", @".", @"^", @"\u00B1", @"\u00B0", @"%", @"\u03C0", @"\u221E", @"!", @"\u221A", @"\u221B", @"x\u2044y", @"x\u207f", @"logx", @"lnx", @"sinx", @"cosx", @"tanx", @"sin.x", @"cos.x", @"tan.x"];
             _operationButtonCharcters = @[@"\u221A", @"\u221B", @"x\u2044y", @"x\u207f", @"sinx", @"cosx", @"tanx"];
-            _buttonValues = @{@"+" : @"+", @"-" : @"-", @"*" : @"*", @"/" : @"/", @"=" : @"=", @"." : @".", @"(" : @"(", @")" : @")", @"[" : @"[", @"]" : @"]", @"<" : @"<", @">" : @">", @"\u2264" : @"<=", @"\u2265" : @">=",@"^" : @"^",  @"\u00B0" : @"degree", @"\u2260" : @"!=", @"\u221A" : @"sqrt() ", @"\u221B" : @"sqrt^3() ", @"%" : @"%", @"\u03C0" : @"pi", @"!" : @"!", @"x\u2044y" : @"()/() ", @"\u221E" : @"infty", @"x\u207f" : @"()^() ", @"\u00B1" : @"+-", @"space" : @" ", @"return" : @"\n", @"sinx" : @"sin() ", @"cosx" : @"cos() ", @"tanx" : @"tan() "};
+            _buttonValues = @{@"+" : @"+", @"-" : @"-", @"*" : @"*", @"/" : @"/", @"=" : @"=", @"." : @".", @"(" : @"(", @")" : @")", @"[" : @"[", @"]" : @"]", @"<" : @"<", @">" : @">", @"\u2264" : @"<=", @"\u2265" : @">=",@"^" : @"^",  @"\u00B0" : @"^circ", @"\u2260" : @"!=", @"\u221A" : @"sqrt() ", @"\u221B" : @"sqrt^3() ", @"%" : @"%", @"\u03C0" : @"pi", @"!" : @"!", @"x\u2044y" : @"()/() ", @"\u221E" : @"infty", @"x\u207f" : @"()^() ", @"\u00B1" : @"+-", @"space" : @" ", @"return" : @"\n", @"sinx" : @"sin() ", @"cosx" : @"cos() ", @"tanx" : @"tan() "};
         }
         [self setUpKeyboard];
     }
@@ -269,8 +269,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     leftButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:25.0f];
     [leftButton setTitle:@"<" forState:UIControlStateNormal];
     leftButton.layer.cornerRadius = 4.0f;
-    leftButton.layer.borderWidth = 3.0f;
-    leftButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
+    //leftButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
+    leftButton.showsTouchWhenHighlighted = YES;
     [leftButton addTarget:self action:@selector(leftCursorButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
         _leftCursorButton = leftButton;
     [_cursorControlView addSubview:_leftCursorButton];
@@ -279,7 +279,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     rightButton.backgroundColor = [UIColor lightGrayColor];
     rightButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:25.0f];
     [rightButton setTitle:@">" forState:UIControlStateNormal];
-    rightButton.layer.cornerRadius = 3.0f;
+    rightButton.layer.cornerRadius = 4.0f;
+    rightButton.showsTouchWhenHighlighted = YES;
     [rightButton addTarget:self action:@selector(rightCursorButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     _rightCursorButton = rightButton;
     [_cursorControlView addSubview:_rightCursorButton];

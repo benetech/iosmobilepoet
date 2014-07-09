@@ -158,18 +158,41 @@
     selectedImageView.layer.shadowRadius = 5.0f;
     selectedImageView.layer.shadowOffset = CGSizeZero;
     
+    UILabel *useButton = [self makeSelectedCellControls];
+    
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
         selectedImageView.center = CGPointMake(self.view.frame.size.width/2.0f, self.view.frame.size.height/2.0f);
         self.darkView.alpha = 0.8f;
+        useButton.center = CGPointMake(useButton.center.x, self.view.frame.size.height - 100.0f);
     }completion:^(BOOL finished){
         if (finished) {
-            [self showSelectedCellControls];
+            //[self showSelectedCellControls];
         }
     }];
 }
 
+-(UILabel *)makeSelectedCellControls
+{
+    UILabel *useButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 45.0f)];
+    useButton.center = CGPointMake(self.view.center.x, self.view.frame.size.height + useButton.frame.size.height);
+    useButton.backgroundColor = [UIColor blueColor];
+    useButton.textColor = [UIColor whiteColor];
+    useButton.textAlignment = NSTextAlignmentCenter;
+    useButton.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    useButton.text = @"Use Image";
+    useButton.userInteractionEnabled = YES;
+    [useButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(useImageButtonPressed:)]];
+    self.selectedCellControls = useButton;
+    [self.view addSubview:useButton];
+    
+    return useButton;
+}
+
 -(void)showSelectedCellControls
 {
+    /* THIS METHOD IS NO LONGER IN USE */
+    
+    /*
     UIButton *useButton = [UIButton buttonWithType:UIButtonTypeSystem];
     useButton.frame = CGRectMake(0, 0, 150.0f, 50.0f);
     useButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20.0f];
@@ -188,14 +211,31 @@
             ;
         }
     }];
+     */
+    
+    UILabel *useButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 45.0f)];
+    useButton.center = CGPointMake(self.view.center.x, self.view.frame.size.height + useButton.frame.size.height);
+    useButton.backgroundColor = [UIColor blueColor];
+    useButton.textColor = [UIColor whiteColor];
+    useButton.textAlignment = NSTextAlignmentCenter;
+    useButton.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    useButton.text = @"Use Image";
+    [useButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(useImageButtonPressed:)]];
+    self.selectedCellControls = useButton;
+    [self.view addSubview:useButton];
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        useButton.center = CGPointMake(useButton.center.x, self.view.frame.size.height - 100.0f);
+    }completion:nil];
+
 }
 
--(void)useImageButtonPressed:(id)sender
+-(void)useImageButtonPressed:(UITapGestureRecognizer *)gesture
 {
     /* Animate into TaskViewController */
     [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.collectionView.center = CGPointMake(self.collectionView.center.x, self.collectionView.center.y * 4.0f );
-        self.selectedCellControls.alpha = 0;
+        //self.selectedCellControls.alpha = 0;
+        self.selectedCellControls.center = CGPointMake(self.selectedCellControls.center.x, self.selectedCellControls.center.y + (self.collectionView.center.y * 4.0f + (self.selectedCellControls.center.y - self.collectionView.center.y)));
     }completion:^(BOOL finished){
         if (finished) {
             /* Push task view controller with selected task */
@@ -217,8 +257,9 @@
     ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:self.selectedCellIndexPath];
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.selectedImage.center = selectedCell.center;
-        self.selectedCellControls.center = selectedCell.center;
-        self.selectedCellControls.alpha = 0;
+        //self.selectedCellControls.center = selectedCell.center;
+        //self.selectedCellControls.alpha = 0;
+        self.selectedCellControls.center = CGPointMake(self.selectedCellControls.center.x, self.view.frame.size.height + self.selectedCellControls.frame.size.height);
         gesture.view.alpha = 0;
     }completion:^(BOOL finished){
         if (finished) {

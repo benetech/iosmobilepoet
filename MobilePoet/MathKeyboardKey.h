@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 /*
- MathKeyboardKey types distiguish keyboard key values that behave differently in the parent text input view.
+ MathKeyboardKey types distiguish keyboard key values that behave differently in the related text input view.
  A 'MathKeyboardKeyTypeAlphanumeric' is simply any letter or number. They are non-functional, meaning they don't require an 'input'.
  A 'MathKeyboardKeyTypeSymbol' would be any key that just inserts a symbol: pi, !, ^, %, etc. Symbols are non-functional and require no input.
  A 'MathKeyboardKeyTypeOperation' key, such as square root, would require the textInputView cursor to change position to fit an a pair of parenthesis: sqrt(_cursor_). They are functional and require input.
