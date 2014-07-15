@@ -40,7 +40,7 @@
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
     backButton.frame = CGRectMake(0, 0, 50.0f, 50.0f);
     backButton.center = CGPointMake(30.0f, 33.0f);
-    backButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
+    backButton.tintColor = [UIColor colorWithRed:0 green:28/255.0f blue:155/255.0f alpha:1.0f];
     backButton.alpha = 0;
     [backButton setTitle:@"Back" forState:UIControlStateNormal];
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -60,8 +60,8 @@
 -(void)showCollectionView
 {
     /* Intro animations */
-    self.collectionView.contentOffset = CGPointMake(0, -100.0f);
-    [UIView animateWithDuration:0.8f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+    self.collectionView.contentOffset = CGPointMake(0, -70.0f);
+    [UIView animateWithDuration:0.6f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.collectionView.alpha = 1.0f;
         self.collectionView.contentOffset = CGPointZero;
     }completion:^(BOOL finished){
@@ -76,7 +76,7 @@
 -(void)fetchImages
 {
     /* For now, 'simulates' fetching images */
-    [self.fetchedImages addObjectsFromArray:@[[UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"3.jpg"], [UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"2.jpg"], [UIImage imageNamed:@"15.jpg"], [UIImage imageNamed:@"4.jpg"]]];
+    [self.fetchedImages addObjectsFromArray:@[[UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"3.jpg"], [UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"2.jpg"], [UIImage imageNamed:@"15.jpg"], [UIImage imageNamed:@"4.jpg"], [UIImage imageNamed:@"16.jpg"], [UIImage imageNamed:@"17.jpg"], [UIImage imageNamed:@"18.jpg"], [UIImage imageNamed:@"19.jpg"], [UIImage imageNamed:@"20.jpg"], [UIImage imageNamed:@"21.jpg"]]];
 }
 
 #pragma mark - UICollectionViewDelegate
@@ -104,6 +104,7 @@
     [cell setImage: self.fetchedImages[indexPath.row]];
     cell.title = [NSString stringWithFormat:@"%d", i];
     i++;
+    //NSLog(@"hi %i", indexPath.row);
     
     return cell;
 }
@@ -255,6 +256,11 @@
 -(void)removeSelectedCellFromStagedViewAndGoBackToGridView:(UITapGestureRecognizer *)gesture
 {
     ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:self.selectedCellIndexPath];
+    /* Remove image shadow thats added in the case that the user uses the image, an the image
+     animates to the TaskViewController */
+    self.selectedImage.layer.shadowOpacity = 0;
+    self.selectedImage.layer.borderWidth = 0.5;
+    self.selectedImage.layer.borderColor = [UIColor blackColor].CGColor;
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.selectedImage.center = selectedCell.center;
         //self.selectedCellControls.center = selectedCell.center;

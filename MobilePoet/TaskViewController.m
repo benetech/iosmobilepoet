@@ -54,7 +54,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [backButton sizeToFit];
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     backButton.center = CGPointMake(30.0f, 40.0f);
-    backButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
+    backButton.tintColor = [UIColor colorWithRed:0 green:30/255.0f blue:168/255.0f alpha:1.0f];
     backButton.alpha = 0;
     backButton.showsTouchWhenHighlighted = YES;
     self.backButton = backButton;
@@ -65,7 +65,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [submitButton sizeToFit];
     [submitButton addTarget:self action:@selector(submitPressed:) forControlEvents:UIControlEventTouchUpInside];
     submitButton.center = CGPointMake(self.view.frame.size.width-35.0f, 40.0f);
-    submitButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
+    submitButton.tintColor = [UIColor colorWithRed:0 green:30/255.0f blue:168/255.0f alpha:1.0f];
     submitButton.alpha = 0;
     submitButton.showsTouchWhenHighlighted = YES;
     self.submitButton = submitButton;
@@ -96,10 +96,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.previewView.userInteractionEnabled = NO;
     [self.view addSubview:self.previewView];
     
-    self.submissionViewSubviews = [NSMutableArray new];
     self.activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     self.activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
     [self.view addSubview:self.activityIndicator];
+    
     
     self.mode = ImageSelectionModeRandom;
 }
@@ -196,6 +196,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     /* Setup views. View center postions are set to their beginning position in the animation where they will be animated in */
     //Labels
+    
+    if (!self.submissionViewSubviews) {
+        self.submissionViewSubviews = [NSMutableArray new];
+    }
     UILabel *confirmInstructionTextView = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
     confirmInstructionTextView.center = CGPointMake(self.view.frame.size.width/2.0f, -(confirmInstructionTextView.frame.size.height/2.0f) + 20.0f);
     confirmInstructionTextView.numberOfLines = 0;
@@ -245,18 +249,18 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         /* animate existing task subviews */
         self.currentImage.transform = CGAffineTransformScale(self.currentImage.transform, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width);
         self.currentImage.center = CGPointMake(self.currentImage.center.x, self.currentImage.center.y + 100.0f);
-        self.previewView.center = CGPointMake(self.previewView.center.x, self.previewView.center.y + 150.0f);
+        self.previewView.center = CGPointMake(self.previewView.center.x, self.previewView.center.y + 130.0f);
         self.textInputView.center = CGPointMake(self.textInputView.center.x, self.textInputView.center.y + 300.0f);
         self.textInputView.alpha = 0;
         self.previewView.layer.shadowOpacity = 0;
+        self.submitButton.alpha = 0;
+        self.backButton.alpha = 0;
         
         /* animate in new submission subviews */
         confirmInstructionTextView.center = CGPointMake(confirmInstructionTextView.center.x, confirmInstructionTextView.center.y + confirmInstructionTextView.frame.size.height);
         yesButton.center = CGPointMake(yesButton.center.x, yesButtonYCenterPosition);
         noButton.center = CGPointMake(noButton.center.x, noButtonYCenterPosition);
-        
-        self.submitButton.alpha = 0;
-        self.backButton.alpha = 0;
+
     }completion:nil];
 }
 
@@ -265,12 +269,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* Remove the submission/decision subview and go back to the taskViewController view */
     
     /* Calculate proper image scaling so the image fits properly in the UI */
-    CGAffineTransform imageTransform;
-    if (self.currentImage.frame.size.height > 100.0f){
-        imageTransform = CGAffineTransformScale(self.currentImage.transform, 100.0f/self.currentImage.frame.size.height, 100.0f/self.currentImage.frame.size.height);
-    }else{
-        imageTransform = CGAffineTransformScale(self.currentImage.transform, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width);
-    }
+    CGAffineTransform imageTransform = [self scaleTaskImageForMainView:self.currentImage];
     
     /* Get references to all 'submission view' subviews */
     UILabel *submissionTextView;
@@ -398,7 +397,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
             self.imageIsEnlarged = YES;
         }
         
-    }completion:^(BOOL finished){}];
+    }completion:nil];
     
 }
 
@@ -471,15 +470,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                 if (finished) {
                     
                     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
-                    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
-                    CGAffineTransform imageTransform;
-                    if (image.frame.size.height > 100.0f){
-                        // Image is too big
-                        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
-                    }else{
-                        // Image is an ideal size, meaning it's below the max height
-                        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
-                    }
+                    CGAffineTransform imageTransform = [self scaleTaskImageForMainView:image];
  
                     /* animate image to the top */
                     [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -491,7 +482,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                         self.previewView.alpha = 1.0f;
                     }completion:^(BOOL finished){
                         if (finished) {
-                            
                             /* calculate position of the preview view. It's y position in the ui is predefined and constant. */
                             //self.previewView.center = CGPointMake(self.view.frame.size.width/2, (image.frame.origin.y + image.frame.size.height + self.previewView.frame.size.height/2 + 50.0f));
                             self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
@@ -516,15 +506,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* This is called when a TaskViewController is pushed when an image is already chosen and is already on screen (AKA the mode is 'ImageSelectionModeSpecificImage' ) */
     UIImageView *image = self.currentImage;
     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
-    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
-    CGAffineTransform imageTransform;
-    if (image.frame.size.height > 100.0f){
-        // Image is too big
-        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
-    }else{
-        // Image is an ideal size, meaning it's below the max height
-        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
-    }
+    CGAffineTransform imageTransform = [self scaleTaskImageForMainView:image];
     
     self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
     self.previewView.hidden = NO;
@@ -542,9 +524,33 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         if (finished) {
             [image addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(enlargeImage:)]];
             [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
+            [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
             image.userInteractionEnabled = YES;
+            
         }
     }];
+    
+}
+
+-(CGAffineTransform)scaleTaskImageForMainView:(UIImageView *)image
+{
+    /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
+    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
+    CGAffineTransform imageTransform;
+    if (image.frame.size.height > 100.0f){
+        // Image is too big
+        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+    }else{
+        // Image is an ideal size, meaning it's below the max height
+        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+        
+        if ((image.frame.size.height * imageTransform.a) > 100.0f){
+            // if the previous transform makes the height too big, scale it down
+            imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+        }
+    }
+    
+    return imageTransform;
 
 }
 

@@ -24,16 +24,17 @@ const CGFloat kPreviewCenterYPostion;
 @property (nonatomic, strong) UIImageView *currentImage;
 /* currently shown test image */
 @property (nonatomic) int currentImageID;
-/* current image id */
+/* current image id / represents the index position of the current image in the image array */
 @property(nonatomic, strong)NSMutableArray *submissionViewSubviews;
 /* All subviews of the translation submission view */
 @property (strong, nonatomic) UIView *introView;
 @property (strong, nonatomic) UIView *navigationBarLabel;
-@property (strong, nonatomic) NSArray *testImages;
-/* Array of the names of every test image */
-@property (strong, nonatomic) NSArray *testImagesCorrectMathMLTraslations;
-@property (strong, nonatomic) NSArray *testImagesCorrectASCIIMathTraslations;
-/* The correct asciimath translation of each test image. In order of the test images ID/index */
+@property (strong, nonatomic) NSArray *practiceImageNames;
+/* The names of every pratice image */
+@property (strong, nonatomic) NSArray *practiceImagesCorrectMathMLTraslations;
+/* The correct MathML representation of each practice image */
+@property (strong, nonatomic) NSArray *practiceImagesCorrectASCIIMathTraslations;
+/* A possible correct asciimath translation of each test image. In order of the test images ID/index */
 @property (strong, nonatomic) UILabel *beginButton;
 @end
 
@@ -45,9 +46,7 @@ const CGFloat kPreviewCenterYPostion;
 {
     [super viewDidLoad];
     
-    self.testImages = @[@"testimg1.jpg"];
-    self.testImagesCorrectMathMLTraslations = @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mi>tan<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><mo>=<.mo><mfrac><msup><mrow><mi>sin<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><msup><mrow><mi>cos<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>"];
-    self.testImagesCorrectASCIIMathTraslations = @[@"tan270^circ = (sin270^circ)/(cos270^circ) = -1/0"];
+    [self setUpPracticeImageData];
     
     /* top buttons */
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
@@ -55,7 +54,7 @@ const CGFloat kPreviewCenterYPostion;
     [backButton sizeToFit];
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     backButton.center = CGPointMake(30.0f, 40.0f);
-    backButton.tintColor = [UIColor blueColor];
+    backButton.tintColor = [UIColor colorWithRed:0 green:30/255.0f blue:168/255.0f alpha:1.0f];
     backButton.alpha = 0;
     backButton.showsTouchWhenHighlighted = YES;
     self.backButton = backButton;
@@ -66,7 +65,7 @@ const CGFloat kPreviewCenterYPostion;
     [submitButton sizeToFit];
     [submitButton addTarget:self action:@selector(checkPressed:) forControlEvents:UIControlEventTouchUpInside];
     submitButton.center = CGPointMake(self.view.frame.size.width-35.0f, 40.0f);
-    submitButton.tintColor = [UIColor blueColor];
+    submitButton.tintColor = [UIColor colorWithRed:0 green:30/255.0f blue:168/255.0f alpha:1.0f];
     submitButton.alpha = 0;
     submitButton.showsTouchWhenHighlighted = YES;
     self.submitButton = submitButton;
@@ -93,22 +92,52 @@ const CGFloat kPreviewCenterYPostion;
     self.textInputView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self.textInputView.autocorrectionType = UITextAutocapitalizationTypeNone;
     self.textInputView.textAlignment = NSTextAlignmentCenter;
+    self.textInputView.userInteractionEnabled = NO;
     self.textInputView.delegate = self;
     [self.view addSubview:self.textInputView];
     
     /* preview view */
-    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 65.0f)];
     /* center is calculated after image is fetched */
     self.previewView.backgroundColor = [UIColor blackColor];
+    self.previewView.layer.shadowOpacity = 0;
+    self.previewView.layer.shadowOffset = CGSizeMake(0,0);
     self.previewView.hidden = YES;
     [self setupPreviewViewHtml];
     self.previewView.userInteractionEnabled = NO;
     self.previewView.delegate = self;
     [self.view addSubview:self.previewView];
     
-    self.submissionViewSubviews = [NSMutableArray new];
-    
     [self setUpIntroView];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        self.beginButton.center = CGPointMake(self.beginButton.center.x, self.view.frame.size.height - 120.0f);
+    }completion:nil];
+    
+}
+
+-(void)setUpPracticeImageData
+{
+    self.practiceImageNames = @[@"practiceimage1.jpg", @"practiceimage2.jpg", @"practiceImage3.jpg", @"practiceImage4.jpg", @"practiceimage5.jpg"];
+    self.practiceImagesCorrectMathMLTraslations = @[
+        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mi>tan<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><mo>=<.mo><mfrac><msup><mrow><mi>sin<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><msup><mrow><mi>cos<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
+        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mi>A<.mi><mn>2<.mn><.msup><mo>+<.mo><msup><mi>B<.mi><mn>2<.mn><.msup><.mrow><.msqrt><.mstyle><.math>",
+        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>sin<.mi><mn>4<.mn><.mrow><mi>x<.mi><mo>+<.mo><mrow><mi>sin<.mi><mn>2<.mn><.mrow><mi>x<.mi><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mn>2<.mn><mi>&.x3C0;<.mi><mi>n<.mi><mo>&.xB1;<.mo><mfrac><mi>&.x3C0;<.mi><mn>2<.mn><.mfrac><.mstyle><.math>"];
+    self.practiceImagesCorrectASCIIMathTraslations = @[
+        @"tan270^circ = (sin270^circ)/(cos270^circ) = -1/0",
+        @"C = sqrt(A^2 + B^2)",
+        @"x^2 + 4y^2 - 36 = 0",
+        @"sin(4x) + sin(2x) = 0",
+        @"2pin +- pi/2"];
+    
+    /* Set the current image id property to -1 to prepare it for setting */
+    self.currentImageID = -1;
 }
 
 -(void)setUpIntroView
@@ -126,12 +155,12 @@ const CGFloat kPreviewCenterYPostion;
     bodyTextView.center = CGPointMake(self.view.center.x, titlelabel.center.y + titlelabel.frame.size.height + bodyTextView.frame.size.height/2);
     bodyTextView.font = [UIFont fontWithName:@"Avenir" size:15.0f];
     bodyTextView.textAlignment = NSTextAlignmentCenter;
-    bodyTextView.text = @"Here you can pratice writing asciimath and describing photos. You’ll be shown a few sample images and be told the accuracy of your math description.\n\n\nNone of the work you do will be submitted to the MathML Cloud servers.";
+    bodyTextView.text = @"Here you can practice writing ASCIIMath and describing images. You’ll be shown a few sample images and be told the accuracy of your math description.\n\n\nNone of the work you do will be submitted to the MathML Cloud servers.";
     [introView addSubview:bodyTextView];
     
     UILabel *beginButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 45.0f)];
     beginButton.center = CGPointMake(self.view.center.x, self.view.frame.size.height + beginButton.frame.size.height);
-    beginButton.backgroundColor = [UIColor blueColor];
+    beginButton.backgroundColor = [UIColor colorWithRed:0 green:38/255.0f blue:221/255.0f alpha:1.0f];
     beginButton.textColor = [UIColor whiteColor];
     beginButton.textAlignment = NSTextAlignmentCenter;
     beginButton.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
@@ -145,14 +174,6 @@ const CGFloat kPreviewCenterYPostion;
     [self.view addSubview:self.beginButton];
 }
 
--(void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-        self.beginButton.center = CGPointMake(self.beginButton.center.x, self.view.frame.size.height - 120.0f);
-    }completion:nil];
-    
-}
 
 -(void)setupPreviewViewHtml
 {
@@ -169,6 +190,7 @@ const CGFloat kPreviewCenterYPostion;
 
 -(UILabel *)makeBorderedButtonWithColor:(UIColor *)color andText:(NSString *)text
 {
+    /* Makes a general rectangular colored UILabel that is used as a button */
     UILabel *button = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 45.0f)];
     button.backgroundColor = color;
     button.textColor = [UIColor whiteColor];
@@ -176,7 +198,6 @@ const CGFloat kPreviewCenterYPostion;
     button.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     button.text = text;
     button.userInteractionEnabled = YES;
-    
     return button;
 }
 
@@ -194,7 +215,9 @@ const CGFloat kPreviewCenterYPostion;
         if (finished) {
             [self.introView removeFromSuperview];
             self.introView = nil;
-            [self fetchPic:nil];
+            [self.beginButton removeFromSuperview];
+            self.beginButton = nil;
+            [self fetchAndAnimateInNewPic:nil];
         }
     }];
 }
@@ -209,25 +232,16 @@ const CGFloat kPreviewCenterYPostion;
         [self generateAndSendMathML];
     }else{
         /* no text entered */
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Empty Translation" message:@"You need to translate the image before you can submit it!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Empty Translation" message:@"Try translating it first!" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
         [alert show];
     }
 }
 
 -(void)backButtonPressed:(UIButton *)button
 {
-    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Leave Image" message:@"Are you sure you want to abandon this image?" delegate:self cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
-    alert.delegate = self;
-    [alert show];
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == 1) {
-        MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
-        [keyboard disableCursorKeyHorizontalAnimationForNextKeyboardDismissal];
-        [self.navigationController popViewControllerAnimated:YES];
-    }
+    MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
+    [keyboard disableCursorKeyHorizontalAnimationForNextKeyboardDismissal];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 #pragma mark Congratulatory and Continue View
@@ -241,6 +255,10 @@ const CGFloat kPreviewCenterYPostion;
     self.textInputView.editable = NO;
     self.backButton.enabled = NO;
     self.submitButton.enabled = NO;
+    
+    if (!self.submissionViewSubviews) {
+        self.submissionViewSubviews = [NSMutableArray new];
+    }
     
     //Labels
     UILabel *confirmInstructionTextView = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
@@ -258,13 +276,13 @@ const CGFloat kPreviewCenterYPostion;
     imageLabel.backgroundColor = [UIColor blueColor];
     
     
-    UILabel *newImageButton = [self makeBorderedButtonWithColor:[UIColor blueColor] andText:@"New Image"];
+    UILabel *newImageButton = [self makeBorderedButtonWithColor:[UIColor colorWithRed:0 green:38/255.0f blue:221/255.0f alpha:1.0f] andText:@"New Image"];
     newImageButton.center = CGPointMake(self.view.center.x, self.view.frame.size.height + newImageButton.frame.size.height);
     [newImageButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(newImagePressed:)]];
     [self.submissionViewSubviews addObject:newImageButton];
     [self.view addSubview:newImageButton];
     
-    UILabel *mainMenuButton = [self makeBorderedButtonWithColor:[UIColor blueColor] andText:@"Main Menu"];
+    UILabel *mainMenuButton = [self makeBorderedButtonWithColor:[UIColor colorWithRed:0 green:38/255.0f blue:221/255.0f alpha:1.0f] andText:@"Main Menu"];
     mainMenuButton.center = CGPointMake(self.view.center.x, self.view.frame.size.height + mainMenuButton.frame.size.height + 100.0f);
     [mainMenuButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(mainMenuPressed:)]];
     [self.submissionViewSubviews addObject:mainMenuButton];
@@ -285,6 +303,7 @@ const CGFloat kPreviewCenterYPostion;
         self.submitButton.alpha = 0;
         self.backButton.alpha = 0;
         self.navigationBarLabel.alpha = 0;
+        self.previewView.layer.shadowOpacity = 0;
         
     }completion:^(BOOL finished){
         [UIView animateWithDuration:0.6f delay:0.7f usingSpringWithDamping:0.8 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -352,7 +371,7 @@ const CGFloat kPreviewCenterYPostion;
             self.imageIsEnlarged = NO;
             
             if (gesture.view == newImageButton){
-                [self fetchPic:nil];
+                [self fetchAndAnimateInNewPic:nil];
             }else{
                 [self.navigationController popViewControllerAnimated:YES];
             }
@@ -407,14 +426,12 @@ const CGFloat kPreviewCenterYPostion;
 
 #pragma mark System
 
--(void)fetchPic:(id)sender
+-(void)fetchAndAnimateInNewPic:(id)sender
 {
     [self resetSubviewsForNewImage];
-
-    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:self.testImages[0]]];
-    self.currentImage = image;
-    self.currentImageID = 0;
+    [self selectNewImage];
     
+    UIImageView *image = self.currentImage;
     /* prepare image for animation */
     image.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
     image.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
@@ -432,14 +449,7 @@ const CGFloat kPreviewCenterYPostion;
             
             /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
             /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
-            CGAffineTransform imageTransform;
-            if (image.frame.size.height > 100.0f){
-                // Image is too big
-                imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
-            }else{
-                // Image is an ideal size, meaning it's below the max height
-                imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
-            }
+            CGAffineTransform imageTransform = [self scaleTaskImageForMainView:image];
             
             /* animate image to the top */
             [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -471,6 +481,41 @@ const CGFloat kPreviewCenterYPostion;
     }];
 }
 
+-(void)selectNewImage
+{
+    /* 
+     Selects a new image and sets the current image and current image id.
+     The image is selected by simply incrementing the current image id by 1, and using that as the index of the image in the 'practiceImages' array.
+     */
+    if (self.currentImageID == ([self.practiceImageNames count]-1)) {
+        self.currentImageID = -1;
+    }
+    self.currentImageID++;
+    self.currentImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:self.practiceImageNames[self.currentImageID]]];
+}
+
+-(CGAffineTransform)scaleTaskImageForMainView:(UIImageView *)image
+{
+    /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
+    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
+    CGAffineTransform imageTransform;
+    if (image.frame.size.height > 100.0f){
+        // Image is too big
+        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+    }else{
+        // Image is an ideal size, meaning it's below the max height
+        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+        
+        if ((image.frame.size.height * imageTransform.a) > 100.0f){
+            // if the previous transform makes the height too big, scale it down
+            imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+        }
+    }
+    
+    return imageTransform;
+    
+}
+
 
 -(void)resetSubviewsForNewImage
 {
@@ -495,6 +540,16 @@ const CGFloat kPreviewCenterYPostion;
 {
     /* Refresh the MathML preview everytime a new charcter is typed */
     [self updatePreviewViewWithText:textView.text];
+    
+    if (![self.textInputView.text isEqualToString:@""] && self.previewView.layer.shadowOpacity == 0) {
+        CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
+        anim.fromValue = [NSNumber numberWithFloat:0];
+        anim.toValue = [NSNumber numberWithFloat:0.2f];
+        anim.duration = 0.5f;
+        [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
+        self.previewView.layer.shadowOpacity = 0.2f;
+    }
+
 }
 
 -(void)updatePreviewViewWithText:(NSString *)text
@@ -559,8 +614,6 @@ const CGFloat kPreviewCenterYPostion;
         /* This address is not legit, and is instead mathml code passed in from the 'generateMathML method'*/
         NSString *mathml = [url.host stringByReplacingOccurrencesOfString:@" " withString:@""];
         mathml = [mathml stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-        NSLog(@"ML");
-        NSLog(@"%@", mathml);
         [self checkUserDescriptionWithMathML:mathml];
         
         return NO;
@@ -570,10 +623,10 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)checkUserDescriptionWithMathML:(NSString *)mathml
 {
-    if ([mathml isEqualToString:self.testImagesCorrectMathMLTraslations[self.currentImageID]]) {
+    if ([mathml isEqualToString:self.practiceImagesCorrectMathMLTraslations[self.currentImageID]]) {
         [self constructAndShowCongratulatoryAndContinueView];
     }else{
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Incorrect Description" message:[NSString stringWithFormat: @"Your description does not seem to produce a similar math image. Here's a good possible ASCIIMath translation:\n\n%@", self.testImagesCorrectASCIIMathTraslations[self.currentImageID]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil];
+        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Incorrect Description" message:[NSString stringWithFormat: @"Your description does not seem to produce a similar math image. Here's a good possible ASCIIMath translation:\n\n%@", self.practiceImagesCorrectASCIIMathTraslations[self.currentImageID]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil];
         [alert show];
     }
 }

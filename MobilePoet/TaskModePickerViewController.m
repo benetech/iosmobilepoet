@@ -35,7 +35,7 @@
     [backButton sizeToFit];
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     backButton.center = CGPointMake(25.0f, 40.0f);
-    backButton.tintColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
+    backButton.tintColor = [UIColor colorWithRed:0 green:28/255.0f blue:155/255.0f alpha:1.0f];
     backButton.alpha = 0;
     self.backButton = backButton;
     [self.view addSubview:self.backButton];

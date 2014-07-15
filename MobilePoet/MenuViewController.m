@@ -28,7 +28,7 @@
 	
     /* UI elements */
     UIView *titleBackground = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 130.0f)];
-    titleBackground.backgroundColor = [UIColor colorWithRed:29/255.0f green:42/255.0f blue:99/255.0f alpha:1.0f];
+    titleBackground.backgroundColor = [UIColor colorWithRed:0 green:28/255.0f blue:125/255.0f alpha:1.0f];
     [self.view addSubview:titleBackground];
     //move buttons up 10 points if the titleBackground is not used
     self.titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 300.0f, 60.0f)];

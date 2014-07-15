@@ -19,9 +19,8 @@
     if (self) {
         _imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
         [self addSubview:_imageView];
-        self.layer.shadowOpacity = 0.4f;
-        self.layer.shadowRadius = 5.0f;
-        self.layer.shadowOffset = CGSizeZero;
+        self.layer.borderWidth = 0.5f;
+        self.layer.borderColor = [UIColor blackColor].CGColor;
     }
     return self;
 }
