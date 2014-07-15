@@ -81,7 +81,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     [self addSubview:_scrollView];
     
     _pageControl = [[UIPageControl alloc]initWithFrame:CGRectMake(0, 0, 25.0f, 0)];
-    _pageControl.center = CGPointMake(self.frame.size.width/2.0f, self.frame.size.height - 54.0f);
+    _pageControl.center = CGPointMake(self.frame.size.width/2.0f, 9.0f);
     _pageControl.numberOfPages = 3;
     _pageControl.currentPage = 1;
     
@@ -94,7 +94,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     /* Row 1 */
     NSArray *test = @[@"Q", @"W", @"E", @"R", @"T", @"Y", @"U", @"I", @"O", @"P", @"A", @"S", @"D", @"F", @"G", @"H", @"J", @"K", @"L", @"Z", @"X", @"C", @"V", @"B", @"N", @"M"];
     for (int i = 0; i<10; i++) {
-        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithFrame:CGRectMake(11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
+        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithFrame:CGRectMake(11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor whiteColor];
         [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [button setTitle:test[i] forState:UIControlStateNormal];
@@ -107,7 +107,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     /* Row 2 */
     row++;
     for (int i = 0; i<9; i++) {
-        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithFrame:CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
+        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithFrame:CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor whiteColor];
         [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         button.layer.cornerRadius = 4.0f;
@@ -120,7 +120,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     /* Row 3 */
     row++;
     for (int i = 1; i<8; i++) {
-        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithFrame: CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
+        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithFrame: CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor whiteColor];
         [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         button.layer.cornerRadius = 4.0f;
@@ -136,7 +136,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     /* Row 1 */
     row = 1;
     for (int i = 0; i<10; i++) {
-        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
+        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (row * 17.0f) + ((row-1) * 10.0f), kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor whiteColor];
         [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [button setTitle:self.buttonCharcters[i] forState:UIControlStateNormal];
@@ -149,7 +149,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     /* Row 2 */
     row++;
     for (int i = 0; i<10; i++) {
-        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
+        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor whiteColor];
         [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         button.layer.cornerRadius = 4.0f;
@@ -163,7 +163,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row++;
     for (int i = 0; i<10; i++) {
         NSString *currentKeyCharcter = self.buttonCharcters[20 + i];
-        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
+        MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
         button.backgroundColor = [UIColor whiteColor];
         [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         button.layer.cornerRadius = 4.0f;
@@ -183,7 +183,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
                 /* Row 1 */
                 NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
                 MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol)
-                andFrame: CGRectMake((self.frame.size.width * 2) + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i),(row * 12.0f), kNormalButtonWidth, kNormalButtonHeight)];
+                andFrame: CGRectMake((self.frame.size.width * 2) + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i),(row * 12.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
                 //adjust button position so the row is centered horizontally
                 button.center = CGPointMake(button.center.x + kNormalButtonWidth, button.center.y);
                 button.backgroundColor = [UIColor whiteColor];
@@ -203,7 +203,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
             }else{
                 /* Row 2 */
                 NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
-                MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 5.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-8)), kNormalButtonHeight + (2 * 12.0f) + 5.0f, kBigButtonWidth, kNormalButtonHeight)];
+                MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 5.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-8)), kNormalButtonHeight + (2 * 12.0f) + 5.0f + 5.0f, kBigButtonWidth, kNormalButtonHeight)];
                 button.backgroundColor = [UIColor whiteColor];
                 [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
                 button.layer.cornerRadius = 4.0f;
