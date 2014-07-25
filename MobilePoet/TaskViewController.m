@@ -38,6 +38,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 /* Guidance mode is handled by the keyboard, but the textView's (self.textInputView) delegate is handled by TaskViewController */
 /* To restrict the textview's user interaction during guidance mode, the bool is required to know if its enabled */
 @property (nonatomic) MathKeyboard *mathKeyboard;
+@property (strong, nonatomic) UILabel *previewViewLabel;
+/* This label identifies the preview view as a preview view before the user begins typing */
 @end
 
 @implementation TaskViewController
@@ -142,6 +144,20 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         _mathKeyboard = (MathKeyboard *)self.textInputView.inputView;
     }
     return _mathKeyboard;
+}
+
+-(UILabel *)previewViewLabel{
+    if (!_previewViewLabel) {
+        _previewViewLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100.0f, 20.0f)];
+        _previewViewLabel.backgroundColor = [UIColor clearColor];
+        _previewViewLabel.center = CGPointMake(_previewView.frame.size.width/2, _previewView.frame.size.height/2);
+        _previewViewLabel.alpha = 0;
+        _previewViewLabel.textColor = [UIColor lightGrayColor];
+        _previewViewLabel.textAlignment = NSTextAlignmentCenter;
+        _previewViewLabel.text = @"Preview";
+        [_previewView addSubview:_previewViewLabel];
+    }
+    return _previewViewLabel;
 }
 
 #pragma mark Button actions
@@ -269,7 +285,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* Remove the submission/decision subview and go back to the taskViewController view */
     
     /* Calculate proper image scaling so the image fits properly in the UI */
-    CGAffineTransform imageTransform = [self scaleTaskImageForMainView:self.currentImage];
+    CGAffineTransform imageTransform = [self scaleTransformForTaskImage:self.currentImage];
     
     /* Get references to all 'submission view' subviews */
     UILabel *submissionTextView;
@@ -380,16 +396,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     UIView *image = gesture.view;
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
         if (self.imageIsEnlarged) {
-            /* Image has already been enlarged, so scale it back to its original size. This is the same way the image's original scaling is calulcuted when its first scaled to fit in the ui. */
-            CGAffineTransform imageTransform;
-            if (image.frame.size.height > 100.0f){
-                // Image is too big
-                imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
-            }else{
-                // Image is an ideal size, meaning it's below the max height
-                imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
-            }
-            image.transform = imageTransform;
+            image.transform = [self scaleTransformForTaskImage:image];
             self.imageIsEnlarged = NO;
         }else{
             /* Image is scaled so that it's width is just slightly less than the width of the screen */
@@ -403,19 +410,31 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 -(void)pinchImage:(UIPinchGestureRecognizer *)gesture
 {
-    if (!self.imageIsEnlarged) {
-        return;
-    }
     if (gesture.state == UIGestureRecognizerStateChanged) {
         gesture.view.transform = CGAffineTransformScale(gesture.view.transform, gesture.scale, gesture.scale);
         gesture.scale = 1.0f;
     }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
-        if (((self.view.frame.size.width/gesture.view.frame.size.width)-0.1f) > 1.0f) {
-            [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-                gesture.view.transform = CGAffineTransformScale(gesture.view.transform,(self.view.frame.size.width/gesture.view.frame.size.width)-0.1f, (self.view.frame.size.width/gesture.view.frame.size.width)-0.1f);
-                }completion:nil];
+
+            /* Image is not enlarged (aka tapped), so scale the image to its original size if its current
+             size is less than its original */
+            CGAffineTransform originalScale = [self scaleTransformForTaskImage:gesture.view];
+        //NSLog(@"if %f < %f", gesture.view.frame.size.width, gesture.view.frame.size.width * originalScale.a);
+        NSLog(@"%f %f %f %f %f %f", originalScale.a, originalScale.b, originalScale.c, originalScale.d, originalScale.tx, originalScale.ty);
+            if (gesture.view.frame.size.width < (gesture.view.frame.size.width * originalScale.a)) {
+                /* If image width is less than its ideal width, scale it up */
+                [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                    gesture.view.transform = originalScale;
+                    NSLog(@"%f", gesture.view.frame.size.width * originalScale.a);
+                }completion:^(BOOL finished){
+                    if (finished) {
+                        if (self.imageIsEnlarged) {
+                            self.imageIsEnlarged = NO;
+                        }
+                    }
+                }];
+            }
         }
-    }
+    
 }
 
 -(void)dragImage:(UIPanGestureRecognizer *)gesture
@@ -470,7 +489,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                 if (finished) {
                     
                     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
-                    CGAffineTransform imageTransform = [self scaleTaskImageForMainView:image];
+                    CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
  
                     /* animate image to the top */
                     [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -492,6 +511,23 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                             [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
                             [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
                             image.userInteractionEnabled = YES;
+                            
+                            
+                            
+                            /* Animate in preview shadow */
+                            CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
+                            anim.fromValue = [NSNumber numberWithFloat:0];
+                            anim.toValue = [NSNumber numberWithFloat:0.2f];
+                            anim.duration = 0.5f;
+                            [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
+                            self.previewView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+                            self.previewView.layer.shadowRadius = 5.0f;
+                            self.previewView.layer.shadowOpacity = 0.2f;
+                            
+                            self.previewViewLabel.hidden = NO;
+                            [UIView animateWithDuration:0.5f animations:^{
+                                self.previewViewLabel.alpha = 1.0f;
+                            }completion:nil];
                         }
                     }];
                 }
@@ -506,7 +542,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* This is called when a TaskViewController is pushed when an image is already chosen and is already on screen (AKA the mode is 'ImageSelectionModeSpecificImage' ) */
     UIImageView *image = self.currentImage;
     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
-    CGAffineTransform imageTransform = [self scaleTaskImageForMainView:image];
+    CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
     
     self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
     self.previewView.hidden = NO;
@@ -527,12 +563,27 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
             [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
             image.userInteractionEnabled = YES;
             
+            /* Animate in preview shadow */
+            CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
+            anim.fromValue = [NSNumber numberWithFloat:0];
+            anim.toValue = [NSNumber numberWithFloat:0.2f];
+            anim.duration = 0.5f;
+            [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
+            self.previewView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+            self.previewView.layer.shadowRadius = 5.0f;
+            self.previewView.layer.shadowOpacity = 0.2f;
+            
+            self.previewViewLabel.hidden = NO;
+            [UIView animateWithDuration:0.5f animations:^{
+                self.previewViewLabel.alpha = 1.0f;
+            }completion:nil];
+            
         }
     }];
     
 }
 
--(CGAffineTransform)scaleTaskImageForMainView:(UIImageView *)image
+-(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
 {
     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
     /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
@@ -595,30 +646,33 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* Refresh the MathML preview everytime a new charcter is typed */
     [self updatePreviewViewWithText:textView.text];
     
-    if (![self.textInputView.text isEqualToString:@""] && self.previewView.layer.shadowOpacity == 0) {
+    
+    if (![self.textInputView.text isEqualToString:@""]) {
+        /*
         CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
         anim.fromValue = [NSNumber numberWithFloat:0];
         anim.toValue = [NSNumber numberWithFloat:0.2f];
         anim.duration = 0.5f;
         [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
+        self.previewView.layer.shadowOffset = CGSizeMake(0, 3.0f);
+        self.previewView.layer.shadowRadius = 5.0f;
         self.previewView.layer.shadowOpacity = 0.2f;
+         */
+        [UIView animateWithDuration:0.5f animations:^{
+            self.previewViewLabel.alpha = 0;
+        }completion:^(BOOL finished){
+            if (finished) {
+                self.previewViewLabel.hidden = YES;
+            }
+        }];
+        
+    }else{
+        self.previewViewLabel.hidden = NO;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.previewViewLabel.alpha = 1.0f;
+        }completion:nil];
     }
-}
-
--(void)textViewDidChangeSelection:(UITextView *)textView
-{
-//    NSRangePointer range = malloc(sizeof(NSRangePointer));
-//    range->location = 0;
-//    range->length = 0;
-//    NSLog(@"%lu", (unsigned long)textView.selectedRange.location);
-//    
-//    if ([[textView.textStorage attributesAtIndex:textView.selectedRange.location effectiveRange:range] objectForKey:NSBackgroundColorAttributeName]) {
-//    }
-//    if (self.guidanceModeEnabled) {
-//        if ([self.mathKeyboard cursorButtonJustChangedCursorPosition]) {
-//            <#statements#>
-//        }
-//    }
+     
 }
 
 -(void)updatePreviewViewWithText:(NSString *)text

@@ -32,10 +32,16 @@ const CGFloat kPreviewCenterYPostion;
 @property (strong, nonatomic) NSArray *practiceImageNames;
 /* The names of every pratice image */
 @property (strong, nonatomic) NSArray *practiceImagesCorrectMathMLTraslations;
-/* The correct MathML representation of each practice image */
+/* The correct MathML representation of each practice image. */
+/* Each object in the array is an array of acceptable mathml translations for the image with the same image id as the index */
 @property (strong, nonatomic) NSArray *practiceImagesCorrectASCIIMathTraslations;
 /* A possible correct asciimath translation of each test image. In order of the test images ID/index */
 @property (strong, nonatomic) UILabel *beginButton;
+@property (strong, nonatomic) NSTimer *mathJaxLoadingTimer;
+/* Is used to recognize if mathjax is taking too long generate mathML */
+@property (strong, nonatomic) NSArray *longLoadingTimeViews;
+/* A set of views that are shown when mathjax has not returned a mathml result in one second */
+@property (strong, nonatomic) UILabel *previewViewLabel;
 @end
 
 @implementation TrainingModeViewController
@@ -124,11 +130,26 @@ const CGFloat kPreviewCenterYPostion;
 {
     self.practiceImageNames = @[@"practiceimage1.jpg", @"practiceimage2.jpg", @"practiceImage3.jpg", @"practiceImage4.jpg", @"practiceimage5.jpg"];
     self.practiceImagesCorrectMathMLTraslations = @[
-        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mi>tan<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><mo>=<.mo><mfrac><msup><mrow><mi>sin<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><msup><mrow><mi>cos<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
-        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mi>A<.mi><mn>2<.mn><.msup><mo>+<.mo><msup><mi>B<.mi><mn>2<.mn><.msup><.mrow><.msqrt><.mstyle><.math>",
-        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
-        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>sin<.mi><mn>4<.mn><.mrow><mi>x<.mi><mo>+<.mo><mrow><mi>sin<.mi><mn>2<.mn><.mrow><mi>x<.mi><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
-        @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mn>2<.mn><mi>&.x3C0;<.mi><mi>n<.mi><mo>&.xB1;<.mo><mfrac><mi>&.x3C0;<.mi><mn>2<.mn><.mfrac><.mstyle><.math>"];
+        /* Image 1 */
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mi>tan<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><mo>=<.mo><mfrac><msup><mrow><mi>sin<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><msup><mrow><mi>cos<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mrow><mo>(<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>)<.mo><.mrow><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>=<.mo><mfrac><mrow><mo>-<.mo><mn>1<.mn><.mrow><mrow><mn>0<.mn><.mrow><.mfrac><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mrow><mo>(<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>)<.mo><.mrow><mo>=<.mo><mfrac><mrow><mo>-<.mo><mn>1<.mn><.mrow><mrow><mn>0<.mn><.mrow><.mfrac><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>"],
+        /* Image 2 */
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mi>A<.mi><mn>2<.mn><.msup><mo>+<.mo><msup><mi>B<.mi><mn>2<.mn><.msup><.mrow><.msqrt><.mstyle><.math>"],
+        /* Image 3 */
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mo>(<.mo><mi>x<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><mn>4<.mn><msup><mrow><mo>(<.mo><mi>y<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mo>(<.mo><mi>x<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mrow><mo>(<.mo><mi>y<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>"],
+        /* Image 4 */
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>sin<.mi><mn>4<.mn><.mrow><mi>x<.mi><mo>+<.mo><mrow><mi>sin<.mi><mn>2<.mn><.mrow><mi>x<.mi><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>sin<.mi><mrow><mo>(<.mo><mn>4<.mn><mi>x<.mi><mo>)<.mo><.mrow><.mrow><mo>+<.mo><mrow><mi>sin<.mi><mrow><mo>(<.mo><mn>2<.mn><mi>x<.mi><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mn>0<.mn><.mstyle><.math>"],
+        /* Image 5 */
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mn>2<.mn><mi>&.x3C0;<.mi><mi>n<.mi><mo>&.xB1;<.mo><mfrac><mi>&.x3C0;<.mi><mn>2<.mn><.mfrac><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mn>2<.mn><mi>&.x3C0;<.mi><mi>n<.mi><mo>&.xB1;<.mo><mfrac><mrow><mi>&.x3C0;<.mi><.mrow><mrow><mn>2<.mn><.mrow><.mfrac><.mstyle><.math>"]];
     self.practiceImagesCorrectASCIIMathTraslations = @[
         @"tan270^circ = (sin270^circ)/(cos270^circ) = -1/0",
         @"C = sqrt(A^2 + B^2)",
@@ -201,6 +222,20 @@ const CGFloat kPreviewCenterYPostion;
     return button;
 }
 
+-(UILabel *)previewViewLabel{
+    if (!_previewViewLabel) {
+        _previewViewLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100.0f, 20.0f)];
+        _previewViewLabel.backgroundColor = [UIColor clearColor];
+        _previewViewLabel.center = CGPointMake(_previewView.frame.size.width/2, _previewView.frame.size.height/2);
+        _previewViewLabel.alpha = 0;
+        _previewViewLabel.textColor = [UIColor lightGrayColor];
+        _previewViewLabel.textAlignment = NSTextAlignmentCenter;
+        _previewViewLabel.text = @"Preview";
+        [_previewView addSubview:_previewViewLabel];
+    }
+    return _previewViewLabel;
+}
+
 
 
 #pragma mark Button actions
@@ -227,6 +262,8 @@ const CGFloat kPreviewCenterYPostion;
     /* The user's description is checked by comparing their resulting MathML code, generated by MathJax, to the correct code
      The mathML is first generated, then checked in 'checkUserDescriptionWithMathML' where the result will also be handled.
      */
+    
+    self.submitButton.enabled = NO;
     
     if (![self.textInputView.text isEqualToString:@""]) {
         [self generateAndSendMathML];
@@ -472,7 +509,19 @@ const CGFloat kPreviewCenterYPostion;
                     [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
                     image.userInteractionEnabled = YES;
                     
+                    /* Animate in preview shadow */
+                    CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
+                    anim.fromValue = [NSNumber numberWithFloat:0];
+                    anim.toValue = [NSNumber numberWithFloat:0.2f];
+                    anim.duration = 0.5f;
+                    [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
+                    self.previewView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+                    self.previewView.layer.shadowRadius = 5.0f;
+                    self.previewView.layer.shadowOpacity = 0.2f;
+                    
+                    self.previewViewLabel.hidden = NO;
                     [UIView animateWithDuration:0.5f animations:^{
+                        self.previewViewLabel.alpha = 1.0f;
                         self.navigationBarLabel.alpha = 1.0f;
                     }completion:nil];
                 }
@@ -483,10 +532,9 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)selectNewImage
 {
-    /* 
-     Selects a new image and sets the current image and current image id.
-     The image is selected by simply incrementing the current image id by 1, and using that as the index of the image in the 'practiceImages' array.
-     */
+    /* Selects a new image and sets the current image and current image id.
+        The image is selected by simply incrementing the current image id by 1, and using that as the index of the image in the 'practiceImages' array. */
+    
     if (self.currentImageID == ([self.practiceImageNames count]-1)) {
         self.currentImageID = -1;
     }
@@ -541,14 +589,22 @@ const CGFloat kPreviewCenterYPostion;
     /* Refresh the MathML preview everytime a new charcter is typed */
     [self updatePreviewViewWithText:textView.text];
     
-    if (![self.textInputView.text isEqualToString:@""] && self.previewView.layer.shadowOpacity == 0) {
-        CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
-        anim.fromValue = [NSNumber numberWithFloat:0];
-        anim.toValue = [NSNumber numberWithFloat:0.2f];
-        anim.duration = 0.5f;
-        [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
-        self.previewView.layer.shadowOpacity = 0.2f;
+    if (![self.textInputView.text isEqualToString:@""]) {
+        [UIView animateWithDuration:0.5f animations:^{
+            self.previewViewLabel.alpha = 0;
+        }completion:^(BOOL finished){
+            if (finished) {
+                self.previewViewLabel.hidden = YES;
+            }
+        }];
+        
+    }else{
+        self.previewViewLabel.hidden = NO;
+        [UIView animateWithDuration:0.5f animations:^{
+            self.previewViewLabel.alpha = 1.0f;
+        }completion:nil];
     }
+
 
 }
 
@@ -603,7 +659,9 @@ const CGFloat kPreviewCenterYPostion;
      */
     
      [self.previewView stringByEvaluatingJavaScriptFromString:@"MathJax.Hub.Queue( function f() {var jax = MathJax.Hub.getAllJax(); if(jax.length = 1){var thing = jax[0].root.toMathML(\"\"); thing = thing.replace(/\\//g, \".\"); thing = thing.replace(\":\", \".\"); thing = thing.replace(/\\#/g, \".\"); window.location = \"fakeLocation://\".concat(thing);}})"];
-
+    
+    NSTimer *loadingTimer = [NSTimer  scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(mathMLStillLoadingAfterOneSecond:) userInfo:nil repeats:NO];
+    self.mathJaxLoadingTimer = loadingTimer;
 
 }
 
@@ -614,6 +672,7 @@ const CGFloat kPreviewCenterYPostion;
         /* This address is not legit, and is instead mathml code passed in from the 'generateMathML method'*/
         NSString *mathml = [url.host stringByReplacingOccurrencesOfString:@" " withString:@""];
         mathml = [mathml stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        NSLog(@"%@", mathml);
         [self checkUserDescriptionWithMathML:mathml];
         
         return NO;
@@ -623,12 +682,43 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)checkUserDescriptionWithMathML:(NSString *)mathml
 {
-    if ([mathml isEqualToString:self.practiceImagesCorrectMathMLTraslations[self.currentImageID]]) {
-        [self constructAndShowCongratulatoryAndContinueView];
-    }else{
-        UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Incorrect Description" message:[NSString stringWithFormat: @"Your description does not seem to produce a similar math image. Here's a good possible ASCIIMath translation:\n\n%@", self.practiceImagesCorrectASCIIMathTraslations[self.currentImageID]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil];
-        [alert show];
+    
+    [self.mathJaxLoadingTimer invalidate];
+    self.submitButton.enabled = YES;
+    /* Deal with the 'long loading views', if they've been added to the previewView */
+    if ([self.previewView.subviews count] > 1) {
+        UIView *indicator = self.longLoadingTimeViews[0];
+        [indicator removeFromSuperview];
+    }
+    
+    NSArray *acceptableMathmlTranslations = self.practiceImagesCorrectMathMLTraslations[self.currentImageID];
+    for (NSString *correctmathml in acceptableMathmlTranslations) {
+        if ([mathml isEqualToString:correctmathml]) {
+            [self constructAndShowCongratulatoryAndContinueView];
+            return;
+        }
+    }
+    /* If the mathml doesn't match any acceptable mathml... */
+    UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"Incorrect Description" message:[NSString stringWithFormat: @"Your description does not seem to produce a similar math image. Here's a good possible ASCIIMath translation:\n\n%@", self.practiceImagesCorrectASCIIMathTraslations[self.currentImageID]] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil];
+    [alert show];
+    
+}
+
+-(void)mathMLStillLoadingAfterOneSecond:(NSTimer *)timer
+{
+    /*Triggered when mathjax has not returned any results after one second */
+    if (!self.longLoadingTimeViews) {
+        UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        activityIndicator.frame = CGRectMake(0, 0, 50.0f, 50.0f);
+        activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.previewView.frame.size.height/2);
+        self.longLoadingTimeViews = @[activityIndicator];
+    }
+    UIActivityIndicatorView *indicator = (UIActivityIndicatorView *)self.longLoadingTimeViews[0];
+    [self.previewView addSubview:indicator];
+    if ([indicator isKindOfClass:[UIActivityIndicatorView class]]) {
+        [indicator startAnimating];
     }
 }
+
 
 @end
