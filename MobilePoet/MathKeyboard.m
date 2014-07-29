@@ -224,7 +224,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
             }else{
                 /* Row 2 */
                 NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
-                MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 5.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-8)), kNormalButtonHeight + (2 * 12.0f) + 5.0f + 5.0f, kBigButtonWidth, kNormalButtonHeight)];
+                MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 4.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-8) + ([currentKeyCharcter isEqualToString:@"tan\u207B\u00B9x"] ? 2.0f : 0)), kNormalButtonHeight + (2 * 12.0f) + 5.0f + 5.0f,([currentKeyCharcter isEqualToString:@"cos\u207B\u00B9x"] ? kBigButtonWidth + 3.0f : kBigButtonWidth), kNormalButtonHeight)];
                 button.backgroundColor = [UIColor whiteColor];
                 [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
                 button.layer.cornerRadius = 4.0f;
@@ -370,6 +370,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
             self.capsEnabled = NO;
             self.capKey.selected = NO;
         }
+    }else if ([button.titleLabel.text isEqualToString:@"help"]){
+        //prevents crashing because this button doens't do anything yet
     }else
         [self.textView insertText:[self.buttonValues objectForKey:button.titleLabel.text]];
     

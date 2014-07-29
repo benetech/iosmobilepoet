@@ -38,12 +38,13 @@
     
     /* Back button setup */
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    backButton.frame = CGRectMake(0, 0, 50.0f, 50.0f);
-    backButton.center = CGPointMake(30.0f, 33.0f);
-    backButton.tintColor = [UIColor colorWithRed:0 green:28/255.0f blue:155/255.0f alpha:1.0f];
-    backButton.alpha = 0;
-    [backButton setTitle:@"Back" forState:UIControlStateNormal];
+    UIImage *backImage = [UIImage imageNamed:@"backButton.png"];
+    [backButton setBackgroundImage:backImage forState:UIControlStateNormal];
+    backButton.frame = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
+    backButton.transform = CGAffineTransformMakeScale(55.0f/backButton.frame.size.width, 55.0f/backButton.frame.size.width);
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    backButton.center = CGPointMake(30.0f, 40.0f);
+    backButton.alpha = 0;
     self.backButton = backButton;
     [self.collectionView addSubview:self.backButton];
     

@@ -42,6 +42,7 @@ const CGFloat kPreviewCenterYPostion;
 @property (strong, nonatomic) NSArray *longLoadingTimeViews;
 /* A set of views that are shown when mathjax has not returned a mathml result in one second */
 @property (strong, nonatomic) UILabel *previewViewLabel;
+@property (strong, nonatomic) UIButton *introBackButton;
 @end
 
 @implementation TrainingModeViewController
@@ -120,9 +121,15 @@ const CGFloat kPreviewCenterYPostion;
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:1.0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+    [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.beginButton.center = CGPointMake(self.beginButton.center.x, self.view.frame.size.height - 120.0f);
-    }completion:nil];
+    }completion:^(BOOL finished){
+        if (finished) {
+            [UIView animateWithDuration:0.5f animations:^{
+                self.introBackButton.alpha = 1.0f;
+            }completion:nil];
+        }
+    }];
     
 }
 
@@ -136,9 +143,11 @@ const CGFloat kPreviewCenterYPostion;
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mrow><mo>(<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>)<.mo><.mrow><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>=<.mo><mfrac><mrow><mo>-<.mo><mn>1<.mn><.mrow><mrow><mn>0<.mn><.mrow><.mfrac><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mrow><mo>(<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>)<.mo><.mrow><mo>=<.mo><mfrac><mrow><mo>-<.mo><mn>1<.mn><.mrow><mrow><mn>0<.mn><.mrow><.mfrac><.mstyle><.math>",
-          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>"],
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><.mfrac><mo>=<.mo><mfrac><mrow><mo>-<.mo><mn>1<.mn><.mrow><mrow><mn>0<.mn><.mrow><.mfrac><.mstyle><.math>"],
         /* Image 2 */
-        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mi>A<.mi><mn>2<.mn><.msup><mo>+<.mo><msup><mi>B<.mi><mn>2<.mn><.msup><.mrow><.msqrt><.mstyle><.math>"],
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mi>A<.mi><mn>2<.mn><.msup><mo>+<.mo><msup><mi>B<.mi><mn>2<.mn><.msup><.mrow><.msqrt><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mrow><mo>(<.mo><mi>A<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><msup><mrow><mo>(<.mo><mi>B<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><.mrow><.msqrt><.mstyle><.math>"],
         /* Image 3 */
         @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mo>(<.mo><mi>x<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><mn>4<.mn><msup><mrow><mo>(<.mo><mi>y<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
@@ -166,7 +175,7 @@ const CGFloat kPreviewCenterYPostion;
     //the intro view is the first view that is seen that talks about what traing mode is
     UIView *introView = [[UIView alloc]initWithFrame:self.view.frame];
     UILabel *titlelabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 200.0f, 50.0f)];
-    titlelabel.center = CGPointMake(self.view.center.x, titlelabel.frame.size.height + 30.0f);
+    titlelabel.center = CGPointMake(self.view.center.x, titlelabel.frame.size.height + 50.0f);
     titlelabel.font = [UIFont fontWithName:@"Avenir-Heavy" size:23.0f];
     titlelabel.textAlignment = NSTextAlignmentCenter;
     titlelabel.text = @"Training";
@@ -177,6 +186,7 @@ const CGFloat kPreviewCenterYPostion;
     bodyTextView.font = [UIFont fontWithName:@"Avenir" size:15.0f];
     bodyTextView.textAlignment = NSTextAlignmentCenter;
     bodyTextView.text = @"Here you can practice writing ASCIIMath and describing images. You’ll be shown a few sample images and be told the accuracy of your math description.\n\n\nNone of the work you do will be submitted to the MathML Cloud servers.";
+    bodyTextView.userInteractionEnabled = NO;
     [introView addSubview:bodyTextView];
     
     UILabel *beginButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 45.0f)];
@@ -189,6 +199,17 @@ const CGFloat kPreviewCenterYPostion;
     beginButton.userInteractionEnabled = YES;
     [beginButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(beginButtonTapped:)]];
     self.beginButton = beginButton;
+    
+    UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    UIImage *backImage = [UIImage imageNamed:@"backButton.png"];
+    [backButton setBackgroundImage:backImage forState:UIControlStateNormal];
+    backButton.frame = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
+    backButton.transform = CGAffineTransformMakeScale(55.0f/backButton.frame.size.width, 55.0f/backButton.frame.size.width);
+    [backButton addTarget:self action:@selector(introBackButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    backButton.center = CGPointMake(30.0f, 40.0f);
+    backButton.alpha = 0;
+    [introView addSubview:backButton];
+    self.introBackButton = backButton;
     
     self.introView = introView;
     [self.view addSubview:self.introView];
@@ -263,9 +284,8 @@ const CGFloat kPreviewCenterYPostion;
      The mathML is first generated, then checked in 'checkUserDescriptionWithMathML' where the result will also be handled.
      */
     
-    self.submitButton.enabled = NO;
-    
     if (![self.textInputView.text isEqualToString:@""]) {
+        self.submitButton.enabled = NO;
         [self generateAndSendMathML];
     }else{
         /* no text entered */
@@ -278,6 +298,11 @@ const CGFloat kPreviewCenterYPostion;
 {
     MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
     [keyboard disableCursorKeyHorizontalAnimationForNextKeyboardDismissal];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+-(void)introBackButtonPressed:(UIButton *)button
+{
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -660,8 +685,8 @@ const CGFloat kPreviewCenterYPostion;
     
      [self.previewView stringByEvaluatingJavaScriptFromString:@"MathJax.Hub.Queue( function f() {var jax = MathJax.Hub.getAllJax(); if(jax.length = 1){var thing = jax[0].root.toMathML(\"\"); thing = thing.replace(/\\//g, \".\"); thing = thing.replace(\":\", \".\"); thing = thing.replace(/\\#/g, \".\"); window.location = \"fakeLocation://\".concat(thing);}})"];
     
-    NSTimer *loadingTimer = [NSTimer  scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(mathMLStillLoadingAfterOneSecond:) userInfo:nil repeats:NO];
-    self.mathJaxLoadingTimer = loadingTimer;
+    //NSTimer *loadingTimer = [NSTimer  scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(mathMLStillLoadingAfterOneSecond:) userInfo:nil repeats:NO];
+    //self.mathJaxLoadingTimer = loadingTimer;
 
 }
 

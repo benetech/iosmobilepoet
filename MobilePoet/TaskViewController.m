@@ -72,6 +72,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     submitButton.showsTouchWhenHighlighted = YES;
     self.submitButton = submitButton;
     [self.view addSubview:self.submitButton];
+    NSLog(@" hi %f %f", self.backButton.frame.size.width ,self.backButton.frame.size.height);
     
     
     /* text view */
@@ -449,7 +450,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
         [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
             gesture.view.center = CGPointMake(gesture.view.center.x, originalImageCenterY);
-        }completion:^(BOOL finished){}];
+        }completion:nil];
     }
 }
 
@@ -459,7 +460,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 {
     [self resetSubviewsForNewImageFetch];
     /* This will evetually handle fetching pictures from the mathml cloud servers. For now this will simulate that using local pics */
-    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg3.jpg"]];
+    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg1.jpg"]];
     self.currentImage = image;
     
     /* prepare image for animation */
@@ -546,6 +547,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
     self.previewView.hidden = NO;
+    self.previewView.alpha = 1.0f;
     [self.textInputView becomeFirstResponder];
     
     /* animate image to the top */
@@ -555,7 +557,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         self.backButton.alpha = 1.0f;
         self.textInputView.alpha = 1.0f;
         self.submitButton.alpha = 1.0f;
-        self.previewView.alpha = 1.0f;
     }completion:^(BOOL finished){
         if (finished) {
             [image addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(enlargeImage:)]];
@@ -563,23 +564,24 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
             [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
             image.userInteractionEnabled = YES;
             
-            /* Animate in preview shadow */
-            CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
-            anim.fromValue = [NSNumber numberWithFloat:0];
-            anim.toValue = [NSNumber numberWithFloat:0.2f];
-            anim.duration = 0.5f;
-            [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
-            self.previewView.layer.shadowOffset = CGSizeMake(0, 2.0f);
-            self.previewView.layer.shadowRadius = 5.0f;
-            self.previewView.layer.shadowOpacity = 0.2f;
-            
-            self.previewViewLabel.hidden = NO;
-            [UIView animateWithDuration:0.5f animations:^{
-                self.previewViewLabel.alpha = 1.0f;
-            }completion:nil];
-            
         }
     }];
+    
+    /* Animate in preview shadow (this happens simultaneously as the above animation) */
+    CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"shadowOpacity"];
+    anim.fromValue = [NSNumber numberWithFloat:0];
+    anim.toValue = [NSNumber numberWithFloat:0.2f];
+    anim.duration = 0.5f;
+    [self.previewView.layer addAnimation:anim forKey:@"shadowOpacity"];
+    self.previewView.layer.shadowOffset = CGSizeMake(0, 2.0f);
+    self.previewView.layer.shadowRadius = 5.0f;
+    self.previewView.layer.shadowOpacity = 0.2f;
+    
+    self.previewViewLabel.hidden = NO;
+    [UIView animateWithDuration:0.5f animations:^{
+        self.previewViewLabel.alpha = 1.0f;
+    }completion:nil];
+
     
 }
 
