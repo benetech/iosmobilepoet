@@ -72,7 +72,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     submitButton.showsTouchWhenHighlighted = YES;
     self.submitButton = submitButton;
     [self.view addSubview:self.submitButton];
-    NSLog(@" hi %f %f", self.backButton.frame.size.width ,self.backButton.frame.size.height);
     
     
     /* text view */
@@ -99,10 +98,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.previewView.userInteractionEnabled = NO;
     [self.view addSubview:self.previewView];
     
-    self.activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
     [self.view addSubview:self.activityIndicator];
-    
     
     self.mode = ImageSelectionModeRandom;
 }
@@ -147,7 +143,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     return _mathKeyboard;
 }
 
--(UILabel *)previewViewLabel{
+-(UILabel *)previewViewLabel
+{
     if (!_previewViewLabel) {
         _previewViewLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100.0f, 20.0f)];
         _previewViewLabel.backgroundColor = [UIColor clearColor];
@@ -159,6 +156,15 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         [_previewView addSubview:_previewViewLabel];
     }
     return _previewViewLabel;
+}
+
+-(UIActivityIndicatorView *)activityIndicator
+{
+    if (!_activityIndicator) {
+        _activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+    }
+    return _activityIndicator;
 }
 
 #pragma mark Button actions
@@ -217,16 +223,16 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     if (!self.submissionViewSubviews) {
         self.submissionViewSubviews = [NSMutableArray new];
     }
-    UILabel *confirmInstructionTextView = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
-    confirmInstructionTextView.center = CGPointMake(self.view.frame.size.width/2.0f, -(confirmInstructionTextView.frame.size.height/2.0f) + 20.0f);
-    confirmInstructionTextView.numberOfLines = 0;
-    confirmInstructionTextView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    UILabel *confirmInstructionLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+    confirmInstructionLabel.center = CGPointMake(self.view.frame.size.width/2.0f, -(confirmInstructionLabel.frame.size.height/2.0f) + 20.0f);
+    confirmInstructionLabel.numberOfLines = 0;
+    confirmInstructionLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     //confirmInstructionTextView.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:18.0f];
-    confirmInstructionTextView.textAlignment = NSTextAlignmentCenter;
-    confirmInstructionTextView.text = @"Is your translation identical to the image?";
+    confirmInstructionLabel.textAlignment = NSTextAlignmentCenter;
+    confirmInstructionLabel.text = @"Is your translation identical to the image?";
     [self.submissionViewSubviews removeAllObjects];
-    [self.submissionViewSubviews addObject:confirmInstructionTextView];
-    [self.view addSubview:confirmInstructionTextView];
+    [self.submissionViewSubviews addObject:confirmInstructionLabel];
+    [self.view addSubview:confirmInstructionLabel];
     
     UILabel *imageLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 20.0f)];
     imageLabel.backgroundColor = [UIColor blueColor];
@@ -274,7 +280,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         self.backButton.alpha = 0;
         
         /* animate in new submission subviews */
-        confirmInstructionTextView.center = CGPointMake(confirmInstructionTextView.center.x, confirmInstructionTextView.center.y + confirmInstructionTextView.frame.size.height);
+        confirmInstructionLabel.center = CGPointMake(confirmInstructionLabel.center.x, confirmInstructionLabel.center.y + confirmInstructionLabel.frame.size.height);
         yesButton.center = CGPointMake(yesButton.center.x, yesButtonYCenterPosition);
         noButton.center = CGPointMake(noButton.center.x, noButtonYCenterPosition);
 
@@ -459,7 +465,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     }
 }
 
-#pragma mark System
+#pragma mark Image/Task Loading and Fetching
 
 -(void)fetchPic:(id)sender
 {
@@ -484,8 +490,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         if (finished) {
             [self.activityIndicator stopAnimating];
             [self.activityIndicator removeFromSuperview];
-            self.activityIndicator.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
-            self.activityIndicator.alpha = 1.0f;
+            [self resetActivityIndicatorScale];
             
             /* animate in image */
             [UIView animateWithDuration:0.8f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -496,7 +501,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                     
                     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
                     CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
- 
+                    
                     /* animate image to the top */
                     [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
                         image.transform = imageTransform;
@@ -568,7 +573,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
             [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
             [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
             image.userInteractionEnabled = YES;
-            
         }
     }];
     
@@ -586,8 +590,130 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [UIView animateWithDuration:0.5f animations:^{
         self.previewViewLabel.alpha = 1.0f;
     }completion:nil];
-
     
+    
+}
+
+-(void)resetSubviewsForNewImageFetch
+{
+    self.previewView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    [self updatePreviewViewWithText:@""];
+    
+    self.currentImage.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    self.currentImage.alpha = 1.0;
+    [self.currentImage removeFromSuperview];
+    self.currentImage = nil;
+    
+    self.textInputView.text = @"";
+    self.textInputView.editable = YES;
+    self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
+    self.backButton.enabled = YES;
+    self.submitButton.enabled = YES;
+}
+
+#pragma mark Description Submiting
+
+-(void)submitImageAndMathmlToCloud
+{
+    /* This will eventually give the user feedback when the image is or is not submitted */
+    [self showActivityIndicator];
+    /* Fake network activty timer */
+    [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(showSubmitSuccessfulView:) userInfo:nil repeats:NO];
+    
+}
+
+-(void)showSubmitSuccessfulView:(NSTimer *)timer
+{
+    UIImageView *checkmark = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"submitSuccessfulCheck2.png"]];
+    /* prepare for animation */
+    checkmark.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+    checkmark.center = self.view.center;
+    
+    UILabel *submitSuccessfulLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+    submitSuccessfulLabel.center = CGPointMake(self.view.frame.size.width/2.0f, -(submitSuccessfulLabel.frame.size.height/2.0f) + 20.0f);
+    submitSuccessfulLabel.numberOfLines = 0;
+    submitSuccessfulLabel.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
+    submitSuccessfulLabel.textAlignment = NSTextAlignmentCenter;
+    submitSuccessfulLabel.text = @"Description Submitted Successfully.";
+    [self.view addSubview:submitSuccessfulLabel];
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        self.activityIndicator.alpha = 0;
+        self.activityIndicator.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+    }completion:^(BOOL finished){
+        [self.activityIndicator removeFromSuperview];
+        [self resetActivityIndicatorScale];
+        
+        /* Animate in label */
+        [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            submitSuccessfulLabel.center = CGPointMake(submitSuccessfulLabel.center.x, checkmark.center.y/2.0f);
+        }completion:nil];
+        
+        /* Animate in checkmark simultaneously */
+        [self.view addSubview:checkmark];
+        [UIView animateWithDuration:0.4f delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+            checkmark.transform = CGAffineTransformMakeScale(1.3f, 1.3f);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.45f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                    checkmark.transform = CGAffineTransformMakeScale( 1.0f, 1.0f);
+                }completion:^(BOOL finished){
+                    if (finished) {
+                        [self removeSubmitSuccessfulViewWithImage:checkmark andTextLabel:submitSuccessfulLabel];
+                    }
+                }];
+            }
+        }];
+        
+    }];
+}
+
+-(void)removeSubmitSuccessfulViewWithImage:(UIImageView *)image andTextLabel:(UILabel *)label
+{
+    /* image == checkmark image */
+    [UIView animateWithDuration:0.2f delay:0.6f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        image.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    }completion:^(BOOL finished){
+        [UIView animateWithDuration:0.25f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            image.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+            label.center = CGPointMake(label.center.x, -(label.frame.size.height/2.0f) + 20.0f);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [image removeFromSuperview];
+                [label removeFromSuperview];
+                [self redirectToNextImageFetchAfterSubmitSuccessViewWasShown];
+            }
+        }];
+    }];
+    
+}
+
+-(void)redirectToNextImageFetchAfterSubmitSuccessViewWasShown
+{
+    /* What happens next is determined by the mode */
+    /* For now if we're in random mode, just gonna load another image */
+    if (self.mode == ImageSelectionModeRandom) {
+        [self showActivityIndicator];
+        [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
+    }else{
+        /* Specific Image */
+        [self.navigationController popViewControllerAnimated:NO];
+    }
+}
+
+#pragma mark Helpers
+
+-(void)showActivityIndicator
+{
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator startAnimating];
+}
+
+-(void)resetActivityIndicatorScale
+{
+    [self.activityIndicator stopAnimating];
+    self.activityIndicator.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    self.activityIndicator.alpha = 1.0f;
 }
 
 -(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
@@ -632,40 +758,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     return imageTransform;
     
-}
-
--(void)submitImageAndMathmlToCloud
-{
-    /* This will eventually give the user feedback when the image is or is not submitted */
-    [self.view addSubview:self.activityIndicator];
-    [self.activityIndicator startAnimating];
-    
-    /* For now if we're in random mode, just gonna load another image */
-    if (self.mode == ImageSelectionModeRandom) {
-        [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
-    }else{
-        /* Specific Image */
-        [self.activityIndicator stopAnimating];
-        [self.navigationController popViewControllerAnimated:NO];
-    }
-    
-}
-
--(void)resetSubviewsForNewImageFetch
-{
-    self.previewView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
-    [self updatePreviewViewWithText:@""];
-    
-    self.currentImage.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
-    self.currentImage.alpha = 1.0;
-    [self.currentImage removeFromSuperview];
-    self.currentImage = nil;
-    
-    self.textInputView.text = @"";
-    self.textInputView.editable = YES;
-    self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
-    self.backButton.enabled = YES;
-    self.submitButton.enabled = YES;
 }
 
 #pragma mark TextView and Preview View
