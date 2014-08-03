@@ -233,8 +233,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     //Buttons (as UILabels)
     const CGFloat decisionButtonHeight = 45.0f;
-    const CGFloat yesButtonYCenterPosition = self.view.frame.size.height - decisionButtonHeight;
-    const CGFloat noButtonYCenterPosition = self.view.frame.size.height - (decisionButtonHeight *  2.5f);
+    const CGFloat noButtonYCenterPosition = self.view.frame.size.height - decisionButtonHeight;
+    const CGFloat yesButtonYCenterPosition = self.view.frame.size.height - (decisionButtonHeight *  2.5f);
     
     UILabel *yesButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, decisionButtonHeight)];
     yesButton.center = CGPointMake(self.view.frame.size.width/2.0f, noButtonYCenterPosition + 150.0f);
@@ -418,39 +418,44 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
             /* Image is not enlarged (aka tapped), so scale the image to its original size if its current
              size is less than its original */
-            CGAffineTransform originalScale = [self scaleTransformForTaskImage:gesture.view];
-        //NSLog(@"if %f < %f", gesture.view.frame.size.width, gesture.view.frame.size.width * originalScale.a);
-        NSLog(@"%f %f %f %f %f %f", originalScale.a, originalScale.b, originalScale.c, originalScale.d, originalScale.tx, originalScale.ty);
-            if (gesture.view.frame.size.width < (gesture.view.frame.size.width * originalScale.a)) {
-                /* If image width is less than its ideal width, scale it up */
-                [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-                    gesture.view.transform = originalScale;
-                    NSLog(@"%f", gesture.view.frame.size.width * originalScale.a);
-                }completion:^(BOOL finished){
-                    if (finished) {
-                        if (self.imageIsEnlarged) {
-                            self.imageIsEnlarged = NO;
-                        }
+        CGAffineTransform originalScale = [self scaleTransformForTaskImageThatTheUserScaledViaThePinchGesture:gesture.view];
+        if (gesture.view.frame.size.width < (gesture.view.frame.size.width * originalScale.a)) {
+            /* If image width is less than its ideal width, scale it up */
+            originalScale = [self scaleTransformForTaskImage:gesture.view];
+            [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                gesture.view.transform = originalScale;
+            }completion:^(BOOL finished){
+                if (finished) {
+                    if (self.imageIsEnlarged) {
+                        self.imageIsEnlarged = NO;
                     }
-                }];
-            }
+                }
+            }];
         }
+    }
     
 }
 
 -(void)dragImage:(UIPanGestureRecognizer *)gesture
 {
+    /* Drags along the Y axis always animate back to the original Y center when the gesture ends */
     static int originalImageCenterY;
-    
     if (gesture.state == UIGestureRecognizerStateBegan) {
         originalImageCenterY = gesture.view.center.y;
     }else if (gesture.state == UIGestureRecognizerStateChanged) {
-        gesture.view.center = CGPointMake(gesture.view.center.x, gesture.view.center.y + [gesture translationInView:self.view].y);
+        gesture.view.center = CGPointMake(gesture.view.center.x + [gesture translationInView:self.view].x, gesture.view.center.y + [gesture translationInView:self.view].y);
         [gesture setTranslation:CGPointZero inView:self.view];
     }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
-        [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        /* Drags along the X axis won't animate back to the screens center when the gesture ends, except when less than 50 points of the image are on screen */
+        if ((gesture.view.frame.origin.x >= (self.view.frame.size.width - 50.0f)) || ((gesture.view.frame.origin.x + gesture.view.frame.size.width) <= 50.0f)) {
+            [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                gesture.view.center = CGPointMake(self.view.center.x, originalImageCenterY);
+            }completion:nil];
+        }else{
+            [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
             gesture.view.center = CGPointMake(gesture.view.center.x, originalImageCenterY);
-        }completion:nil];
+            }completion:nil];
+        }
     }
 }
 
@@ -587,7 +592,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 -(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
 {
-    /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
+    /* Calculate proper image scaling so the image fits properly in the main UI. Assuming any image size is possible */
     /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
     CGAffineTransform imageTransform;
     if (image.frame.size.height > 100.0f){
@@ -605,6 +610,28 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     return imageTransform;
 
+}
+
+-(CGAffineTransform)scaleTransformForTaskImageThatTheUserScaledViaThePinchGesture:(UIView *)image
+{
+    /* Same as the above method, except scales are based of the images current transform. Basicly 'CGAffineTransformMakeScale' instead of 'CGAffineTransformScale' */
+
+    CGAffineTransform imageTransform;
+    if (image.frame.size.height > 100.0f){
+        // Image is too big
+        imageTransform = CGAffineTransformMakeScale(100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+    }else{
+        // Image is an ideal size, meaning it's below the max height
+        imageTransform = CGAffineTransformMakeScale((self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+        
+        if ((image.frame.size.height * imageTransform.a) > 100.0f){
+            // if the previous transform makes the height too big, scale it down
+            imageTransform = CGAffineTransformMakeScale(100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+        }
+    }
+    
+    return imageTransform;
+    
 }
 
 -(void)submitImageAndMathmlToCloud

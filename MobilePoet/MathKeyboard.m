@@ -43,6 +43,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 /* Capital letters locked on enabled */
 @property (nonatomic) MathKeyboardKey *capKey;
 /* Capital key reference so that the selected state can be easily adjusted. */
+@property (nonatomic) BOOL uiGuideModeEnabled;
+/* UI guide is a feature in training mode where some UI elements are pointed out to the user. */
 @end
 
 @implementation MathKeyboard
@@ -380,6 +382,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         [self changeSelectedRangeforOperation:button.titleLabel.text];
         [self enableGuidanceModeForOperation:button.titleLabel.text];
     }
+
 }
 
 -(void)leftCursorButtonPressed:(id)sender
@@ -518,6 +521,45 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         self.rightCursorButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
         //self.cursorControlView.center = CGPointMake(self.cursorControlView.center.x, self.cursorControlView.center.y + 50.0f);
     }completion:nil];
+}
+
+#pragma mark UI Guide Mode
+
+-(void)enableUIGuideMode
+{
+    self.uiGuideModeEnabled = YES;
+    /* Keyboard animation */
+    self.userInteractionEnabled = NO;
+    [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - 40.0f, self.scrollView.contentOffset.y);
+    }completion:^(BOOL finished){
+        if (finished) {
+            [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + 80.0f, self.scrollView.contentOffset.y);
+            }completion:^(BOOL finished){
+                if (finished) {
+                    [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                        self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - 40.0f, self.scrollView.contentOffset.y);
+                    }completion:^(BOOL finished){
+                        if (finished) {
+                            self.userInteractionEnabled = YES;
+                            [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+                                self.leftCursorButton.transform = CGAffineTransformMakeScale(1.3f, 1.3f);
+                                self.rightCursorButton.transform = CGAffineTransformMakeScale(1.3f, 1.3f);
+                            }completion:^(BOOL finished){
+                                if (finished) {
+                                    [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                                        self.leftCursorButton.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+                                        self.rightCursorButton.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+                                    }completion:nil];
+                                }
+                            }];
+                        }
+                    }];
+                }
+            }];
+        }
+    }];
 }
 
 #pragma mark ScrollView Delegate

@@ -43,6 +43,10 @@ const CGFloat kPreviewCenterYPostion;
 /* A set of views that are shown when mathjax has not returned a mathml result in one second */
 @property (strong, nonatomic) UILabel *previewViewLabel;
 @property (strong, nonatomic) UIButton *introBackButton;
+@property (strong, nonatomic) NSMutableArray *uiGuideViews;
+/* Contains all views that make up the UI Guide, which only shows up when the user first enters training mode. */
+/* The UI Guide points out important UI elements to the user */
+@property (nonatomic) BOOL showedUIGuide;
 @end
 
 @implementation TrainingModeViewController
@@ -135,9 +139,17 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)setUpPracticeImageData
 {
-    self.practiceImageNames = @[@"practiceimage1.jpg", @"practiceimage2.jpg", @"practiceImage3.jpg", @"practiceImage4.jpg", @"practiceimage5.jpg"];
+    self.practiceImageNames = @[@"practiceImage3.jpg", @"practiceimage2.jpg", @"practiceimage1.jpg", @"practiceImage4.jpg", @"practiceimage5.jpg"];
     self.practiceImagesCorrectMathMLTraslations = @[
         /* Image 1 */
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mo>(<.mo><mi>x<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><mn>4<.mn><msup><mrow><mo>(<.mo><mi>y<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mo>(<.mo><mi>x<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mrow><mo>(<.mo><mi>y<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>"],
+        /* Image 2 */
+        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mi>A<.mi><mn>2<.mn><.msup><mo>+<.mo><msup><mi>B<.mi><mn>2<.mn><.msup><.mrow><.msqrt><.mstyle><.math>",
+          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mrow><mo>(<.mo><mi>A<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><msup><mrow><mo>(<.mo><mi>B<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><.mrow><.msqrt><.mstyle><.math>"],
+        /* Image 3 */
         @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mi>tan<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><mo>=<.mo><mfrac><msup><mrow><mi>sin<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><msup><mrow><mi>cos<.mi><mn>270<.mn><.mrow><mo>&.x2218;<.mo><.msup><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mrow><mo>(<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>)<.mo><.mrow><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
@@ -145,14 +157,6 @@ const CGFloat kPreviewCenterYPostion;
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mrow><mo>(<.mo><mfrac><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mfrac><mo>)<.mo><.mrow><mo>=<.mo><mfrac><mrow><mo>-<.mo><mn>1<.mn><.mrow><mrow><mn>0<.mn><.mrow><.mfrac><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><.mfrac><mo>=<.mo><mo>-<.mo><mfrac><mn>1<.mn><mn>0<.mn><.mfrac><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>tan<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mfrac><mrow><mrow><mi>sin<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><mrow><mrow><mi>cos<.mi><mrow><mo>(<.mo><msup><mn>270<.mn><mo>&.x2218;<.mo><.msup><mo>)<.mo><.mrow><.mrow><.mrow><.mfrac><mo>=<.mo><mfrac><mrow><mo>-<.mo><mn>1<.mn><.mrow><mrow><mn>0<.mn><.mrow><.mfrac><.mstyle><.math>"],
-        /* Image 2 */
-        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mi>A<.mi><mn>2<.mn><.msup><mo>+<.mo><msup><mi>B<.mi><mn>2<.mn><.msup><.mrow><.msqrt><.mstyle><.math>",
-          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mi>C<.mi><mo>=<.mo><msqrt><mrow><msup><mrow><mo>(<.mo><mi>A<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><msup><mrow><mo>(<.mo><mi>B<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><.mrow><.msqrt><.mstyle><.math>"],
-        /* Image 3 */
-        @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
-          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mo>(<.mo><mi>x<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><mn>4<.mn><msup><mrow><mo>(<.mo><mi>y<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
-          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mrow><mo>(<.mo><mi>x<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>+<.mo><mn>4<.mn><msup><mi>y<.mi><mn>2<.mn><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
-          @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><msup><mi>x<.mi><mn>2<.mn><.msup><mo>+<.mo><mn>4<.mn><msup><mrow><mo>(<.mo><mi>y<.mi><mo>)<.mo><.mrow><mrow><mn>2<.mn><.mrow><.msup><mo>-<.mo><mn>36<.mn><mo>=<.mo><mn>0<.mn><.mstyle><.math>"],
         /* Image 4 */
         @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>sin<.mi><mn>4<.mn><.mrow><mi>x<.mi><mo>+<.mo><mrow><mi>sin<.mi><mn>2<.mn><.mrow><mi>x<.mi><mo>=<.mo><mn>0<.mn><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mrow><mi>sin<.mi><mrow><mo>(<.mo><mn>4<.mn><mi>x<.mi><mo>)<.mo><.mrow><.mrow><mo>+<.mo><mrow><mi>sin<.mi><mrow><mo>(<.mo><mn>2<.mn><mi>x<.mi><mo>)<.mo><.mrow><.mrow><mo>=<.mo><mn>0<.mn><.mstyle><.math>"],
@@ -160,9 +164,9 @@ const CGFloat kPreviewCenterYPostion;
         @[@"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mn>2<.mn><mi>&.x3C0;<.mi><mi>n<.mi><mo>&.xB1;<.mo><mfrac><mi>&.x3C0;<.mi><mn>2<.mn><.mfrac><.mstyle><.math>",
           @"<mathxmlns=\"http...www.w3.org.1998.Math.MathML\"><mstyledisplaystyle=\"true\"><mn>2<.mn><mi>&.x3C0;<.mi><mi>n<.mi><mo>&.xB1;<.mo><mfrac><mrow><mi>&.x3C0;<.mi><.mrow><mrow><mn>2<.mn><.mrow><.mfrac><.mstyle><.math>"]];
     self.practiceImagesCorrectASCIIMathTraslations = @[
-        @"tan270^circ = (sin270^circ)/(cos270^circ) = -1/0",
-        @"C = sqrt(A^2 + B^2)",
         @"x^2 + 4y^2 - 36 = 0",
+        @"C = sqrt(A^2 + B^2)",
+        @"tan270^circ = (sin270^circ)/(cos270^circ) = -1/0",
         @"sin(4x) + sin(2x) = 0",
         @"2pin +- pi/2"];
     
@@ -257,14 +261,241 @@ const CGFloat kPreviewCenterYPostion;
     return _previewViewLabel;
 }
 
+-(NSMutableArray *)uiGuideViews
+{
+    if (!_uiGuideViews) {
+        _uiGuideViews = [NSMutableArray new];
+    }
+    return _uiGuideViews;
+}
 
+#pragma mark UI Guide View
+
+-(void)setUpAndShowUIGuide
+{
+    /* The UIGuide only shows when the user first uses training mode. It points out particular UI elements that are important */
+    UIView *darkView = [[UIView alloc]initWithFrame:self.view.frame];
+    darkView.backgroundColor = [UIColor blackColor];
+    darkView.alpha = 0;
+    [self.view addSubview:darkView];
+    [self.uiGuideViews addObject:darkView];
+    
+    UITextView *keyboardDialogTextView = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 130.0f)];
+    keyboardDialogTextView.editable = NO;
+    keyboardDialogTextView.backgroundColor = [UIColor clearColor];
+    keyboardDialogTextView.center = CGPointMake(self.view.center.x, -keyboardDialogTextView.frame.size.height);
+    keyboardDialogTextView.textColor = [UIColor whiteColor];
+    keyboardDialogTextView.textAlignment = NSTextAlignmentCenter;
+    keyboardDialogTextView.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:17.0f];
+    keyboardDialogTextView.text = @"You can scroll the keyboard left and right to access other keys.\n\nThe arrow keys on top of the keyboard can be used to move the cursor.";
+    [self.view addSubview:keyboardDialogTextView];
+    [self.uiGuideViews addObject:keyboardDialogTextView];
+    
+    UILabel *okButton = [self makeBorderedButtonWithColor:[UIColor blueColor] andText:@"Ok"];
+    okButton.center = CGPointMake(darkView.center.x, darkView.frame.size.height + okButton.frame.size.height);
+    [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForKeyboardDialog:)]];
+    [self.view addSubview:okButton];
+    [self.uiGuideViews addObject:okButton];
+    
+    [UIView animateWithDuration:0.5f animations:^{
+        darkView.alpha = 0.9f;
+    }completion:^(BOOL finished){
+        if (finished) {
+            [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, darkView.center.y - 150.0f);
+                okButton.center = CGPointMake(okButton.center.x, darkView.center.y - 20.0f);
+            }completion:^(BOOL finished){
+                if (finished) {
+                    MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
+                    [keyboard enableUIGuideMode];
+                }
+            }];
+        }
+    }];
+}
+
+-(void)okButtonPressedForKeyboardDialog:(id)sender
+{
+    UITextView *keyboardDialogTextView;
+    UILabel *okButton;
+    UIView *darkView;
+    for (UIView *uiGuideView in self.uiGuideViews) {
+        if ([uiGuideView isKindOfClass:[UITextView class]]) {
+            keyboardDialogTextView = (UITextView *)uiGuideView;
+        }else if ([uiGuideView isMemberOfClass:[UILabel class]]){
+            okButton = (UILabel *)uiGuideView;
+        }else{
+            darkView = uiGuideView;
+        }
+    }
+    if (keyboardDialogTextView) {
+        [self.textInputView resignFirstResponder];
+        [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, -keyboardDialogTextView.frame.size.height);
+            okButton.center = CGPointMake(okButton.center.x, okButton.center.y + 350.0f);
+        }completion:^(BOOL finished){
+            [keyboardDialogTextView removeFromSuperview];
+            [okButton removeGestureRecognizer:okButton.gestureRecognizers[0]];
+            [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForPreviewViewDialog:)]];
+            [self.uiGuideViews removeObject:keyboardDialogTextView];
+            UITextView *arrowKeysDialogTextView = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+            arrowKeysDialogTextView.backgroundColor = [UIColor clearColor];
+            arrowKeysDialogTextView.center = CGPointMake(arrowKeysDialogTextView.center.x,self.view.frame.size.height + arrowKeysDialogTextView.frame.size.height);
+            arrowKeysDialogTextView.textColor = [UIColor whiteColor];
+            arrowKeysDialogTextView.textAlignment = NSTextAlignmentCenter;
+            arrowKeysDialogTextView.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:17.0f];
+            arrowKeysDialogTextView.text = @"When you type your math, the preview view will show a live preview of the math interpritation";
+            [self.view addSubview:arrowKeysDialogTextView];
+            [self.uiGuideViews addObject:arrowKeysDialogTextView];
+            
+            [UIView animateWithDuration:0.4f delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+                darkView.frame = CGRectMake(0, self.previewView.frame.origin.y + self.previewView.frame.size.height + 60.0f, darkView.frame.size.width, darkView.frame.size.height);
+            }completion:^(BOOL finished){
+                [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                    arrowKeysDialogTextView.center = CGPointMake(arrowKeysDialogTextView.center.x, self.view.frame.size.height - (arrowKeysDialogTextView.frame.size.height + 80.0f));
+                    okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
+                }completion:^(BOOL finished){
+                    if (finished) {
+                        [self triggerFakeTyping];
+                    }
+                }];
+            }];
+            
+        }];
+    }
+}
+
+-(void)okButtonPressedForPreviewViewDialog:(id)sender
+{
+    UITextView *dialogTextView;
+    UILabel *okButton;
+    UIView *darkView;
+    for (UIView *uiGuideView in self.uiGuideViews) {
+        if ([uiGuideView isKindOfClass:[UITextView class]]) {
+            dialogTextView = (UITextView *)uiGuideView;
+        }else if ([uiGuideView isMemberOfClass:[UILabel class]]){
+            okButton = (UILabel *)uiGuideView;
+        }else{
+            darkView = uiGuideView;
+        }
+    }
+    if (dialogTextView) {
+        /* Create the arrow */
+        UIImageView *arrow = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"UIGuideArrow.png"]];
+        arrow.center = CGPointMake(self.view.center.x, ((self.previewView.frame.origin.y - self.currentImage.frame.origin.y)/3) + self.currentImage.frame.origin.y + self.currentImage.frame.size.height);
+        NSLog(@"%f", arrow.center.y);
+        arrow.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+        arrow.alpha = 1;
+        [self.uiGuideViews addObject:arrow];
+        
+        [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            dialogTextView.center = CGPointMake(dialogTextView.center.x,self.view.frame.size.height + dialogTextView.frame.size.height + 100.0f);
+            okButton.center = CGPointMake(okButton.center.x, okButton.center.y + 350.0f);
+        }completion:^(BOOL finished){
+            [okButton removeGestureRecognizer:okButton.gestureRecognizers[0]];
+            [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForGoalDialog:)]];
+            dialogTextView.text = @"Your goal is to write a mathematical description similar to the image.\nMake sure the preview view and the image are identical.";
+                [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                    dialogTextView.center = CGPointMake(dialogTextView.center.x, self.view.frame.size.height - (dialogTextView.frame.size.height + 80.0f));
+                    okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
+                }completion:^(BOOL finished){
+                    if (finished) {
+                        [self.view addSubview:arrow];
+                        [UIView animateWithDuration:0.4f delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                            arrow.transform = CGAffineTransformMakeScale(1.3f, 1.3f);
+                        }completion:^(BOOL finished){
+                            if (finished) {
+                                [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                                    arrow.transform = CGAffineTransformMakeScale( 1.0f, 1.0f);
+                                }completion:nil];
+                            }
+                        }];
+                    }
+                }];
+            
+        }];
+    }
+}
+
+-(void)okButtonPressedForGoalDialog:(id)sender
+{
+    UITextView *dialogTextView;
+    UILabel *okButton;
+    UIView *darkView;
+    UIImageView *arrow;
+    for (UIView *uiGuideView in self.uiGuideViews) {
+        if ([uiGuideView isKindOfClass:[UITextView class]]) {
+            dialogTextView = (UITextView *)uiGuideView;
+        }else if ([uiGuideView isMemberOfClass:[UILabel class]]){
+            okButton = (UILabel *)uiGuideView;
+        }else if ([uiGuideView isMemberOfClass:[UIImageView class]]){
+            arrow = (UIImageView *)uiGuideView;
+        }else{
+            darkView = uiGuideView;
+        }
+    }
+    if (dialogTextView) {
+        [UIView animateWithDuration:0.2f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            arrow.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+        }completion:^(BOOL finished){
+            [UIView animateWithDuration:0.4f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+                arrow.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+                arrow.alpha = 0;
+            }completion:^(BOOL finished){
+                
+            }];
+        }];
+        
+        [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            dialogTextView.center = CGPointMake(dialogTextView.center.x, -dialogTextView.frame.size.height);
+            dialogTextView.alpha = 0;
+            okButton.center = CGPointMake(okButton.center.x, okButton.center.y + 350.0f);
+        }completion:^(BOOL finished){
+            self.textInputView.text = @"";
+            [self textViewDidChange:self.textInputView];
+            [self.textInputView becomeFirstResponder];
+            [UIView animateWithDuration:0.3f delay:0 options:0 animations:^{
+                darkView.alpha = 0;
+            }completion:^(BOOL finished){
+                if (finished) {
+                    [dialogTextView removeFromSuperview];
+                    [okButton removeFromSuperview];
+                    [darkView removeFromSuperview];
+                    [arrow removeFromSuperview];
+                    [self.uiGuideViews removeAllObjects];
+                }
+            }];
+        }];
+    }
+}
+
+-(void)triggerFakeTyping
+{
+    [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(typeNextFakeCharcter:) userInfo:nil repeats:YES];
+}
+
+-(void)typeNextFakeCharcter:(NSTimer *)timer
+{
+    static int iterationCount = 0;
+    if (iterationCount == 19) {
+        /* This should be reset if the ui guide is shown more than once. It never will, but juts in case */
+        iterationCount = 0;
+    }
+    const NSString *fakeText = @"x^2 + 4y^2 - 36 = 0";
+    self.textInputView.text = [fakeText substringWithRange:NSMakeRange(0, iterationCount + 1)];
+    iterationCount++;
+    if (iterationCount == [fakeText length]) {
+        [timer invalidate];
+        [self textViewDidChange:self.textInputView];
+    }
+}
 
 #pragma mark Button actions
 
 -(void)beginButtonTapped:(UITapGestureRecognizer *)gesture
 {
     gesture.view.userInteractionEnabled = NO;
-    [UIView animateWithDuration:0.3f delay:0.0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+    [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.introView.center = CGPointMake(self.introView.center.x, self.introView.center.y - self.view.frame.size.height);
         self.beginButton.center = CGPointMake(self.beginButton.center.x, self.view.frame.size.height + self.beginButton.frame.size.height * 4);
     }completion:^(BOOL finished){
@@ -472,18 +703,52 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)dragImage:(UIPanGestureRecognizer *)gesture
 {
+    /* Drags along the Y axis always animate back to the original Y center when the gesture ends */
     static int originalImageCenterY;
-    
     if (gesture.state == UIGestureRecognizerStateBegan) {
         originalImageCenterY = gesture.view.center.y;
     }else if (gesture.state == UIGestureRecognizerStateChanged) {
-        gesture.view.center = CGPointMake(gesture.view.center.x, gesture.view.center.y + [gesture translationInView:self.view].y);
+        gesture.view.center = CGPointMake(gesture.view.center.x + [gesture translationInView:self.view].x, gesture.view.center.y + [gesture translationInView:self.view].y);
         [gesture setTranslation:CGPointZero inView:self.view];
     }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
-        [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-            gesture.view.center = CGPointMake(gesture.view.center.x, originalImageCenterY);
-        }completion:^(BOOL finished){}];
+        /* Drags along the X axis won't animate back to the screens center when the gesture ends, except when less than 50 points of the image are on screen */
+        if ((gesture.view.frame.origin.x >= (self.view.frame.size.width - 50.0f)) || ((gesture.view.frame.origin.x + gesture.view.frame.size.width) <= 50.0f)) {
+            [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                gesture.view.center = CGPointMake(self.view.center.x, originalImageCenterY);
+            }completion:nil];
+        }else{
+            [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                gesture.view.center = CGPointMake(gesture.view.center.x, originalImageCenterY);
+            }completion:nil];
+        }
     }
+}
+
+-(void)pinchImage:(UIPinchGestureRecognizer *)gesture
+{
+    if (gesture.state == UIGestureRecognizerStateChanged) {
+        gesture.view.transform = CGAffineTransformScale(gesture.view.transform, gesture.scale, gesture.scale);
+        gesture.scale = 1.0f;
+    }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
+        
+        /* Image is not enlarged (aka tapped), so scale the image to its original size if its current
+         size is less than its original */
+        CGAffineTransform originalScale = [self scaleTransformForTaskImageThatTheUserScaledViaThePinchGesture:gesture.view];
+        if (gesture.view.frame.size.width < (gesture.view.frame.size.width * originalScale.a)) {
+            /* If image width is less than its ideal width, scale it up */
+            originalScale = [self scaleTransformForTaskImage:gesture.view];
+            [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                gesture.view.transform = originalScale;
+            }completion:^(BOOL finished){
+                if (finished) {
+                    if (self.imageIsEnlarged) {
+                        self.imageIsEnlarged = NO;
+                    }
+                }
+            }];
+        }
+    }
+    
 }
 
 #pragma mark System
@@ -511,7 +776,7 @@ const CGFloat kPreviewCenterYPostion;
             
             /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
             /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
-            CGAffineTransform imageTransform = [self scaleTaskImageForMainView:image];
+            CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
             
             /* animate image to the top */
             [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -532,6 +797,8 @@ const CGFloat kPreviewCenterYPostion;
                     [self.textInputView becomeFirstResponder];
                     [image addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(enlargeImage:)]];
                     [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
+                    [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
+
                     image.userInteractionEnabled = YES;
                     
                     /* Animate in preview shadow */
@@ -548,7 +815,14 @@ const CGFloat kPreviewCenterYPostion;
                     [UIView animateWithDuration:0.5f animations:^{
                         self.previewViewLabel.alpha = 1.0f;
                         self.navigationBarLabel.alpha = 1.0f;
-                    }completion:nil];
+                    }completion:^(BOOL finished){
+                        if (finished) {
+                            if (!self.showedUIGuide) {
+                                [self setUpAndShowUIGuide];
+                                self.showedUIGuide = YES;
+                            }
+                        }
+                    }];
                 }
             }];
         }
@@ -567,9 +841,9 @@ const CGFloat kPreviewCenterYPostion;
     self.currentImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:self.practiceImageNames[self.currentImageID]]];
 }
 
--(CGAffineTransform)scaleTaskImageForMainView:(UIImageView *)image
+-(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
 {
-    /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
+    /* Calculate proper image scaling so the image fits properly in the main UI. Assuming any image size is possible */
     /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
     CGAffineTransform imageTransform;
     if (image.frame.size.height > 100.0f){
@@ -589,6 +863,27 @@ const CGFloat kPreviewCenterYPostion;
     
 }
 
+-(CGAffineTransform)scaleTransformForTaskImageThatTheUserScaledViaThePinchGesture:(UIView *)image
+{
+    /* Same as the above method, except scales are based of the images current transform. Basicly 'CGAffineTransformMakeScale' instead of 'CGAffineTransformScale' */
+    
+    CGAffineTransform imageTransform;
+    if (image.frame.size.height > 100.0f){
+        // Image is too big
+        imageTransform = CGAffineTransformMakeScale(100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+    }else{
+        // Image is an ideal size, meaning it's below the max height
+        imageTransform = CGAffineTransformMakeScale((self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+        
+        if ((image.frame.size.height * imageTransform.a) > 100.0f){
+            // if the previous transform makes the height too big, scale it down
+            imageTransform = CGAffineTransformMakeScale(100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+        }
+    }
+    
+    return imageTransform;
+    
+}
 
 -(void)resetSubviewsForNewImage
 {

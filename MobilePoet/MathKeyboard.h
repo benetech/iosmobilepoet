@@ -12,11 +12,11 @@
 
 -(instancetype)initWithTextView:(UITextView *)textView withCharacters:(NSArray *)characters;
 /* The keyboard will be 'textView's inputView. Each character in 'charcters' will have a button on the keyboard */
-
 +(void)addMathKeyboardToTextView:(UITextView *)textView;
 /* Creates and attaches a math keyboard to the textview without having to intialize one. */
-
 -(void)animateIn;
 -(void)disableCursorKeyHorizontalAnimationForNextKeyboardDismissal;
+/* For clean animations when a keyboards super view is pushed off the navigation stack */
+-(void)enableUIGuideMode;
 
 @end
