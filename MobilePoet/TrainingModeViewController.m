@@ -120,6 +120,9 @@ const CGFloat kPreviewCenterYPostion;
     [self.view addSubview:self.previewView];
     
     [self setUpIntroView];
+    
+    /* Check whether this is the users first time trying training mode. If so we'll show the UI Guide and disable the submit button */
+    [self checkWhetherToShowUIGuide];
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -261,6 +264,14 @@ const CGFloat kPreviewCenterYPostion;
     return _previewViewLabel;
 }
 
+-(void)checkWhetherToShowUIGuide
+{
+    /* Using nsuserdefaults... */
+    if (!self.showedUIGuide) {
+        self.submitButton.enabled = NO;
+    }
+}
+
 -(NSMutableArray *)uiGuideViews
 {
     if (!_uiGuideViews) {
@@ -287,7 +298,7 @@ const CGFloat kPreviewCenterYPostion;
     keyboardDialogTextView.textColor = [UIColor whiteColor];
     keyboardDialogTextView.textAlignment = NSTextAlignmentCenter;
     keyboardDialogTextView.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:17.0f];
-    keyboardDialogTextView.text = @"You can scroll the keyboard left and right to access other keys.\n\nThe arrow keys on top of the keyboard can be used to move the cursor.";
+    keyboardDialogTextView.text = @"You can scroll the keyboard left and right to access other keys on the keyboard.";
     [self.view addSubview:keyboardDialogTextView];
     [self.uiGuideViews addObject:keyboardDialogTextView];
     
@@ -302,7 +313,7 @@ const CGFloat kPreviewCenterYPostion;
     }completion:^(BOOL finished){
         if (finished) {
             [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, darkView.center.y - 150.0f);
+                keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, darkView.center.y - 100.0f);
                 okButton.center = CGPointMake(okButton.center.x, darkView.center.y - 20.0f);
             }completion:^(BOOL finished){
                 if (finished) {
@@ -314,8 +325,14 @@ const CGFloat kPreviewCenterYPostion;
     }];
 }
 
+/* The next few "okbutton..." methods will handle each next step in the ui guide interactive walkthorugh */
+/* Each method represents the completion of a guide dialog */
+
 -(void)okButtonPressedForKeyboardDialog:(id)sender
 {
+    /* Show arrow cursor keys dialog */
+    
+    /* Get a reference to the guide subviews */
     UITextView *keyboardDialogTextView;
     UILabel *okButton;
     UIView *darkView;
@@ -328,31 +345,97 @@ const CGFloat kPreviewCenterYPostion;
             darkView = uiGuideView;
         }
     }
+    
+    if (keyboardDialogTextView) {
+        /* If all went well with finding the references, continue with the guide */
+        UITextView *arrowKeyDialog = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 130.0f)];
+        arrowKeyDialog.editable = NO;
+        arrowKeyDialog.backgroundColor = [UIColor clearColor];
+        arrowKeyDialog.center = CGPointMake(self.view.center.x, -keyboardDialogTextView.frame.size.height);
+        arrowKeyDialog.textColor = [UIColor whiteColor];
+        arrowKeyDialog.textAlignment = NSTextAlignmentCenter;
+        arrowKeyDialog.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:17.0f];
+        arrowKeyDialog.text = @"The arrow keys on top of the keyboard can be used to move the cursor.";
+        [self.view addSubview:arrowKeyDialog];
+        [self.uiGuideViews addObject:arrowKeyDialog];
+        
+        //Animate away ok button...
+        [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            okButton.center = CGPointMake(okButton.center.x, okButton.center.y + 350.0f);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [okButton removeGestureRecognizer:okButton.gestureRecognizers[0]];
+                [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForArrowKeys:)]];
+            
+                //Animate back ok button and second textview
+                [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                    keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, keyboardDialogTextView.center.y + 30.0f);
+                    arrowKeyDialog.center = CGPointMake(arrowKeyDialog.center.x, darkView.center.y - 150.0f);
+                    okButton.center = CGPointMake(okButton.center.x, darkView.center.y - 20.0f);
+                }completion:^(BOOL finished){
+                    MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
+                    [keyboard animateCursorButtonsForUIGuide];
+                }];
+            }
+            
+        }];
+        
+    }
+}
+
+-(void)okButtonPressedForArrowKeys:(id)sender
+{
+    /* Show math preview view dialog */
+    
+    UITextView *keyboardDialogTextView;
+    UITextView *arrowKeysDialogTextView;
+    UILabel *okButton;
+    UIView *darkView;
+    for (UIView *uiGuideView in self.uiGuideViews) {
+        if ([uiGuideView isKindOfClass:[UITextView class]]) {
+            UITextView *textView = (UITextView *)uiGuideView;
+            if ([textView.text isEqualToString:@"You can scroll the keyboard left and right to access other keys on the keyboard."]) {
+                keyboardDialogTextView = (UITextView *)uiGuideView;
+            }else{
+                arrowKeysDialogTextView = (UITextView *)uiGuideView;
+            }
+        }else if ([uiGuideView isMemberOfClass:[UILabel class]]){
+            okButton = (UILabel *)uiGuideView;
+        }else{
+            darkView = uiGuideView;
+        }
+    }
     if (keyboardDialogTextView) {
         [self.textInputView resignFirstResponder];
         [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
             keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, -keyboardDialogTextView.frame.size.height);
+            arrowKeysDialogTextView.center = CGPointMake(arrowKeysDialogTextView.center.x, -arrowKeysDialogTextView.frame.size.height);
             okButton.center = CGPointMake(okButton.center.x, okButton.center.y + 350.0f);
         }completion:^(BOOL finished){
+            /* Remove existing textviews, reset ok button selector */
             [keyboardDialogTextView removeFromSuperview];
+            [arrowKeysDialogTextView removeFromSuperview];
             [okButton removeGestureRecognizer:okButton.gestureRecognizers[0]];
             [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForPreviewViewDialog:)]];
             [self.uiGuideViews removeObject:keyboardDialogTextView];
-            UITextView *arrowKeysDialogTextView = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
-            arrowKeysDialogTextView.backgroundColor = [UIColor clearColor];
-            arrowKeysDialogTextView.center = CGPointMake(arrowKeysDialogTextView.center.x,self.view.frame.size.height + arrowKeysDialogTextView.frame.size.height);
-            arrowKeysDialogTextView.textColor = [UIColor whiteColor];
-            arrowKeysDialogTextView.textAlignment = NSTextAlignmentCenter;
-            arrowKeysDialogTextView.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:17.0f];
-            arrowKeysDialogTextView.text = @"When you type your math, the preview view will show a live preview of the math interpritation";
-            [self.view addSubview:arrowKeysDialogTextView];
-            [self.uiGuideViews addObject:arrowKeysDialogTextView];
+            [self.uiGuideViews removeObject:arrowKeysDialogTextView];
+            
+            /* Make new textview */
+            UITextView *previewDialogTextView = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+            previewDialogTextView.backgroundColor = [UIColor clearColor];
+            previewDialogTextView.center = CGPointMake(previewDialogTextView.center.x,self.view.frame.size.height + previewDialogTextView.frame.size.height + 50.0f);
+            previewDialogTextView.textColor = [UIColor whiteColor];
+            previewDialogTextView.textAlignment = NSTextAlignmentCenter;
+            previewDialogTextView.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:17.0f];
+            previewDialogTextView.text = @"When you type your math, the preview view will show a live preview of the math interpritation";
+            [self.view addSubview:previewDialogTextView];
+            [self.uiGuideViews addObject:previewDialogTextView];
             
             [UIView animateWithDuration:0.4f delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
                 darkView.frame = CGRectMake(0, self.previewView.frame.origin.y + self.previewView.frame.size.height + 60.0f, darkView.frame.size.width, darkView.frame.size.height);
             }completion:^(BOOL finished){
                 [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                    arrowKeysDialogTextView.center = CGPointMake(arrowKeysDialogTextView.center.x, self.view.frame.size.height - (arrowKeysDialogTextView.frame.size.height + 80.0f));
+                    previewDialogTextView.center = CGPointMake(previewDialogTextView.center.x, self.view.frame.size.height - (previewDialogTextView.frame.size.height + 70.0f));
                     okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
                 }completion:^(BOOL finished){
                     if (finished) {
@@ -367,6 +450,8 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)okButtonPressedForPreviewViewDialog:(id)sender
 {
+    /* Show the goal dialog */
+    
     UITextView *dialogTextView;
     UILabel *okButton;
     UIView *darkView;
@@ -389,7 +474,7 @@ const CGFloat kPreviewCenterYPostion;
         [self.uiGuideViews addObject:arrow];
         
         [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
-            dialogTextView.center = CGPointMake(dialogTextView.center.x,self.view.frame.size.height + dialogTextView.frame.size.height + 100.0f);
+            dialogTextView.center = CGPointMake(dialogTextView.center.x,self.view.frame.size.height + dialogTextView.frame.size.height + 250.0f);
             okButton.center = CGPointMake(okButton.center.x, okButton.center.y + 350.0f);
         }completion:^(BOOL finished){
             [okButton removeGestureRecognizer:okButton.gestureRecognizers[0]];
@@ -463,6 +548,11 @@ const CGFloat kPreviewCenterYPostion;
                     [darkView removeFromSuperview];
                     [arrow removeFromSuperview];
                     [self.uiGuideViews removeAllObjects];
+                    
+                    MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
+                    [keyboard disableUIGuideMode];
+                    self.showedUIGuide = YES;
+                    self.submitButton.enabled = YES;
                 }
             }];
         }];

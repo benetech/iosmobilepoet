@@ -18,5 +18,8 @@
 -(void)disableCursorKeyHorizontalAnimationForNextKeyboardDismissal;
 /* For clean animations when a keyboards super view is pushed off the navigation stack */
 -(void)enableUIGuideMode;
+-(void)disableUIGuideMode;
+-(void)animateCursorButtonsForUIGuide;
+/* This is used for the UI Guide in training mode. This method won't work if the keyboard is not in UI Guide mode */
 
 @end
