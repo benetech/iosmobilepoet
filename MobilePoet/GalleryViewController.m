@@ -18,6 +18,7 @@
 @property (strong, nonatomic) UIView *selectedCellControls;
 @property (strong, nonatomic) UIView *darkView;
 @property (strong, nonatomic) UIButton *backButton;
+@property (strong, nonatomic) UILabel *navigationBarLabel;
 @end
 
 @implementation GalleryViewController
@@ -27,7 +28,7 @@
     [super viewDidLoad];
     
     /* CollectionView setup */
-	self.collectionView = [[UICollectionView alloc]initWithFrame:self.view.frame collectionViewLayout:[UICollectionViewFlowLayout new]];
+	self.collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) collectionViewLayout:[UICollectionViewFlowLayout new]];
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     self.collectionView.scrollEnabled = YES;
@@ -47,6 +48,7 @@
     backButton.alpha = 0;
     self.backButton = backButton;
     [self.collectionView addSubview:self.backButton];
+    [self.collectionView addSubview:self.navigationBarLabel];
     
     /* Fetch images */
     self.fetchedImages = [NSMutableArray new];
@@ -55,6 +57,11 @@
 
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
+    [UIView animateWithDuration:0.3f animations:^{
+        self.backButton.alpha = 1.0f;
+        self.navigationBarLabel.alpha = 1.0f;
+    }completion:nil];
+
     [self showCollectionView];
 }
 
@@ -62,22 +69,30 @@
 {
     /* Intro animations */
     self.collectionView.contentOffset = CGPointMake(0, -70.0f);
-    [UIView animateWithDuration:0.6f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+    [UIView animateWithDuration:0.6f delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.collectionView.alpha = 1.0f;
         self.collectionView.contentOffset = CGPointZero;
-    }completion:^(BOOL finished){
-        if (finished) {
-            [UIView animateWithDuration:0.5f animations:^{
-                self.backButton.alpha = 1.0f;
-            }completion:nil];
-        }
-    }];
+    }completion:nil];
 }
 
 -(void)fetchImages
 {
     /* For now, 'simulates' fetching images */
     [self.fetchedImages addObjectsFromArray:@[[UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"3.jpg"], [UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"2.jpg"], [UIImage imageNamed:@"15.jpg"], [UIImage imageNamed:@"4.jpg"], [UIImage imageNamed:@"16.jpg"], [UIImage imageNamed:@"17.jpg"], [UIImage imageNamed:@"18.jpg"], [UIImage imageNamed:@"19.jpg"], [UIImage imageNamed:@"20.jpg"], [UIImage imageNamed:@"21.jpg"]]];
+}
+
+-(UILabel *)navigationBarLabel
+{
+    if (!_navigationBarLabel) {
+        _navigationBarLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100.0f, 25.0f)];
+        _navigationBarLabel.center = CGPointMake(self.view.center.x, _backButton.center.y);
+        _navigationBarLabel.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:16.0f];
+        _navigationBarLabel.textAlignment = NSTextAlignmentCenter;
+        _navigationBarLabel.text = @"Gallery";
+        _navigationBarLabel.alpha = 0;
+    }
+    
+    return _navigationBarLabel;
 }
 
 #pragma mark - UICollectionViewDelegate

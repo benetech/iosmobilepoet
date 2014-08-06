@@ -128,16 +128,25 @@ const CGFloat kPreviewCenterYPostion;
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    /* Animate in begin button */
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.beginButton.center = CGPointMake(self.beginButton.center.x, self.view.frame.size.height - 120.0f);
-    }completion:^(BOOL finished){
-        if (finished) {
-            [UIView animateWithDuration:0.5f animations:^{
-                self.introBackButton.alpha = 1.0f;
-            }completion:nil];
-        }
-    }];
+    }completion:nil];
     
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self prepareAndExecuteBackButtonAnimation];
+}
+
+-(void)prepareAndExecuteBackButtonAnimation
+{
+    self.introBackButton.center = CGPointMake(self.introBackButton.center.x - 70.0f, self.introBackButton.center.y);
+    [UIView animateWithDuration:0.45f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        self.introBackButton.center = CGPointMake(self.introBackButton.center.x + 70.0f, self.introBackButton.center.y);
+    }completion:nil];
 }
 
 -(void)setUpPracticeImageData
@@ -208,13 +217,12 @@ const CGFloat kPreviewCenterYPostion;
     self.beginButton = beginButton;
     
     UIButton *backButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    UIImage *backImage = [UIImage imageNamed:@"backButton.png"];
+    UIImage *backImage = [UIImage imageNamed:@"backToMenuButton.png"];
     [backButton setBackgroundImage:backImage forState:UIControlStateNormal];
     backButton.frame = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
     backButton.transform = CGAffineTransformMakeScale(55.0f/backButton.frame.size.width, 55.0f/backButton.frame.size.width);
     [backButton addTarget:self action:@selector(introBackButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     backButton.center = CGPointMake(30.0f, 40.0f);
-    backButton.alpha = 0;
     [introView addSubview:backButton];
     self.introBackButton = backButton;
     
@@ -431,7 +439,7 @@ const CGFloat kPreviewCenterYPostion;
             [self.view addSubview:previewDialogTextView];
             [self.uiGuideViews addObject:previewDialogTextView];
             
-            [UIView animateWithDuration:0.4f delay:0 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+            [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
                 darkView.frame = CGRectMake(0, self.previewView.frame.origin.y + self.previewView.frame.size.height + 60.0f, darkView.frame.size.width, darkView.frame.size.height);
             }completion:^(BOOL finished){
                 [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
@@ -468,7 +476,6 @@ const CGFloat kPreviewCenterYPostion;
         /* Create the arrow */
         UIImageView *arrow = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"UIGuideArrow.png"]];
         arrow.center = CGPointMake(self.view.center.x, ((self.previewView.frame.origin.y - self.currentImage.frame.origin.y)/3) + self.currentImage.frame.origin.y + self.currentImage.frame.size.height);
-        NSLog(@"%f", arrow.center.y);
         arrow.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
         arrow.alpha = 1;
         [self.uiGuideViews addObject:arrow];
@@ -540,6 +547,7 @@ const CGFloat kPreviewCenterYPostion;
             [self textViewDidChange:self.textInputView];
             [self.textInputView becomeFirstResponder];
             [UIView animateWithDuration:0.3f delay:0 options:0 animations:^{
+                darkView.frame = CGRectMake(0, self.view.frame.size.height, darkView.frame.size.width, darkView.frame.size.height);
                 darkView.alpha = 0;
             }completion:^(BOOL finished){
                 if (finished) {
@@ -553,6 +561,8 @@ const CGFloat kPreviewCenterYPostion;
                     [keyboard disableUIGuideMode];
                     self.showedUIGuide = YES;
                     self.submitButton.enabled = YES;
+                    
+                    [self markThatUserHasAccessedTrainingMode];
                 }
             }];
         }];
@@ -578,6 +588,14 @@ const CGFloat kPreviewCenterYPostion;
         [timer invalidate];
         [self textViewDidChange:self.textInputView];
     }
+}
+
+-(void)markThatUserHasAccessedTrainingMode
+{
+    /* Mark that the user has done training mode so we stop alerting them about it */
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:[NSNumber numberWithInt:1] forKey:@"hasDoneTrainingMode"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 #pragma mark Button actions
@@ -617,6 +635,7 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)backButtonPressed:(UIButton *)button
 {
+    /* Remove self from view */
     MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
     [keyboard disableCursorKeyHorizontalAnimationForNextKeyboardDismissal];
     [self.navigationController popViewControllerAnimated:YES];
@@ -624,6 +643,9 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)introBackButtonPressed:(UIButton *)button
 {
+    [UIView animateWithDuration:0.45f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+        self.introBackButton.center = CGPointMake(self.introBackButton.center.x - 70.0f, self.introBackButton.center.y);
+    }completion:nil];
     [self.navigationController popViewControllerAnimated:YES];
 }
 

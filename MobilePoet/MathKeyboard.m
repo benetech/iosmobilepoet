@@ -530,19 +530,19 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     self.uiGuideModeEnabled = YES;
     /* Keyboard animations */
     self.userInteractionEnabled = NO;
-    [UIView animateWithDuration:0.5f delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
     }completion:^(BOOL finished){
         if (finished) {
-            [UIView animateWithDuration:0.5f delay:0.4f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
                 self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
             }completion:^(BOOL finished){
                 if (finished) {
-                    [UIView animateWithDuration:0.5f delay:0.4f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                    [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
                         self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
                     }completion:^(BOOL finished){
                         if (finished) {
-                            [UIView animateWithDuration:0.5f delay:0.4f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                            [UIView animateWithDuration:0.6f delay:0.4f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
                                 self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
                             }completion:^(BOOL finished){
                                 if (finished) {

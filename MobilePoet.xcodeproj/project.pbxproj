@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		240FD360199287F400B24878 /* backToMenuButton.png in Resources */ = {isa = PBXBuildFile; fileRef = 240FD35E199287F400B24878 /* backToMenuButton.png */; };
+		240FD361199287F400B24878 /* backToMenuButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 240FD35F199287F400B24878 /* backToMenuButton@2x.png */; };
 		241142DC1947AABB003CFB4E /* MathKeyboardKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 241142DB1947AABB003CFB4E /* MathKeyboardKey.m */; };
 		241142DF194A5918003CFB4E /* TaskModePickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 241142DE194A5918003CFB4E /* TaskModePickerViewController.m */; };
 		2436B5B9192EBE510047110C /* MathKeyboard.m in Sources */ = {isa = PBXBuildFile; fileRef = 2436B5B8192EBE510047110C /* MathKeyboard.m */; };
@@ -74,6 +76,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		240FD35E199287F400B24878 /* backToMenuButton.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = backToMenuButton.png; sourceTree = "<group>"; };
+		240FD35F199287F400B24878 /* backToMenuButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "backToMenuButton@2x.png"; sourceTree = "<group>"; };
 		241142DA1947AABB003CFB4E /* MathKeyboardKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MathKeyboardKey.h; sourceTree = "<group>"; };
 		241142DB1947AABB003CFB4E /* MathKeyboardKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MathKeyboardKey.m; sourceTree = "<group>"; };
 		241142DD194A5918003CFB4E /* TaskModePickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TaskModePickerViewController.h; sourceTree = "<group>"; };
@@ -285,6 +289,8 @@
 				2442D543198C43AB006ADE3F /* UIGuideArrow@2x.png */,
 				2442D53E1988164E006ADE3F /* backButton.png */,
 				2442D53F1988164E006ADE3F /* backButton@2x.png */,
+				240FD35E199287F400B24878 /* backToMenuButton.png */,
+				240FD35F199287F400B24878 /* backToMenuButton@2x.png */,
 				2497B6A3196DECEF008A7191 /* Training Mode Images */,
 				24A6410F195CA4A8000DF735 /* Gallery Sample Images */,
 				2436B5C0192FD1100047110C /* testimg1.jpg */,
@@ -412,7 +418,9 @@
 				24A64116195CA4F6000DF735 /* 2.jpg in Resources */,
 				24F7596219575D7000AF0856 /* backspace@2x.png in Resources */,
 				24ED7D90192A810F00C9A150 /* Images.xcassets in Resources */,
+				240FD361199287F400B24878 /* backToMenuButton@2x.png in Resources */,
 				2436B5C1192FD1100047110C /* testimg1.jpg in Resources */,
+				240FD360199287F400B24878 /* backToMenuButton.png in Resources */,
 				2497B6AC19703776008A7191 /* 16.jpg in Resources */,
 				24BEF1AB1978708200B9F0EC /* capitalizeKeyImage@2x.png in Resources */,
 				24BEF1AE197871B500B9F0EC /* capitalizeKeyHighlightedImage.png in Resources */,

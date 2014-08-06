@@ -13,7 +13,7 @@
                         <viewControllerLayoutGuide type="bottom" id="ZZ0-ML-kzl"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dhk-Nw-8HI">
@@ -66,18 +66,6 @@
                                     <action selector="aboutButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="hK1-QG-kFy"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YBm-QL-CcM">
-                                <rect key="frame" x="120" y="502" width="81" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="19"/>
-                                <state key="normal" title="Sign In">
-                                    <color key="titleColor" red="0.09803922474" green="0.10588236149999999" blue="0.60784316059999999" alpha="1" colorSpace="deviceRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="signInButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="2Or-f5-0ep"/>
-                                </connections>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -86,7 +74,6 @@
                         <outlet property="aboutButton" destination="dQ6-DA-dtC" id="KF7-sG-A1Z"/>
                         <outlet property="beginButton" destination="dhk-Nw-8HI" id="c54-Zl-9O6"/>
                         <outlet property="helpButton" destination="cGF-nj-44N" id="JeX-1n-MUL"/>
-                        <outlet property="signInButton" destination="YBm-QL-CcM" id="G0f-Qt-WtY"/>
                         <outlet property="trainingModeButton" destination="mhd-Jd-hjD" id="6BH-mG-uGG"/>
                     </connections>
                 </viewController>
@@ -97,7 +84,7 @@
         <!--Navigation Controller-->
         <scene sceneID="tqd-zX-yy5">
             <objects>
-                <navigationController definesPresentationContext="YES" navigationBarHidden="YES" id="Lqc-UG-g0N" sceneMemberID="viewController">
+                <navigationController definesPresentationContext="YES" id="Lqc-UG-g0N" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Nv4-rm-A4D">
                         <rect key="frame" x="0.0" y="0.0" width="0.0" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -120,7 +107,7 @@
                         <viewControllerLayoutGuide type="bottom" id="kQJ-bO-Cvr"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="y9V-cm-aw7">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -139,7 +126,7 @@
                         <viewControllerLayoutGuide type="bottom" id="wzR-sj-r5y"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="dby-Td-j5N">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -158,7 +145,7 @@
                         <viewControllerLayoutGuide type="bottom" id="j8c-de-hb7"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="IQ9-7S-EGT">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SyB-Xb-M7U">
@@ -284,7 +271,7 @@
                         <viewControllerLayoutGuide type="bottom" id="B5d-Ht-0Gp"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="OMs-qR-olj">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
