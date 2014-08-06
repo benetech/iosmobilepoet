@@ -13,7 +13,7 @@
                         <viewControllerLayoutGuide type="bottom" id="ZZ0-ML-kzl"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dhk-Nw-8HI">
@@ -64,6 +64,7 @@
                                 </state>
                                 <connections>
                                     <action selector="aboutButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="hK1-QG-kFy"/>
+                                    <segue destination="OGu-7M-vBw" kind="push" id="64w-Vi-3l1"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -84,7 +85,7 @@
         <!--Navigation Controller-->
         <scene sceneID="tqd-zX-yy5">
             <objects>
-                <navigationController definesPresentationContext="YES" id="Lqc-UG-g0N" sceneMemberID="viewController">
+                <navigationController definesPresentationContext="YES" navigationBarHidden="YES" id="Lqc-UG-g0N" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="Nv4-rm-A4D">
                         <rect key="frame" x="0.0" y="0.0" width="0.0" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -107,7 +108,7 @@
                         <viewControllerLayoutGuide type="bottom" id="kQJ-bO-Cvr"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="y9V-cm-aw7">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -126,7 +127,7 @@
                         <viewControllerLayoutGuide type="bottom" id="wzR-sj-r5y"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="dby-Td-j5N">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -145,7 +146,7 @@
                         <viewControllerLayoutGuide type="bottom" id="j8c-de-hb7"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="IQ9-7S-EGT">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SyB-Xb-M7U">
@@ -262,6 +263,25 @@
             </objects>
             <point key="canvasLocation" x="363" y="60"/>
         </scene>
+        <!--About View Controller-->
+        <scene sceneID="OKV-8a-jDh">
+            <objects>
+                <viewController id="OGu-7M-vBw" customClass="AboutViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="tBo-Oq-8WJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wyB-C0-ph1"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="o6l-At-SaS">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="TJh-Tf-IGA"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xf1-Ha-v3L" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-228" y="759"/>
+        </scene>
         <!--Training Mode View Controller-->
         <scene sceneID="75P-WH-wyV">
             <objects>
@@ -271,7 +291,7 @@
                         <viewControllerLayoutGuide type="bottom" id="B5d-Ht-0Gp"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="OMs-qR-olj">
-                        <rect key="frame" x="0.0" y="64" width="320" height="504"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>

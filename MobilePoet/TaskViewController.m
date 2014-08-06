@@ -207,7 +207,21 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     if (buttonIndex == 1) {
         MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
         [keyboard disableCursorKeyHorizontalAnimationForNextKeyboardDismissal];
-        [self.navigationController popViewControllerAnimated:YES];
+        if (self.mode == ImageSelectionModeSpecificImage) {
+            [self.textInputView resignFirstResponder];
+            [UIView animateWithDuration:0.3f delay:0 options:0 animations:^{
+                self.textInputView.alpha = 0;
+                self.previewView.alpha = 0;
+                self.backButton.alpha = 0;
+                self.submitButton.alpha = 0;
+                self.currentImage.alpha = 0;
+            }completion:^(BOOL finished){
+                if (finished) {
+                    [self.navigationController popViewControllerAnimated:NO];
+                }
+            }];
+        }else
+            [self.navigationController popViewControllerAnimated:YES];
     }
 }
 

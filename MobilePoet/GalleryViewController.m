@@ -19,6 +19,7 @@
 @property (strong, nonatomic) UIView *darkView;
 @property (strong, nonatomic) UIButton *backButton;
 @property (strong, nonatomic) UILabel *navigationBarLabel;
+@property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
 @end
 
 @implementation GalleryViewController
@@ -43,9 +44,9 @@
     [backButton setBackgroundImage:backImage forState:UIControlStateNormal];
     backButton.frame = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
     backButton.transform = CGAffineTransformMakeScale(55.0f/backButton.frame.size.width, 55.0f/backButton.frame.size.width);
+    backButton.alpha = 1.0f;
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     backButton.center = CGPointMake(30.0f, 40.0f);
-    backButton.alpha = 0;
     self.backButton = backButton;
     [self.collectionView addSubview:self.backButton];
     [self.collectionView addSubview:self.navigationBarLabel];
@@ -55,24 +56,42 @@
     [self fetchImages];
 }
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    /*Activity Indicator */
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator startAnimating];
+}
+
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    [UIView animateWithDuration:0.3f animations:^{
-        self.backButton.alpha = 1.0f;
-        self.navigationBarLabel.alpha = 1.0f;
-    }completion:nil];
-
     [self showCollectionView];
+}
+
+-(void)prepareViewsForAnimation
+{
+    self.collectionView.contentOffset = CGPointMake(0, -70.0f);
+    self.navigationBarLabel.center = CGPointMake(self.navigationBarLabel.center.x, self.navigationBarLabel.center.y - 70.0f);
+    self.backButton.center = CGPointMake(self.backButton.center.x, self.backButton.center.y - 70.0f);
 }
 
 -(void)showCollectionView
 {
+    [self prepareViewsForAnimation];
     /* Intro animations */
-    self.collectionView.contentOffset = CGPointMake(0, -70.0f);
     [UIView animateWithDuration:0.6f delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.collectionView.alpha = 1.0f;
         self.collectionView.contentOffset = CGPointZero;
-    }completion:nil];
+        self.navigationBarLabel.center = CGPointMake(self.navigationBarLabel.center.x, self.navigationBarLabel.center.y + 70.0f);
+        self.backButton.center = CGPointMake(self.backButton.center.x, self.backButton.center.y + 70.0f);
+        self.activityIndicator.alpha = 0;
+    }completion:^(BOOL finished){
+        if (finished) {
+            [self.activityIndicator stopAnimating];
+            [self.activityIndicator removeFromSuperview];
+        }
+    }];
 }
 
 -(void)fetchImages
@@ -89,10 +108,19 @@
         _navigationBarLabel.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:16.0f];
         _navigationBarLabel.textAlignment = NSTextAlignmentCenter;
         _navigationBarLabel.text = @"Gallery";
-        _navigationBarLabel.alpha = 0;
+        _navigationBarLabel.alpha = 1;
     }
     
     return _navigationBarLabel;
+}
+
+-(UIActivityIndicatorView *)activityIndicator
+{
+    if (!_activityIndicator) {
+        _activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activityIndicator.center = self.view.center;
+    }
+    return _activityIndicator;
 }
 
 #pragma mark - UICollectionViewDelegate
@@ -137,7 +165,7 @@
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(50.0f, 5.0f, 50.0f, 5.0f);
+    return UIEdgeInsetsMake(70.0f, 5.0f, 50.0f, 5.0f);
 }
 
 #pragma mark Button Action

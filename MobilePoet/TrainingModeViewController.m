@@ -435,7 +435,7 @@ const CGFloat kPreviewCenterYPostion;
             previewDialogTextView.textColor = [UIColor whiteColor];
             previewDialogTextView.textAlignment = NSTextAlignmentCenter;
             previewDialogTextView.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:17.0f];
-            previewDialogTextView.text = @"When you type your math, the preview view will show a live preview of the math interpritation";
+            previewDialogTextView.text = @"When you type your math, the preview view will show a live preview of the math interpretation.";
             [self.view addSubview:previewDialogTextView];
             [self.uiGuideViews addObject:previewDialogTextView];
             
@@ -486,7 +486,7 @@ const CGFloat kPreviewCenterYPostion;
         }completion:^(BOOL finished){
             [okButton removeGestureRecognizer:okButton.gestureRecognizers[0]];
             [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForGoalDialog:)]];
-            dialogTextView.text = @"Your goal is to write a mathematical description similar to the image.\nMake sure the preview view and the image are identical.";
+            dialogTextView.text = @"Your goal is to write a mathematical description similar to the image.\nMake sure the preview view and the image above it are identical.";
                 [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
                     dialogTextView.center = CGPointMake(dialogTextView.center.x, self.view.frame.size.height - (dialogTextView.frame.size.height + 80.0f));
                     okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
