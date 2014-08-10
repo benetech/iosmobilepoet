@@ -648,7 +648,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     submitSuccessfulLabel.numberOfLines = 0;
     submitSuccessfulLabel.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
     submitSuccessfulLabel.textAlignment = NSTextAlignmentCenter;
-    submitSuccessfulLabel.text = @"Description Submitted Successfully.";
+    submitSuccessfulLabel.text = @"Description Submitted Successfully";
     [self.view addSubview:submitSuccessfulLabel];
     
     [UIView animateWithDuration:0.2f animations:^{
