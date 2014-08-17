@@ -8,6 +8,8 @@
 
 #import "MathKeyboard.h"
 #import "MathKeyboardKey.h"
+#import "TaskViewController.h"
+//TaskViewController is necessary to handle the help button
 
 const CGFloat kPortaitKeyboardHeight = 216.0f;
 const CGFloat kNormalButtonWidth = 25.0f;
@@ -382,7 +384,13 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
             self.capKey.selected = NO;
         }
     }else if ([button.titleLabel.text isEqualToString:@"help"]){
-        //prevents crashing because this button doens't do anything yet
+        /* Get a reference to the parent TaskViewController */
+        TaskViewController *taskViewController = (TaskViewController *)[self.textView.superview nextResponder];
+        if ([taskViewController isKindOfClass:[TaskViewController class]]) {
+            [taskViewController handleHelpButtonPressed];
+        }else{
+            //...shouldn't ever happen
+        }
     }else
         [self.textView insertText:[self.buttonValues objectForKey:button.titleLabel.text]];
     

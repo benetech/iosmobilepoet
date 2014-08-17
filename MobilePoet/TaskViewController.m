@@ -8,6 +8,8 @@
 
 #import "TaskViewController.h"
 #import "MathKeyboard.h"
+#import "HelpViewController.h"
+#import "GalleryViewController.h"
 
 typedef NS_ENUM(NSInteger, ImageSelectionMode){
     ImageSelectionModeRandom,
@@ -41,6 +43,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 @property (strong, nonatomic) UILabel *previewViewLabel;
 /* This label identifies the preview view as a preview view before the user begins typing */
 @property (strong, nonatomic) NSMutableArray *randomImages;
+@property (nonatomic) BOOL presentedHelpViewController;
+/* Keeps track on if the HelpViewController was just presented/dismissed. */
 @end
 
 @implementation TaskViewController
@@ -107,6 +111,11 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    if (self.presentedHelpViewController) {
+        self.presentedHelpViewController = NO;
+        [self.textInputView becomeFirstResponder];
+        return;
+    }
     if (self.mode == ImageSelectionModeRandom) {
         [self.activityIndicator startAnimating];
         /* Fake delay to simulate server fetch of image */
@@ -517,10 +526,9 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         [self reloadRandomImages];
     }
     /* choose random image */
-    //NSInteger randomIndex = arc4random_uniform([self.randomImages count]);
-    //UIImageView *image = [[UIImageView alloc]initWithImage:[self.randomImages objectAtIndex:randomIndex]];
-    //[self.randomImages removeObjectAtIndex:randomIndex];
-    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"randomImage5.jpg"]];
+    NSInteger randomIndex = arc4random_uniform([self.randomImages count]);
+    UIImageView *image = [[UIImageView alloc]initWithImage:[self.randomImages objectAtIndex:randomIndex]];
+    [self.randomImages removeObjectAtIndex:randomIndex];
     self.currentImage = image;
     
     /* prepare image for animation */
@@ -746,6 +754,11 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
     }else{
         /* Specific Image */
+        UIViewController *superViewController = [[self.navigationController viewControllers]objectAtIndex:[[self.navigationController viewControllers]count]-2];
+        if ([superViewController isMemberOfClass:[GalleryViewController class]]) {
+            GalleryViewController *gallery = (GalleryViewController *)superViewController;
+            [gallery removePreviouslySelectedImage];
+        }
         [self.navigationController popViewControllerAnimated:NO];
     }
 }
@@ -807,6 +820,17 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     return imageTransform;
     
+}
+
+-(void)handleHelpButtonPressed
+{
+    /* Presents the helpviewcontroller if the help button is pressed, because a view (the keyboard) can not do this */
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    HelpViewController *helpViewController = (HelpViewController *)[storyboard instantiateViewControllerWithIdentifier:@"help"];
+    [helpViewController adjustForModalPresentation];
+
+    [self presentViewController:helpViewController animated:YES completion:nil];
+    self.presentedHelpViewController = YES;
 }
 
 #pragma mark TextView and Preview View

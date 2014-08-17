@@ -52,7 +52,6 @@
     [self.collectionView addSubview:self.navigationBarLabel];
     
     /* Fetch images */
-    self.fetchedImages = [NSMutableArray new];
     [self fetchImages];
 }
 
@@ -123,6 +122,14 @@
     return _activityIndicator;
 }
 
+-(NSMutableArray *)fetchedImages
+{
+    if (!_fetchedImages) {
+        _fetchedImages = [NSMutableArray new];
+    }
+    return _fetchedImages;
+}
+
 #pragma mark - UICollectionViewDelegate
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
@@ -166,6 +173,12 @@
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(70.0f, 5.0f, 50.0f, 5.0f);
+}
+
+-(void)removePreviouslySelectedImage
+{
+    ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:self.selectedCellIndexPath];
+    selectedCell.alpha = 0;
 }
 
 #pragma mark Button Action
@@ -325,5 +338,6 @@
         }
     }];
 }
+
 
 @end

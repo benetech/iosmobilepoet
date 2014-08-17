@@ -52,6 +52,7 @@
                                 </state>
                                 <connections>
                                     <action selector="helpButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="kDu-ED-csk"/>
+                                    <segue destination="1JE-ig-phs" kind="push" id="zPq-fg-9w2"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dQ6-DA-dtC">
@@ -178,7 +179,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="20"/>
                                 <state key="normal" title="Source">
-                                    <color key="titleColor" red="0.1098039299" green="0.1098039299" blue="0.6549019814" alpha="1" colorSpace="deviceRGB"/>
+                                    <color key="titleColor" red="0.52253952240000001" green="0.55353906829999999" blue="0.62859517340000004" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
@@ -229,7 +230,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="20"/>
                                 <state key="normal" title="Review and Revise">
-                                    <color key="titleColor" red="0.098039224743843079" green="0.10588236153125763" blue="0.60784316062927246" alpha="1" colorSpace="deviceRGB"/>
+                                    <color key="titleColor" red="0.52253952241373214" green="0.55353906826348598" blue="0.62859517335891724" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
@@ -300,6 +301,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bag-uv-rYe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="229" y="772"/>
+        </scene>
+        <!--Help View Controller-->
+        <scene sceneID="qdm-ov-opJ">
+            <objects>
+                <viewController storyboardIdentifier="help" id="1JE-ig-phs" customClass="HelpViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="6ei-B1-RGe"/>
+                        <viewControllerLayoutGuide type="bottom" id="5eR-hQ-9Yn"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="JAn-E8-hcQ">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="iCl-N1-6M6"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Aoy-bu-YUo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="708" y="740"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

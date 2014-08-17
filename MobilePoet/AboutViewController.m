@@ -11,6 +11,7 @@
 @interface AboutViewController ()
 @property (strong, nonatomic) UITextView *textView;
 @property (strong, nonatomic) UIButton *backButton;
+@property (strong, nonatomic) UILabel *titleLabel;
 @end
 
 @implementation AboutViewController
@@ -22,6 +23,7 @@
     [super viewDidLoad];
     [self.view addSubview:self.textView];
     [self.view addSubview:self.backButton];
+    [self.view addSubview:self.titleLabel];
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -33,16 +35,27 @@
 -(UITextView *)textView
 {
     if (!_textView) {
-        _textView = [[UITextView alloc]initWithFrame:CGRectMake(10.0f, 80.0f, self.view.frame.size.width - 20.0f, self.view.frame.size.height - 80.0f)];
+        _textView = [[UITextView alloc]initWithFrame:CGRectMake(10.0f, 110.0f, self.view.frame.size.width - 20.0f, self.view.frame.size.height - 80.0f)];
         _textView.editable = NO;
         _textView.userInteractionEnabled = NO;
         _textView.attributedText = [self makeTextViewText];
         _textView.font = [UIFont fontWithName:@"Avenir" size:14.0f];
         _textView.textAlignment = NSTextAlignmentCenter;
-        _textView.text = @"About\n\nDeveloped by The DIAGRAM Center, the MobilePoet mathematical expression description tool is an open-source tool for creating accessible descriptions of mathematical equations.\n\nWith MobilePoet, it is possible to instantaneously crowdsource the translation of mathematical images from textbooks and worksheets to accessible formats that can be voiced, converted to Nemeth braille, or incorporated into DAISY formatted books.";
-        [_textView.textStorage addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Avenir-Heavy" size:22.0f] range:NSMakeRange(0, 5)];
+        _textView.text = @"Developed by The DIAGRAM Center, the MobilePoet mathematical expression description tool is an open-source tool for creating accessible descriptions of mathematical equations.\n\nWith MobilePoet, it is possible to instantaneously crowdsource the translation of mathematical images from textbooks and worksheets to accessible formats that can be voiced, converted to Nemeth braille, or incorporated into DAISY formatted books.";
         }
     return _textView;
+}
+
+-(UILabel *)titleLabel
+{
+    if (!_titleLabel) {
+        _titleLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100.0f, 40.0f)];
+        _titleLabel.center = CGPointMake(self.view.frame.size.width/2.0f, 80.0f);
+        _titleLabel.textAlignment = NSTextAlignmentCenter;
+        _titleLabel.font = [UIFont fontWithName:@"Avenir-Heavy" size:22.0f];
+        _titleLabel.text = @"About";
+    }
+    return _titleLabel;
 }
 
 -(UIButton *)backButton

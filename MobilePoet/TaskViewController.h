@@ -12,4 +12,6 @@
 -(void)setTask:(UIImageView *)image;
 -(void)enableGuidanceMode;
 -(void)disableGuidanceMode;
+-(void)handleHelpButtonPressed;
+/* Presents helpViewController */
 @end

@@ -541,7 +541,7 @@ const CGFloat kPreviewCenterYPostion;
         }completion:^(BOOL finished){
             [okButton removeGestureRecognizer:okButton.gestureRecognizers[0]];
             [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForGetStartedDialog:)]];
-            dialogTextView.text = @"Now it's time to get practicing.\n\nLets get started!";
+            dialogTextView.text = @"Now it's time to get practicing.\nLets get started!";
             [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
                 dialogTextView.center = CGPointMake(dialogTextView.center.x, self.view.frame.size.height - (dialogTextView.frame.size.height + 60.0f));
                 okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
