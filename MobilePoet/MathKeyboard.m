@@ -536,38 +536,108 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 -(void)enableUIGuideMode
 {
     self.uiGuideModeEnabled = YES;
-    /* Keyboard animations */
     self.userInteractionEnabled = NO;
-    [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-        self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
+    
+    /* This view creates a yellow outline around the keyboard. I could of just used the keyboard view's 
+     .layer.borderColor property, but then I can't animate it. */
+    UIView *borderView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+    borderView.center = CGPointMake(self.frame.size.width/2.0f, self.frame.size.height/2.0f);
+    borderView.backgroundColor = [UIColor clearColor];
+    borderView.layer.borderWidth = 5.0f;
+    borderView.layer.borderColor = [UIColor yellowColor].CGColor;
+    borderView.alpha = 0;
+    borderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    [self addSubview:borderView];
+    
+
+    /* Keyboard animations */
+    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        borderView.alpha = 1.0f;
+        borderView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
     }completion:^(BOOL finished){
-        if (finished) {
-            [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-                self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
-            }completion:^(BOOL finished){
-                if (finished) {
-                    [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-                        self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
-                    }completion:^(BOOL finished){
-                        if (finished) {
-                            [UIView animateWithDuration:0.6f delay:0.4f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                                self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
-                            }completion:^(BOOL finished){
-                                if (finished) {
-                                    self.userInteractionEnabled = YES;
-                                }
-                            }];
-                        }
-                    }];
-                }
-            }];
-        }
+        [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                    self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
+                }completion:^(BOOL finished){
+                    if (finished) {
+                        [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                            self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
+                        }completion:^(BOOL finished){
+                            if (finished) {
+                                [UIView animateWithDuration:0.6f delay:0.4f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                    self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
+                                }completion:^(BOOL finished){
+                                    if (finished) {
+                                        self.userInteractionEnabled = YES;
+                                    }
+                                }];
+                            }
+                        }];
+                    }
+                }];
+            }
+        }];
     }];
 }
 
 -(void)disableUIGuideMode
 {
     self.uiGuideModeEnabled = NO;
+}
+
+-(void)removeYellowBorderForUIGuide
+{
+    UIView *borderView = [self.subviews objectAtIndex:([self.subviews count]-1)];
+    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        borderView.alpha = 0;
+        borderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    }completion:^(BOOL finished){
+        [borderView removeFromSuperview];
+        
+        /* The next step in the UI Guide is pointing out the arrow keys. So we'll highlight those. */
+        [self makeYellowBorderOnArrowKeysForUIGuide];
+    }];
+}
+
+-(void)makeYellowBorderOnArrowKeysForUIGuide
+{
+    UIView *leftArrowButtonBorderView = [[UIView alloc]initWithFrame:self.leftCursorButton.frame];
+    UIView *rightArrowButtonBorderView = [[UIView alloc]initWithFrame:self.rightCursorButton.frame];
+    leftArrowButtonBorderView.center = CGPointMake(self.leftCursorButton.frame.size.width/2.0f, self.leftCursorButton.frame.size.height/2.0f);
+    rightArrowButtonBorderView.center = CGPointMake(self.rightCursorButton.frame.size.width/2.0f, self.rightCursorButton.frame.size.height/2.0f);
+    leftArrowButtonBorderView.backgroundColor = [UIColor clearColor];
+    rightArrowButtonBorderView.backgroundColor = [UIColor clearColor];
+    leftArrowButtonBorderView.layer.borderWidth = 5.0f;
+    rightArrowButtonBorderView.layer.borderWidth = 5.0f;
+    leftArrowButtonBorderView.layer.cornerRadius = 4.0f;
+    rightArrowButtonBorderView.layer.cornerRadius = 4.0f;
+    leftArrowButtonBorderView.layer.borderColor = [UIColor yellowColor].CGColor;
+    rightArrowButtonBorderView.layer.borderColor = [UIColor yellowColor].CGColor;
+    leftArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    rightArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    leftArrowButtonBorderView.alpha = 0;
+    rightArrowButtonBorderView.alpha = 0;
+    [self.leftCursorButton addSubview:leftArrowButtonBorderView];
+    [self.rightCursorButton addSubview:rightArrowButtonBorderView];
+    
+    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        leftArrowButtonBorderView.alpha = 1.0f;
+        rightArrowButtonBorderView.alpha = 1.0f;
+        leftArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+        rightArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    }completion:nil];
+    
+}
+
+-(void)removeCursorKeysYellowBorderForUIGuide
+{
+    UIView *leftArrowButtonBorderView = [self.leftCursorButton.subviews objectAtIndex:([self.leftCursorButton.subviews count]-1)];
+    UIView *rightArrowButtonBorderView = [self.rightCursorButton.subviews objectAtIndex:([self.rightCursorButton.subviews count]-1)];
+    [leftArrowButtonBorderView removeFromSuperview];
+    [rightArrowButtonBorderView removeFromSuperview];
 }
 
 -(void)animateCursorButtonsForUIGuide

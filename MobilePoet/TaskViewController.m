@@ -40,6 +40,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 @property (nonatomic) MathKeyboard *mathKeyboard;
 @property (strong, nonatomic) UILabel *previewViewLabel;
 /* This label identifies the preview view as a preview view before the user begins typing */
+@property (strong, nonatomic) NSMutableArray *randomImages;
 @end
 
 @implementation TaskViewController
@@ -135,6 +136,13 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.mode = ImageSelectionModeSpecificImage;
 }
 
+-(void)reloadRandomImages
+{
+    for (int i = 1; i < 14; i++) {
+        [self.randomImages addObject:[UIImage imageNamed:[NSString stringWithFormat:@"randomImage%d.jpg", i]]];
+    }
+}
+
 -(MathKeyboard *)mathKeyboard
 {
     if (!_mathKeyboard) {
@@ -165,6 +173,17 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         _activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
     }
     return _activityIndicator;
+}
+
+-(NSMutableArray *)randomImages
+{
+    if (!_randomImages) {
+        _randomImages = [NSMutableArray new];
+        for (int i = 1; i < 14; i++) {
+            [_randomImages addObject:[UIImage imageNamed:[NSString stringWithFormat:@"randomImage%d.jpg", i]]];
+        }
+    }
+    return _randomImages;
 }
 
 #pragma mark Button actions
@@ -281,10 +300,17 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [self.view addSubview:yesButton];
     [self.view addSubview:noButton];
     
+    /* Make scale for images */
+    CGAffineTransform scale = CGAffineTransformScale(self.currentImage.transform, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width);
+    if ((self.currentImage.frame.size.height/self.currentImage.transform.a) * scale.a > 200.0f) {
+        /* If the height of the image is still too big, make the height 200 points, which is the maximum height limit for the image in a submission view */
+        scale = CGAffineTransformScale(self.currentImage.transform, 200.0f/self.currentImage.frame.size.height, 200.0f/self.currentImage.frame.size.height);
+    }
+    
     /* Animate in submission view */
     [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
         /* animate existing task subviews */
-        self.currentImage.transform = CGAffineTransformScale(self.currentImage.transform, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width);
+        self.currentImage.transform = scale;
         self.currentImage.center = CGPointMake(self.currentImage.center.x, self.currentImage.center.y + 100.0f);
         self.previewView.center = CGPointMake(self.previewView.center.x, self.previewView.center.y + 130.0f);
         self.textInputView.center = CGPointMake(self.textInputView.center.x, self.textInputView.center.y + 300.0f);
@@ -410,9 +436,9 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
 }
 
-#pragma mark Gestures
+#pragma mark Image Gestures
 
--(void)enlargeImage:(UIGestureRecognizer *)gesture
+-(void)enlargeImage:(UITapGestureRecognizer *)gesture
 {
     UIView *image = gesture.view;
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -483,9 +509,18 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 -(void)fetchPic:(id)sender
 {
+    /* For ImageSelectionModeRandom type only */
     [self resetSubviewsForNewImageFetch];
     /* This will evetually handle fetching pictures from the mathml cloud servers. For now this will simulate that using local pics */
-    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg1.jpg"]];
+    if ([self.randomImages count] == 0) {
+        /* If all the random images have been described, reload them all again */
+        [self reloadRandomImages];
+    }
+    /* choose random image */
+    //NSInteger randomIndex = arc4random_uniform([self.randomImages count]);
+    //UIImageView *image = [[UIImageView alloc]initWithImage:[self.randomImages objectAtIndex:randomIndex]];
+    //[self.randomImages removeObjectAtIndex:randomIndex];
+    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"randomImage5.jpg"]];
     self.currentImage = image;
     
     /* prepare image for animation */
@@ -741,8 +776,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     }else{
         // Image is an ideal size, meaning it's below the max height
         imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
-        
-        if ((image.frame.size.height * imageTransform.a) > 100.0f){
+
+        if (((image.frame.size.height/image.transform.a) * imageTransform.a) > 100.0f){
             // if the previous transform makes the height too big, scale it down
             imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
         }

@@ -277,12 +277,14 @@
 -(void)useImageButtonPressed:(UITapGestureRecognizer *)gesture
 {
     /* Animate into TaskViewController */
+        ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:self.selectedCellIndexPath];
     [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.collectionView.center = CGPointMake(self.collectionView.center.x, self.collectionView.center.y * 4.0f );
         //self.selectedCellControls.alpha = 0;
         self.selectedCellControls.center = CGPointMake(self.selectedCellControls.center.x, self.selectedCellControls.center.y + (self.collectionView.center.y * 4.0f + (self.selectedCellControls.center.y - self.collectionView.center.y)));
     }completion:^(BOOL finished){
         if (finished) {
+            selectedCell.alpha = 1.0;
             /* Push task view controller with selected task */
             /* TaskViewController is instantiated through the storyboard because UIKit hates me */
             UIStoryboard *sb = self.storyboard;
