@@ -87,6 +87,7 @@
 
 -(NSAttributedString *)makeAttributedQuestion:(NSString *)question andAnswer:(NSString *)answer
 {
+    /* Creates and formats questions and answers that can easily be appended the a textviews attributed text */
     NSMutableAttributedString *qa = [[NSMutableAttributedString alloc]initWithString:[NSString stringWithFormat:@"%@\n%@\n\n", question, answer]];
     [qa addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Avenir" size:14.0f] range:NSMakeRange(0, [qa length])];
     [qa addAttribute:NSFontAttributeName value:[UIFont fontWithName:@"Avenir-Heavy" size:16.0f] range:NSMakeRange(0, [question length])];
