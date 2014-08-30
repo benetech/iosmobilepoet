@@ -10,6 +10,15 @@
 
 @interface TaskModePickerViewController ()
 @property (strong, nonatomic) UIButton *backButton;
+@property (weak, nonatomic) IBOutlet UIButton *randomButton;
+@property (weak, nonatomic) IBOutlet UIButton *galleryButton;
+@property (weak, nonatomic) IBOutlet UIButton *sourceButton;
+@property (weak, nonatomic) IBOutlet UIButton *reviewButton;
+@property (weak, nonatomic) IBOutlet UILabel *randomLabel;
+@property (weak, nonatomic) IBOutlet UILabel *galleryLabel;
+@property (weak, nonatomic) IBOutlet UILabel *sourceLabel;
+@property (weak, nonatomic) IBOutlet UILabel *reviewLabel;
+
 @end
 
 @implementation TaskModePickerViewController
@@ -36,6 +45,26 @@
     backButton.alpha = 0;
     self.backButton = backButton;
     [self.view addSubview:self.backButton];
+}
+
+-(void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    
+    /* Adjust buttons for 3.5 inch screen manually because as far as I know, autolayout in interface
+     * builder cannot space the buttons evenly vertically along the screen. 
+    */
+    if ([self deviceHasThreePointFiveInchScreen]) {
+        self.randomButton.center = CGPointMake(self.randomButton.center.x, self.randomButton.center.y - 15.0f);
+        self.randomLabel.center = CGPointMake(self.randomLabel.center.x, self.randomLabel.center.y - 15.0f);
+        self.galleryButton.center = CGPointMake(self.galleryButton.center.x, self.galleryButton.center.y - 35.0f);
+        self.galleryLabel.center = CGPointMake(self.galleryLabel.center.x, self.galleryLabel.center.y - 35.0f);
+        self.sourceButton.center = CGPointMake(self.sourceButton.center.x, self.sourceButton.center.y - 55.0f);
+        self.sourceLabel.center = CGPointMake(self.sourceLabel.center.x, self.sourceLabel.center.y - 55.0f);
+        self.reviewButton.center = CGPointMake(self.reviewButton.center.x, self.reviewButton.center.y - 75.0f);
+        self.reviewLabel.center = CGPointMake(self.reviewLabel.center.x, self.reviewLabel.center.y - 75.0f);
+    }
+    
 }
 
 -(void)viewWillAppear:(BOOL)animated
@@ -81,10 +110,9 @@
     [self.navigationController popViewControllerAnimated:YES];
 }
 
-- (void)didReceiveMemoryWarning
+-(BOOL)deviceHasThreePointFiveInchScreen
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    return !([UIScreen mainScreen].bounds.size.height == 568.0);
 }
 
 @end

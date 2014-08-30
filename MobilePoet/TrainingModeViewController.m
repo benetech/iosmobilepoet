@@ -13,6 +13,9 @@
 NSString * const HTMLFileName2 = @"asciimathhtml.html";
 const CGFloat kImageCenterYPostion;
 const CGFloat kPreviewCenterYPostion;
+/* Adjusted constants for iPhone 4 and 4s 3.5 inch screens */
+const CGFloat kImageCenterYPostionForThreePointFiveInchScreen;
+const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
 
 @interface TrainingModeViewController () <UITextViewDelegate, UIAlertViewDelegate, UIWebViewDelegate>
 @property (nonatomic, strong) UIButton *backButton;
@@ -95,7 +98,7 @@ const CGFloat kPreviewCenterYPostion;
     
     
     /* text view */
-    self.textInputView = [[UITextView alloc]initWithFrame:(CGRect){CGPointZero, self.view.frame.size.width, 80.0f}];
+    self.textInputView = [[UITextView alloc]initWithFrame:(CGRect){CGPointZero, self.view.frame.size.width, [self deviceHasThreePointFiveInchScreen] ? 65.0f : 80.0f}];
     [MathKeyboard addMathKeyboardToTextView:self.textInputView];
     self.textInputView.font = [UIFont systemFontOfSize:15.0f];
     self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
@@ -108,8 +111,8 @@ const CGFloat kPreviewCenterYPostion;
     [self.view addSubview:self.textInputView];
     
     /* preview view */
-    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 65.0f)];
-    /* center is calculated after image is fetched */
+    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, ([self deviceHasThreePointFiveInchScreen] ? 58.0f : 65.0f))];
+    self.previewView.center = CGPointMake(self.view.frame.size.width/2.0f, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
     self.previewView.backgroundColor = [UIColor blackColor];
     self.previewView.layer.shadowOpacity = 0;
     self.previewView.layer.shadowOffset = CGSizeMake(0,0);
@@ -198,7 +201,7 @@ const CGFloat kPreviewCenterYPostion;
     [introView addSubview:titlelabel];
     
     UITextView *bodyTextView = [[UITextView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width - 20.0f, 180.0f)];
-    bodyTextView.center = CGPointMake(self.view.center.x, titlelabel.center.y + titlelabel.frame.size.height + bodyTextView.frame.size.height/2);
+    bodyTextView.center = CGPointMake(self.view.center.x, titlelabel.center.y + titlelabel.frame.size.height + ([self deviceHasThreePointFiveInchScreen] ? bodyTextView.frame.size.height/3 : bodyTextView.frame.size.height/2));
     bodyTextView.font = [UIFont fontWithName:@"Avenir" size:15.0f];
     bodyTextView.textAlignment = NSTextAlignmentCenter;
     bodyTextView.text = @"Here you can practice writing ASCIIMath and describing images. You’ll be shown a few sample images and be told the accuracy of your math description.\n\n\nNone of the work you do will be submitted to the MathML Cloud servers.";
@@ -243,19 +246,6 @@ const CGFloat kPreviewCenterYPostion;
     NSURL* url = [NSURL fileURLWithPath:path];
     NSURLRequest* req = [[NSURLRequest alloc] initWithURL:url];
     [self.previewView loadRequest:req];
-}
-
--(UILabel *)makeBorderedButtonWithColor:(UIColor *)color andText:(NSString *)text
-{
-    /* Makes a general rectangular colored UILabel that is used as a button */
-    UILabel *button = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 45.0f)];
-    button.backgroundColor = color;
-    button.textColor = [UIColor whiteColor];
-    button.textAlignment = NSTextAlignmentCenter;
-    button.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-    button.text = text;
-    button.userInteractionEnabled = YES;
-    return button;
 }
 
 -(UILabel *)previewViewLabel{
@@ -327,8 +317,8 @@ const CGFloat kPreviewCenterYPostion;
     }completion:^(BOOL finished){
         if (finished) {
             [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, darkView.center.y - 100.0f);
-                okButton.center = CGPointMake(okButton.center.x, darkView.center.y - 20.0f);
+                keyboardDialogTextView.center = CGPointMake(keyboardDialogTextView.center.x, [self deviceHasThreePointFiveInchScreen] ? darkView.center.y - 115.0f : darkView.center.y - 100.0f);
+                okButton.center = CGPointMake(okButton.center.x, [self deviceHasThreePointFiveInchScreen] ? darkView.center.y - 50.0f : darkView.center.y - 20.0f);
             }completion:^(BOOL finished){
                 if (finished) {
                     MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
@@ -378,8 +368,8 @@ const CGFloat kPreviewCenterYPostion;
             
                 //Animate back ok button and text view
                 [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                    dialogTextView.center = CGPointMake(dialogTextView.center.x, darkView.center.y - 100.0f);
-                    okButton.center = CGPointMake(okButton.center.x, darkView.center.y - 20.0f);
+                    dialogTextView.center = CGPointMake(dialogTextView.center.x, [self deviceHasThreePointFiveInchScreen] ? darkView.center.y - 115.0f : darkView.center.y - 100.0f);
+                    okButton.center = CGPointMake(okButton.center.x, [self deviceHasThreePointFiveInchScreen] ? darkView.center.y - 50.0f : darkView.center.y - 20.0f);
                 }completion:^(BOOL finished){
                     [keyboard animateCursorButtonsForUIGuide];
                 }];
@@ -436,7 +426,7 @@ const CGFloat kPreviewCenterYPostion;
                 darkView.frame = CGRectMake(0, self.previewView.frame.origin.y + self.previewView.frame.size.height + 60.0f, darkView.frame.size.width, darkView.frame.size.height);
             }completion:^(BOOL finished){
                 [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                    previewDialogTextView.center = CGPointMake(previewDialogTextView.center.x, self.view.frame.size.height - (previewDialogTextView.frame.size.height + 70.0f));
+                    previewDialogTextView.center = CGPointMake(previewDialogTextView.center.x, self.view.frame.size.height - ([self deviceHasThreePointFiveInchScreen] ? previewDialogTextView.frame.size.height + 50.0f : previewDialogTextView.frame.size.height + 70.0f));
                     okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
                 }completion:^(BOOL finished){
                     if (finished) {
@@ -468,7 +458,7 @@ const CGFloat kPreviewCenterYPostion;
     if (dialogTextView) {
         /* Create the arrow */
         UIImageView *arrow = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"UIGuideArrow.png"]];
-        arrow.center = CGPointMake(self.view.center.x, ((self.previewView.frame.origin.y - self.currentImage.frame.origin.y)/3) + self.currentImage.frame.origin.y + self.currentImage.frame.size.height);
+        arrow.center = CGPointMake(self.view.center.x, ((self.previewView.frame.origin.y - self.currentImage.frame.origin.y)/3) + self.currentImage.frame.origin.y + self.currentImage.frame.size.height - ([self deviceHasThreePointFiveInchScreen] ? 7.0f : 0));
         arrow.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
         arrow.alpha = 1;
         [self.uiGuideViews addObject:arrow];
@@ -481,7 +471,7 @@ const CGFloat kPreviewCenterYPostion;
             [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForGoalDialog:)]];
             dialogTextView.text = @"Your goal is to write a mathematical description similar to the image.\nMake sure the preview view and the image above it are identical.";
                 [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                    dialogTextView.center = CGPointMake(dialogTextView.center.x, self.view.frame.size.height - (dialogTextView.frame.size.height + 80.0f));
+                    dialogTextView.center = CGPointMake(dialogTextView.center.x, self.view.frame.size.height - ([self deviceHasThreePointFiveInchScreen] ? dialogTextView.frame.size.height + 60.0f : dialogTextView.frame.size.height + 80.0f));
                     okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
                 }completion:^(BOOL finished){
                     if (finished) {
@@ -491,7 +481,7 @@ const CGFloat kPreviewCenterYPostion;
                         }completion:^(BOOL finished){
                             if (finished) {
                                 [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-                                    arrow.transform = CGAffineTransformMakeScale( 1.0f, 1.0f);
+                                    arrow.transform = [self deviceHasThreePointFiveInchScreen] ? CGAffineTransformMakeScale( 0.8f, 0.8f) : CGAffineTransformMakeScale( 1.0f, 1.0f);
                                 }completion:nil];
                             }
                         }];
@@ -504,7 +494,7 @@ const CGFloat kPreviewCenterYPostion;
 
 -(void)okButtonPressedForGoalDialog:(id)sender
 {
-    /* Show the goal dialog */
+    /* Show the get started dialog */
     
     UITextView *dialogTextView;
     UILabel *okButton;
@@ -543,7 +533,7 @@ const CGFloat kPreviewCenterYPostion;
             [okButton addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(okButtonPressedForGetStartedDialog:)]];
             dialogTextView.text = @"Now it's time to get practicing.\nLets get started!";
             [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-                dialogTextView.center = CGPointMake(dialogTextView.center.x, self.view.frame.size.height - (dialogTextView.frame.size.height + 60.0f));
+                dialogTextView.center = CGPointMake(dialogTextView.center.x, self.view.frame.size.height - ([self deviceHasThreePointFiveInchScreen] ? dialogTextView.frame.size.height + 40.0f : dialogTextView.frame.size.height + 60.0f));
                 okButton.center = CGPointMake(okButton.center.x, self.view.frame.size.height - 70.0f);
             }completion:^(BOOL finished){
                 if (finished) {
@@ -907,7 +897,7 @@ const CGFloat kPreviewCenterYPostion;
     
 }
 
-#pragma mark System
+#pragma mark Image Fetch
 
 -(void)fetchAndAnimateInNewPic:(id)sender
 {
@@ -937,7 +927,7 @@ const CGFloat kPreviewCenterYPostion;
             /* animate image to the top */
             [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
                 image.transform = imageTransform;
-                image.center = CGPointMake(image.center.x, kImageCenterYPostion);
+                image.center = CGPointMake(image.center.x, ([self deviceHasThreePointFiveInchScreen] ? kImageCenterYPostionForThreePointFiveInchScreen : kImageCenterYPostion));
                 self.backButton.alpha = 1.0f;
                 self.textInputView.alpha = 1.0f;
                 self.submitButton.alpha = 1.0f;
@@ -947,7 +937,7 @@ const CGFloat kPreviewCenterYPostion;
                     
                     /* calculate position of the preview view. It's y position in the ui is predefined and constant. */
                     //self.previewView.center = CGPointMake(self.view.frame.size.width/2, (image.frame.origin.y + image.frame.size.height + self.previewView.frame.size.height/2 + 50.0f));
-                    self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
+                    self.previewView.center = CGPointMake(self.view.frame.size.width/2, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
                     self.previewView.hidden = NO;
                     
                     [self.textInputView becomeFirstResponder];
@@ -997,6 +987,25 @@ const CGFloat kPreviewCenterYPostion;
     self.currentImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:self.practiceImageNames[self.currentImageID]]];
 }
 
+-(void)resetSubviewsForNewImage
+{
+    self.previewView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    [self updatePreviewViewWithText:@""];
+    
+    self.currentImage.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    self.currentImage.alpha = 1.0;
+    [self.currentImage removeFromSuperview];
+    self.currentImage = nil;
+    
+    self.textInputView.text = @"";
+    self.textInputView.editable = YES;
+    self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
+    self.backButton.enabled = YES;
+    self.submitButton.enabled = YES;
+}
+
+#pragma mark Helpers
+
 -(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
 {
     /* Calculate proper image scaling so the image fits properly in the main UI. Assuming any image size is possible */
@@ -1041,21 +1050,22 @@ const CGFloat kPreviewCenterYPostion;
     
 }
 
--(void)resetSubviewsForNewImage
+-(BOOL)deviceHasThreePointFiveInchScreen
 {
-    self.previewView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
-    [self updatePreviewViewWithText:@""];
-    
-    self.currentImage.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
-    self.currentImage.alpha = 1.0;
-    [self.currentImage removeFromSuperview];
-    self.currentImage = nil;
-    
-    self.textInputView.text = @"";
-    self.textInputView.editable = YES;
-    self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
-    self.backButton.enabled = YES;
-    self.submitButton.enabled = YES;
+    return !([UIScreen mainScreen].bounds.size.height == 568.0);
+}
+
+-(UILabel *)makeBorderedButtonWithColor:(UIColor *)color andText:(NSString *)text
+{
+    /* Makes a general rectangular colored UILabel that is used as a button */
+    UILabel *button = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 45.0f)];
+    button.backgroundColor = color;
+    button.textColor = [UIColor whiteColor];
+    button.textAlignment = NSTextAlignmentCenter;
+    button.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    button.text = text;
+    button.userInteractionEnabled = YES;
+    return button;
 }
 
 #pragma mark TextView and Preview View

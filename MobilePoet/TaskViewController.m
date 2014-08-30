@@ -21,6 +21,9 @@ typedef NS_ENUM(NSInteger, ImageSelectionMode){
 NSString * const HTMLFileName = @"asciimathhtml.html";
 const CGFloat kImageCenterYPostion = 110.0f;
 const CGFloat kPreviewCenterYPostion = 220.0f;
+/* Adjusted constants for iPhone 4 and 4s 3.5 inch screens */
+const CGFloat kImageCenterYPostionForThreePointFiveInchScreen = 90.0f;
+const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
 
 @interface TaskViewController () <UITextViewDelegate, UIAlertViewDelegate>
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
@@ -80,7 +83,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
     
     /* text view */
-    self.textInputView = [[UITextView alloc]initWithFrame:(CGRect){CGPointZero, self.view.frame.size.width, 80.0f}];
+    self.textInputView = [[UITextView alloc]initWithFrame:(CGRect){CGPointZero, self.view.frame.size.width, [self deviceHasThreePointFiveInchScreen] ? 65.0f : 80.0f }];
     [MathKeyboard addMathKeyboardToTextView:self.textInputView];
     self.textInputView.font = [UIFont systemFontOfSize:15.0f];
     self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
@@ -93,8 +96,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [self.view addSubview:self.textInputView];
     
     /* preview view */
-    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 65.0f)];
-    /* center is calculated after image is fetched */
+    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, ([self deviceHasThreePointFiveInchScreen] ? 58.0f : 65.0f))];
+    self.previewView.center = CGPointMake(self.view.frame.size.width/2.0f, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
     self.previewView.backgroundColor = [UIColor blackColor];
     self.previewView.layer.shadowOpacity = 0;
     self.previewView.layer.shadowOffset = CGSizeMake(0,0);
@@ -365,10 +368,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.submitButton.enabled = YES;
     
     /* Animate out submission view subviews and animate task view subviews back into place */
-    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-        self.previewView.center = CGPointMake(self.previewView.center.x, kPreviewCenterYPostion);
+    [UIView animateWithDuration:([self deviceHasThreePointFiveInchScreen] ? 0.7f : 0.6f) delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        self.previewView.center = CGPointMake(self.previewView.center.x, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
         self.currentImage.transform = imageTransform;
-        self.currentImage.center = CGPointMake(self.currentImage.center.x, kImageCenterYPostion);
+        self.currentImage.center = CGPointMake(self.currentImage.center.x, ([self deviceHasThreePointFiveInchScreen] ? kImageCenterYPostionForThreePointFiveInchScreen : kImageCenterYPostion));
         self.textInputView.center = CGPointMake(self.textInputView.center.x, self.textInputView.center.y - 300.0f);
         self.textInputView.alpha = 1.0f;
         self.backButton.alpha = 1.0f;
@@ -558,11 +561,16 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                     
                     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
                     CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
+                    /* If the image is scaled up a lot, reduce shadow size becuase its also scaled up */
+                    if (imageTransform.a > 2.0f) {
+                        image.layer.shadowOpacity = 0.25f;
+                        image.layer.shadowRadius = 2.5f;
+                    }
                     
                     /* animate image to the top */
                     [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
                         image.transform = imageTransform;
-                        image.center = CGPointMake(image.center.x, kImageCenterYPostion);
+                        image.center = CGPointMake(image.center.x,([self deviceHasThreePointFiveInchScreen] ? kImageCenterYPostionForThreePointFiveInchScreen : kImageCenterYPostion));
                         self.backButton.alpha = 1.0f;
                         self.textInputView.alpha = 1.0f;
                         self.submitButton.alpha = 1.0f;
@@ -571,7 +579,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                         if (finished) {
                             /* calculate position of the preview view. It's y position in the ui is predefined and constant. */
                             //self.previewView.center = CGPointMake(self.view.frame.size.width/2, (image.frame.origin.y + image.frame.size.height + self.previewView.frame.size.height/2 + 50.0f));
-                            self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
+                            self.previewView.center = CGPointMake(self.view.frame.size.width/2, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
                             self.previewView.hidden = NO;
                             
                             [self.textInputView becomeFirstResponder];
@@ -611,8 +619,13 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     UIImageView *image = self.currentImage;
     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
     CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
+    /* If the image is scaled up a lot, reduce shadow size becuase its also scaled up */
+    if (imageTransform.a > 2.0f) {
+        image.layer.shadowOpacity = 0.25f;
+        image.layer.shadowRadius = 2.5f;
+    }
     
-    self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
+    self.previewView.center = CGPointMake(self.view.frame.size.width/2, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
     self.previewView.hidden = NO;
     self.previewView.alpha = 1.0f;
     [self.textInputView becomeFirstResponder];
@@ -620,7 +633,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* animate image to the top */
     [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.9f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
         image.transform = imageTransform;
-        image.center = CGPointMake(image.center.x, kImageCenterYPostion);
+        image.center = CGPointMake(image.center.x,([self deviceHasThreePointFiveInchScreen] ? kImageCenterYPostionForThreePointFiveInchScreen : kImageCenterYPostion));
         self.backButton.alpha = 1.0f;
         self.textInputView.alpha = 1.0f;
         self.submitButton.alpha = 1.0f;
@@ -778,24 +791,48 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.activityIndicator.alpha = 1.0f;
 }
 
+-(BOOL)deviceHasThreePointFiveInchScreen
+{
+    return !([UIScreen mainScreen].bounds.size.height == 568.0);
+}
+
 -(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
 {
     /* Calculate proper image scaling so the image fits properly in the main UI. Assuming any image size is possible */
-    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
+    /* The max height of an image before it's too big for the 4 inch screen ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
+    /* The max height for 3.5 inch screens is 85 */
     CGAffineTransform imageTransform;
-    if (image.frame.size.height > 100.0f){
-        // Image is too big
-        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+    
+    if ([self deviceHasThreePointFiveInchScreen]) {
+        const CGFloat maxImageHeight = 70.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+            
+            if (((image.frame.size.height/image.transform.a) * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
+        }
     }else{
-        // Image is an ideal size, meaning it's below the max height
-        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+        const CGFloat maxImageHeight = 100.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
 
-        if (((image.frame.size.height/image.transform.a) * imageTransform.a) > 100.0f){
-            // if the previous transform makes the height too big, scale it down
-            imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+            if (((image.frame.size.height/image.transform.a) * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
         }
     }
-    
+    NSLog(@"%f %f %f", imageTransform.a, imageTransform.b, imageTransform.c);
     return imageTransform;
 
 }
@@ -805,16 +842,35 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* Same as the above method, except scales are based of the images current transform. Basicly 'CGAffineTransformMakeScale' instead of 'CGAffineTransformScale' */
 
     CGAffineTransform imageTransform;
-    if (image.frame.size.height > 100.0f){
-        // Image is too big
-        imageTransform = CGAffineTransformMakeScale(100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+    
+    if ([self deviceHasThreePointFiveInchScreen]) {
+        const CGFloat maxImageHeight = 70.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformMakeScale((self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+            
+            if ((image.frame.size.height * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
+        }
+
     }else{
-        // Image is an ideal size, meaning it's below the max height
-        imageTransform = CGAffineTransformMakeScale((self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
-        
-        if ((image.frame.size.height * imageTransform.a) > 100.0f){
-            // if the previous transform makes the height too big, scale it down
-            imageTransform = CGAffineTransformMakeScale(100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
+        const CGFloat maxImageHeight = 100.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformMakeScale((self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+            
+            if ((image.frame.size.height * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
         }
     }
     
@@ -883,7 +939,9 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 -(NSString *)makeHtmlFromAsciimath:(NSString *)asciimath
 {
-    NSString *html1 = @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
+    NSString *html1 = [self deviceHasThreePointFiveInchScreen] ?
+    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 110%; text-align: center;'>" :
+    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
         
     /*The following string is the same HTML as above except it sets the 'scale' in a mathjax configuration.*/
     /* It works, but the scaling takes about a second to take effect. If I use a div CSS (as done in the above string) then it takes effect immediately.

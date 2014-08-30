@@ -259,6 +259,16 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" id="XBI-p7-g8f"/>
+                    <connections>
+                        <outlet property="galleryButton" destination="wwj-U1-HBz" id="GH9-tb-3Kg"/>
+                        <outlet property="galleryLabel" destination="MP7-rc-QrM" id="UKj-Gy-miZ"/>
+                        <outlet property="randomButton" destination="SyB-Xb-M7U" id="Eea-1O-7PF"/>
+                        <outlet property="randomLabel" destination="YFE-CK-Zxv" id="uQI-76-L2J"/>
+                        <outlet property="reviewButton" destination="blK-FR-0dh" id="Dss-8Z-o3z"/>
+                        <outlet property="reviewLabel" destination="XYP-fb-wsS" id="aSo-iw-u51"/>
+                        <outlet property="sourceButton" destination="lNF-Eu-8Gv" id="4Kb-hE-gNi"/>
+                        <outlet property="sourceLabel" destination="Ba9-8Q-e5Z" id="ZR7-G2-SL7"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="i0D-mf-fav" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
