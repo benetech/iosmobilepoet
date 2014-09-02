@@ -105,10 +105,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     NSArray *test = @[@"Q", @"W", @"E", @"R", @"T", @"Y", @"U", @"I", @"O", @"P", @"A", @"S", @"D", @"F", @"G", @"H", @"J", @"K", @"L", @"Z", @"X", @"C", @"V", @"B", @"N", @"M"];
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [button setTitle:test[i] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self.scrollView addSubview:button];
@@ -118,9 +115,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row++;
     for (int i = 0; i<9; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:test[10+i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -131,9 +125,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row++;
     for (int i = 1; i<8; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:test[20+(i-2)] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -141,10 +132,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     }
     
     MathKeyboardKey *capitalizeKey = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeCapitalizeKey andFrame:CGRectMake(11.0f, (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonHeight, kNormalButtonHeight)];
-    capitalizeKey.backgroundColor = [UIColor whiteColor];
     [capitalizeKey setBackgroundImage:[UIImage imageNamed:@"capitalizeKeyImage.png"] forState:UIControlStateNormal];
     [capitalizeKey setBackgroundImage:[UIImage imageNamed:@"capitalizeKeyHighlightedImage.png"] forState:UIControlStateSelected];
-    capitalizeKey.layer.cornerRadius = 4.0f;
     [capitalizeKey addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self.buttons addObject:capitalizeKey];
     self.capKey = capitalizeKey;
@@ -157,10 +146,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row = 1;
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (row * 17.0f) + ((row-1) * 10.0f), kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [button setTitle:self.buttonCharcters[i] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self.scrollView addSubview:button];
@@ -170,9 +156,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row++;
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:self.buttonCharcters[10+i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -184,9 +167,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     for (int i = 0; i<10; i++) {
         NSString *currentKeyCharcter = self.buttonCharcters[20 + i];
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -206,9 +186,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
                 andFrame: CGRectMake((self.frame.size.width * 2) + ((kNormalButtonWidth+kNormalButtonSpacing)*i) - 5.0f,(row * 12.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
                 //adjust button position so the row is centered horizontally
                 button.center = CGPointMake(button.center.x + kNormalButtonWidth, button.center.y);
-                button.backgroundColor = [UIColor whiteColor];
-                [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-                button.layer.cornerRadius = 4.0f;
                 [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
                 if ([button.titleLabel.text isEqualToString:@"logx"]) {
                     //The string 'logn' is a bit longer than the other charcters, so make the key a little bigger
@@ -229,9 +206,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
                 /* Row 2 */
                 NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
                 MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 4.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-9) + ([currentKeyCharcter isEqualToString:@"tan\u207B\u00B9x"] ? 2.0f : 0)), kNormalButtonHeight + (2 * 12.0f) + 5.0f + 5.0f,([currentKeyCharcter isEqualToString:@"cos\u207B\u00B9x"] ? kBigButtonWidth + 3.0f : kBigButtonWidth), kNormalButtonHeight)];
-                button.backgroundColor = [UIColor whiteColor];
-                [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-                button.layer.cornerRadius = 4.0f;
                 [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
                 [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
                 [self.buttons addObject:button];
@@ -240,9 +214,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
             }else{
                  NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
                 MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 4.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-15) + 2.0f),kNormalButtonHeight + kNormalButtonHeight + (3 * 12.0f) + ((3-1) * 5.0f) + 5.0f,kBigButtonWidth, kNormalButtonHeight)];
-                button.backgroundColor = [UIColor whiteColor];
-                [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-                button.layer.cornerRadius = 4.0f;
                 [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
                 [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
                 [self.buttons addObject:button];
@@ -257,9 +228,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row = 4;
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
 
         if (i == 0) {
             /* help button */
@@ -320,7 +288,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     rightButton.layer.cornerRadius = 4.0f;
     rightButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
     rightButton.layer.borderWidth = 1.5f;
-    rightButton.layer.cornerRadius = 4.0f;
     rightButton.showsTouchWhenHighlighted = YES;
     [rightButton addTarget:self action:@selector(rightCursorButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     _rightCursorButton = rightButton;
@@ -385,12 +352,15 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         }
     }else if ([button.titleLabel.text isEqualToString:@"help"]){
         /* Get a reference to the parent TaskViewController */
+        /* Old:
         TaskViewController *taskViewController = (TaskViewController *)[self.textView.superview nextResponder];
         if ([taskViewController isKindOfClass:[TaskViewController class]]) {
             [taskViewController handleHelpButtonPressed];
         }else{
             //...shouldn't ever happen
         }
+         */
+        [[NSNotificationCenter defaultCenter]postNotificationName:@"helpButtonPressed" object:nil];
     }else
         [self.textView insertText:[self.buttonValues objectForKey:button.titleLabel.text]];
     

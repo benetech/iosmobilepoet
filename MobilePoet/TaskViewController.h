@@ -18,6 +18,4 @@
  * "functions" parenthesis, guidance mode ends, removing the highlight and allowing the arrow keys to freely move the cursor again
  */
 -(void)disableGuidanceMode;
--(void)handleHelpButtonPressed;
-/* Presents helpViewController */
 @end

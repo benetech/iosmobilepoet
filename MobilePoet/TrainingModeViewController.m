@@ -8,6 +8,7 @@
 
 #import "TrainingModeViewController.h"
 #import "MathKeyboard.h"
+#import "HelpViewController.h"
 
 
 NSString * const HTMLFileName2 = @"asciimathhtml.html";
@@ -21,6 +22,7 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, strong) UIButton *submitButton;
 @property (nonatomic, strong) UITextView *textInputView;
+/* Main textview that the user types in their ASCIIMath in */
 @property (nonatomic, strong) UIWebView *previewView;
 @property (nonatomic) BOOL imageIsEnlarged;
 /* used for the tap gesture to make the fetched image bigger */
@@ -31,6 +33,7 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
 @property(nonatomic, strong)NSMutableArray *submissionViewSubviews;
 /* All subviews of the translation submission view */
 @property (strong, nonatomic) UIView *introView;
+/* introview contains the subviews that make up the intro view, which is the first view shown that talks about what training mode is */
 @property (strong, nonatomic) UIView *navigationBarLabel;
 @property (strong, nonatomic) NSArray *practiceImageNames;
 /* The names of every pratice image */
@@ -45,11 +48,14 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
 @property (strong, nonatomic) NSArray *longLoadingTimeViews;
 /* A set of views that are shown when mathjax has not returned a mathml result in one second */
 @property (strong, nonatomic) UILabel *previewViewLabel;
+/* Label that says "(Preview)" when nothing is typed in the textview */
 @property (strong, nonatomic) UIButton *introBackButton;
 @property (strong, nonatomic) NSMutableArray *uiGuideViews;
 /* Contains all views that make up the UI Guide, which only shows up when the user first enters training mode. */
 /* The UI Guide points out important UI elements to the user */
 @property (nonatomic) BOOL showedUIGuide;
+@property (nonatomic) BOOL presentedHelpViewController;
+/* Keeps track of if the HelpViewController was just presented/dismissed. */
 @end
 
 @implementation TrainingModeViewController
@@ -122,6 +128,9 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
     self.previewView.delegate = self;
     [self.view addSubview:self.previewView];
     
+    /* Displaying the help menu when 'help' is pressed on the keyboard is handled by here, triggered by a notification */
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(handleHelpButtonPressed:) name:@"helpButtonPressed" object:nil];
+    
     [self setUpIntroView];
     
     /* Check whether this is the users first time trying training mode. If so we'll show the UI Guide and disable the submit button */
@@ -131,6 +140,11 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    if (self.presentedHelpViewController) {
+        self.presentedHelpViewController = NO;
+        [self.textInputView becomeFirstResponder];
+        return;
+    }
     /* Animate in begin button */
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
         self.beginButton.center = CGPointMake(self.beginButton.center.x, self.view.frame.size.height - 120.0f);
@@ -1066,6 +1080,17 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
     button.text = text;
     button.userInteractionEnabled = YES;
     return button;
+}
+
+-(void)handleHelpButtonPressed:(NSNotification *)notification
+{
+    /* Presents the helpviewcontroller if the help button is pressed, because a view (the keyboard) can not do this */
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    HelpViewController *helpViewController = (HelpViewController *)[storyboard instantiateViewControllerWithIdentifier:@"help"];
+    [helpViewController adjustForModalPresentation];
+    
+    [self presentViewController:helpViewController animated:YES completion:nil];
+    self.presentedHelpViewController = YES;
 }
 
 #pragma mark TextView and Preview View

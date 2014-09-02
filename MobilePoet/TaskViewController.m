@@ -30,6 +30,7 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, strong) UIButton *submitButton;
 @property (nonatomic, strong) UITextView *textInputView;
+/* Main textview that the user types in their ASCIIMath in */
 @property (nonatomic, strong) UIWebView *previewView;
 @property (nonatomic) BOOL imageIsEnlarged;
 /* used for the tap gesture to make the fetched image bigger */
@@ -44,10 +45,10 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
 /* To restrict the textview's user interaction during guidance mode, the bool is required to know if its enabled */
 @property (nonatomic) MathKeyboard *mathKeyboard;
 @property (strong, nonatomic) UILabel *previewViewLabel;
-/* This label identifies the preview view as a preview view before the user begins typing */
+/* This label identifies the preview view as a preview view before the user begins typing - says (Preview) */
 @property (strong, nonatomic) NSMutableArray *randomImages;
 @property (nonatomic) BOOL presentedHelpViewController;
-/* Keeps track on if the HelpViewController was just presented/dismissed. */
+/* Keeps track on of the HelpViewController was just presented/dismissed. */
 @end
 
 @implementation TaskViewController
@@ -109,6 +110,9 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
     [self.view addSubview:self.activityIndicator];
     
     self.mode = ImageSelectionModeRandom;
+    
+    /* Displaying the help menu when 'help' is pressed on the keyboard is handled by here, triggered by a notification */
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(handleHelpButtonPressed:) name:@"helpButtonPressed" object:nil];
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -151,6 +155,9 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
 -(void)reloadRandomImages
 {
     for (int i = 1; i < 14; i++) {
+        if (i == 5) {
+            continue;
+        }
         [self.randomImages addObject:[UIImage imageNamed:[NSString stringWithFormat:@"randomImage%d.jpg", i]]];
     }
 }
@@ -832,7 +839,6 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
             }
         }
     }
-    NSLog(@"%f %f %f", imageTransform.a, imageTransform.b, imageTransform.c);
     return imageTransform;
 
 }
@@ -878,7 +884,7 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
     
 }
 
--(void)handleHelpButtonPressed
+-(void)handleHelpButtonPressed:(NSNotification *)notification
 {
     /* Presents the helpviewcontroller if the help button is pressed, because a view (the keyboard) can not do this */
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
