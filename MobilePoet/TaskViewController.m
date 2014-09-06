@@ -155,10 +155,9 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
 -(void)reloadRandomImages
 {
     for (int i = 1; i < 14; i++) {
-        if (i == 5) {
-            continue;
+        if (i != 5) {
+            [self.randomImages addObject:[UIImage imageNamed:[NSString stringWithFormat:@"randomImage%d.jpg", i]]];
         }
-        [self.randomImages addObject:[UIImage imageNamed:[NSString stringWithFormat:@"randomImage%d.jpg", i]]];
     }
 }
 
