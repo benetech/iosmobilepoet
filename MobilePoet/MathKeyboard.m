@@ -10,6 +10,7 @@
 #import "MathKeyboardKey.h"
 #import "TaskViewController.h"
 //TaskViewController is necessary to handle the help button
+#import "CustomScrollView.h"
 
 const CGFloat kPortaitKeyboardHeight = 216.0f;
 const CGFloat kNormalButtonWidth = 25.0f;
@@ -19,7 +20,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 
 @interface MathKeyboard() <UIScrollViewDelegate>
 @property (strong, nonatomic) UITextView *textView;
-@property (strong, nonatomic) UIScrollView *scrollView;
+@property (strong, nonatomic) CustomScrollView *scrollView;
 @property (strong, nonatomic) NSArray *buttonCharcters;
 /* all characters on the keyboard */
 @property (strong, nonatomic) NSArray *operationButtonCharcters;
@@ -81,7 +82,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     /* Messy keyboard view construction */
     
     self.frame = CGRectMake(0, [[UIScreen mainScreen] bounds].size.height - kPortaitKeyboardHeight, [[UIScreen mainScreen] bounds].size.width, kPortaitKeyboardHeight);
-    _scrollView = [UIScrollView new];
+    _scrollView = [CustomScrollView new];
     _scrollView.frame = CGRectMake(0, 0, self.frame.size.width, kPortaitKeyboardHeight - 50.0f);
     _scrollView.contentSize = CGSizeMake(self.frame.size.width * 3.0f, self.frame.size.height - kNormalButtonHeight * 2.0f);
     _scrollView.delegate = self;

@@ -51,6 +51,7 @@
 		2444396D19B68192003F015D /* selectedNormalSizeKeyBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2444396919B68192003F015D /* selectedNormalSizeKeyBackground@2x.png */; };
 		2444397519B6840E003F015D /* selectedSpaceKeyBackground.png in Resources */ = {isa = PBXBuildFile; fileRef = 2444397319B6840E003F015D /* selectedSpaceKeyBackground.png */; };
 		2444397619B6840E003F015D /* selectedSpaceKeyBackground@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2444397419B6840E003F015D /* selectedSpaceKeyBackground@2x.png */; };
+		244C770019C37AFD00A5BA8F /* CustomScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 244C76FF19C37AFD00A5BA8F /* CustomScrollView.m */; };
 		2457EB691937F1FD005C32D1 /* testimg2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2457EB671937F1FD005C32D1 /* testimg2.jpg */; };
 		2457EB6A1937F1FD005C32D1 /* testimg3.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2457EB681937F1FD005C32D1 /* testimg3.jpg */; };
 		2497B6A5196F17EC008A7191 /* practiceimage1.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 2497B6A4196F17EC008A7191 /* practiceimage1.jpg */; };
@@ -155,6 +156,8 @@
 		2444396919B68192003F015D /* selectedNormalSizeKeyBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "selectedNormalSizeKeyBackground@2x.png"; sourceTree = "<group>"; };
 		2444397319B6840E003F015D /* selectedSpaceKeyBackground.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = selectedSpaceKeyBackground.png; sourceTree = "<group>"; };
 		2444397419B6840E003F015D /* selectedSpaceKeyBackground@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "selectedSpaceKeyBackground@2x.png"; sourceTree = "<group>"; };
+		244C76FE19C37AFD00A5BA8F /* CustomScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomScrollView.h; sourceTree = "<group>"; };
+		244C76FF19C37AFD00A5BA8F /* CustomScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomScrollView.m; sourceTree = "<group>"; };
 		2457EB671937F1FD005C32D1 /* testimg2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = testimg2.jpg; sourceTree = "<group>"; };
 		2457EB681937F1FD005C32D1 /* testimg3.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = testimg3.jpg; sourceTree = "<group>"; };
 		2497B6A4196F17EC008A7191 /* practiceimage1.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = practiceimage1.jpg; sourceTree = "<group>"; };
@@ -326,6 +329,8 @@
 				24BEF1A319786F3900B9F0EC /* Capital Key Images */,
 				2436B5B7192EBE510047110C /* MathKeyboard.h */,
 				2436B5B8192EBE510047110C /* MathKeyboard.m */,
+				244C76FE19C37AFD00A5BA8F /* CustomScrollView.h */,
+				244C76FF19C37AFD00A5BA8F /* CustomScrollView.m */,
 				241142DA1947AABB003CFB4E /* MathKeyboardKey.h */,
 				241142DB1947AABB003CFB4E /* MathKeyboardKey.m */,
 			);
@@ -615,6 +620,7 @@
 				2440633719A11BEE00CBD3E5 /* HelpViewController.m in Sources */,
 				2436B5BF192FC67D0047110C /* TaskViewController.m in Sources */,
 				240FD36419928EA000B24878 /* AboutViewController.m in Sources */,
+				244C770019C37AFD00A5BA8F /* CustomScrollView.m in Sources */,
 				24ED7D88192A810F00C9A150 /* AppDelegate.m in Sources */,
 				24ED7D84192A810F00C9A150 /* main.m in Sources */,
 			);
