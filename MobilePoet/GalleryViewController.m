@@ -155,7 +155,6 @@
     [cell setImage: self.fetchedImages[indexPath.row]];
     cell.title = [NSString stringWithFormat:@"%d", i];
     i++;
-    //NSLog(@"hi %i", indexPath.row);
     
     return cell;
 }
@@ -196,7 +195,7 @@
     ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     
     /* Create a dark UIView layer to darken the background */
-    UIView *darkView = [[UIView alloc]initWithFrame:self.collectionView.frame];
+    UIView *darkView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.collectionView.contentSize.width, (self.collectionView.contentSize.height > self.collectionView.frame.size.height) ? self.collectionView.contentSize.height: self.collectionView.frame.size.height)];
     [darkView addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(removeSelectedCellFromStagedViewAndGoBackToGridView:)]];
     darkView.backgroundColor = [UIColor blackColor];
     darkView.alpha = 0;
@@ -208,7 +207,7 @@
     self.selectedImage = selectedImageView;
     self.selectedCellIndexPath = indexPath;
     selectedImageView.transform = CGAffineTransformMakeScale(selectedCell.frame.size.width/selectedImageView.frame.size.width, selectedCell.frame.size.height/selectedImageView.frame.size.height);
-    selectedImageView.center = selectedCell.center;
+    selectedImageView.center = CGPointMake(selectedCell.center.x, selectedCell.center.y - self.collectionView.contentOffset.y);
     [self.view addSubview:selectedImageView];
     
     selectedCell.alpha = 0;
@@ -224,7 +223,7 @@
         useButton.center = CGPointMake(useButton.center.x, self.view.frame.size.height - 100.0f);
     }completion:^(BOOL finished){
         if (finished) {
-            //[self showSelectedCellControls];
+            self.collectionView.scrollEnabled = NO;
         }
     }];
 }
@@ -293,7 +292,6 @@
         ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:self.selectedCellIndexPath];
     [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.collectionView.center = CGPointMake(self.collectionView.center.x, self.collectionView.center.y * 4.0f );
-        //self.selectedCellControls.alpha = 0;
         self.selectedCellControls.center = CGPointMake(self.selectedCellControls.center.x, self.selectedCellControls.center.y + (self.collectionView.center.y * 4.0f + (self.selectedCellControls.center.y - self.collectionView.center.y)));
     }completion:^(BOOL finished){
         if (finished) {
@@ -308,6 +306,7 @@
             self.collectionView.alpha = 0;
             self.darkView.alpha = 0;
             [self.darkView removeFromSuperview];
+            self.collectionView.scrollEnabled = YES;
         }
     }];
 }
@@ -321,9 +320,7 @@
     self.selectedImage.layer.borderWidth = 0.5;
     self.selectedImage.layer.borderColor = [UIColor blackColor].CGColor;
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        self.selectedImage.center = selectedCell.center;
-        //self.selectedCellControls.center = selectedCell.center;
-        //self.selectedCellControls.alpha = 0;
+        self.selectedImage.center = CGPointMake(selectedCell.center.x, selectedCell.center.y - self.collectionView.contentOffset.y);
         self.selectedCellControls.center = CGPointMake(self.selectedCellControls.center.x, self.view.frame.size.height + self.selectedCellControls.frame.size.height);
         gesture.view.alpha = 0;
     }completion:^(BOOL finished){
@@ -335,6 +332,7 @@
             self.selectedImage = nil;
             self.selectedCellIndexPath = nil;
             self.selectedCellControls = nil;
+            self.collectionView.scrollEnabled = YES;
         }
     }];
 }
