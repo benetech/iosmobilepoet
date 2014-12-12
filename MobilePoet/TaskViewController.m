@@ -535,7 +535,7 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
         [self reloadRandomImages];
     }
     /* choose random image */
-    NSInteger randomIndex = arc4random_uniform([self.randomImages count]);
+    NSInteger randomIndex = arc4random_uniform((int)[self.randomImages count]);
     UIImageView *image = [[UIImageView alloc]initWithImage:[self.randomImages objectAtIndex:randomIndex]];
     [self.randomImages removeObjectAtIndex:randomIndex];
     self.currentImage = image;

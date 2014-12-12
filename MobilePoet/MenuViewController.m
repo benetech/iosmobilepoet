@@ -65,7 +65,7 @@
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+    NSString *osVersion = [[UIDevice currentDevice]systemVersion];
     if (!self.alreadyBeenOnScreen) {
         self.alreadyBeenOnScreen = YES;
         [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
@@ -73,8 +73,8 @@
             self.trainingModeButton.center = CGPointMake(self.trainingModeButton.center.x, self.trainingModeButton.center.y - 300.0f);
             self.helpButton.center = CGPointMake(self.helpButton.center.x, self.helpButton.center.y - 300.0f);
             self.aboutButton.center = CGPointMake(self.aboutButton.center.x, self.aboutButton.center.y - 300.0f);
-            self.titleBackground.center = CGPointMake(self.titleBackground.center.x, self.titleBackground.center.y + 130.0f);
-            self.titleLabel.center = CGPointMake(self.titleLabel.center.x, self.titleLabel.center.y + 130.0f);
+            self.titleBackground.center = CGPointMake(self.titleBackground.center.x, self.titleBackground.center.y + ([osVersion hasPrefix:@"7"] ? 130.0f : 260.0f));
+            self.titleLabel.center = CGPointMake(self.titleLabel.center.x, self.titleLabel.center.y + ([osVersion hasPrefix:@"7"] ? 130.0f : 260.0f));
 
         }completion:nil];
     }
