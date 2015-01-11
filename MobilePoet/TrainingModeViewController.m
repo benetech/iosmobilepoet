@@ -1169,21 +1169,44 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
      There are 2 string replacements in the js function. This is because those specific charcters stopped all the following charcters after that to not be copied into the fake address. A little confusing, but it's necessary to get the entirety of the MathML string into a fake address
      */
     
-     [self.previewView stringByEvaluatingJavaScriptFromString:@"MathJax.Hub.Queue( function f() {var jax = MathJax.Hub.getAllJax(); if(jax.length = 1){var thing = jax[0].root.toMathML(\"\"); thing = thing.replace(/\\//g, \".\"); thing = thing.replace(\":\", \".\"); thing = thing.replace(/\\#/g, \".\"); window.location = \"fakeLocation://\".concat(thing);}})"];
+    /* iOS 8 inserts % symbols for some ASCII characters, so the strings must be slightly different for the webview
+     * to accept and correctly parse it
+     */
+    NSString *version = [[UIDevice currentDevice]systemVersion];
+    if ([version hasPrefix:@"7"]) {
+        [self.previewView stringByEvaluatingJavaScriptFromString:@"MathJax.Hub.Queue( function f() {var jax = MathJax.Hub.getAllJax(); if(jax.length = 1){var thing = jax[0].root.toMathML(\"\"); thing = thing.replace(/\\//g, \".\"); thing = thing.replace(\":\", \".\"); thing = thing.replace(/\\#/g, \".\"); window.location = \"fakeLocation://\".concat(thing);}})"];
+    }else{
+        [self.previewView stringByEvaluatingJavaScriptFromString:@"MathJax.Hub.Queue( function f() {var jax = MathJax.Hub.getAllJax(); if(jax.length = 1){var thing = jax[0].root.toMathML(\"\"); thing = thing.replace(/\\//g, \".\"); thing = thing.replace(\":\", \".\"); thing = thing.replace(/\\#/g, \".\"); window.location = \"fakeLocation:/\".concat(thing);}})"];
+    }
     
     //NSTimer *loadingTimer = [NSTimer  scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(mathMLStillLoadingAfterOneSecond:) userInfo:nil repeats:NO];
     //self.mathJaxLoadingTimer = loadingTimer;
-
+    
 }
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSURL* url = request.URL;
-    if ([url.host hasPrefix:@"<math"] ) {
-        /* This address is not legit, and is instead mathml code passed in from the 'generateMathML method'*/
-        NSString *mathml = [url.host stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+    /* The 2nd 'if' condition below is needed because iOS 8 replaces some ASCII characters with percent symbols.
+     * This makes the URL parts indistiguishable, with the 'host' or 'base'
+     */
+    if ([url.host hasPrefix:@"<math"] || [url.absoluteString hasPrefix:@"fakelocation:/%3Cmath"] ) {
+        /* This address is not legit, and is instead mathml code passed in from the 'generateMathML' method*/
+        NSString *mathml;
+        /* iOS 8 replaces some ASCII characters with percent symbols. They need to be replaced,
+         * and the host needs to be identified manually by substring'ing it
+         */
+         NSString *version = [[UIDevice currentDevice]systemVersion];
+        if (![version hasPrefix:@"7"]) {
+            NSMutableString *urlString = [[NSMutableString alloc]initWithString:[url.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSASCIIStringEncoding]];
+            NSString *hostString = [urlString substringWithRange:NSMakeRange(14, [urlString length]-14)];
+            mathml = [hostString stringByReplacingOccurrencesOfString:@" " withString:@""];
+        }else{
+            mathml = [url.host stringByReplacingOccurrencesOfString:@" " withString:@""];
+        }
+        
         mathml = [mathml stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-        NSLog(@"%@", mathml);
         [self checkUserDescriptionWithMathML:mathml];
         
         return NO;
