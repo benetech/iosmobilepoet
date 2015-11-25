@@ -258,6 +258,7 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
                 }
             }];
         }else
+            [self.textInputView resignFirstResponder];
             [self.navigationController popViewControllerAnimated:YES];
     }
 }
@@ -945,8 +946,8 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
 -(NSString *)makeHtmlFromAsciimath:(NSString *)asciimath
 {
     NSString *html1 = [self deviceHasThreePointFiveInchScreen] ?
-    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 110%; text-align: center;'>" :
-    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
+    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 110%; text-align: center;'>" :
+    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
         
     /*The following string is the same HTML as above except it sets the 'scale' in a mathjax configuration.*/
     /* It works, but the scaling takes about a second to take effect. If I use a div CSS (as done in the above string) then it takes effect immediately.

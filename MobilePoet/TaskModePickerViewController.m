@@ -18,6 +18,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *galleryLabel;
 @property (weak, nonatomic) IBOutlet UILabel *sourceLabel;
 @property (weak, nonatomic) IBOutlet UILabel *reviewLabel;
+@property (nonatomic) BOOL viewAppeared; //used to prevent the "First Time?" alert from showing without setting the NSUserDefault
+
 
 @end
 
@@ -91,13 +93,14 @@
 -(void)checkForFirstLaunch
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if (![defaults objectForKey:@"hasDoneTrainingMode"]) {
+    if (![defaults objectForKey:@"hasDoneTrainingMode"] && !self.viewAppeared) {
         [self alertForTraining];
     }
 }
 
 -(void)alertForTraining
 {
+    self.viewAppeared = true;
     UIAlertView *alert = [[UIAlertView alloc]initWithTitle:@"First Time?" message:@"If this is your first time describing images, its recommended you try training mode first to get familiar with your tools. You can access training mode from the main menu." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [alert show];
 }

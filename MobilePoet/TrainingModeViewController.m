@@ -1135,7 +1135,7 @@ const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen;
 {
     NSString *html1 = @"<html><head><script type='text/x-mathjax-config'>"
     "MathJax.Hub.Config({messageStyle: 'none', extensions: ['toMathML.js']});"
-    "</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script>"
+    "</script><script type='text/javascript' src = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script>"
     "<script> function toMathML(jax,callback) { var mml; try { mml = jax.root.toMathML(''); } catch(err) {"
             "if (!err.restart) {throw err} // an actual error"
     "return MathJax.Callback.After([toMathML,jax,callback],err.restart);"
