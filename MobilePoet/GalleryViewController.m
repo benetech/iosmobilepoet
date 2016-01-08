@@ -18,6 +18,8 @@
 @property (strong, nonatomic) UIView *selectedCellControls;
 @property (strong, nonatomic) UIView *darkView;
 @property (strong, nonatomic) UIButton *backButton;
+@property (strong, nonatomic) UILabel *navigationBarLabel;
+@property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
 @end
 
 @implementation GalleryViewController
@@ -27,7 +29,7 @@
     [super viewDidLoad];
     
     /* CollectionView setup */
-	self.collectionView = [[UICollectionView alloc]initWithFrame:self.view.frame collectionViewLayout:[UICollectionViewFlowLayout new]];
+	self.collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) collectionViewLayout:[UICollectionViewFlowLayout new]];
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
     self.collectionView.scrollEnabled = YES;
@@ -42,15 +44,23 @@
     [backButton setBackgroundImage:backImage forState:UIControlStateNormal];
     backButton.frame = CGRectMake(0, 0, backImage.size.width, backImage.size.height);
     backButton.transform = CGAffineTransformMakeScale(55.0f/backButton.frame.size.width, 55.0f/backButton.frame.size.width);
+    backButton.alpha = 1.0f;
     [backButton addTarget:self action:@selector(backButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     backButton.center = CGPointMake(30.0f, 40.0f);
-    backButton.alpha = 0;
     self.backButton = backButton;
     [self.collectionView addSubview:self.backButton];
+    [self.collectionView addSubview:self.navigationBarLabel];
     
     /* Fetch images */
-    self.fetchedImages = [NSMutableArray new];
     [self fetchImages];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    /*Activity Indicator */
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator startAnimating];
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -58,18 +68,27 @@
     [self showCollectionView];
 }
 
+-(void)prepareViewsForAnimation
+{
+    self.collectionView.contentOffset = CGPointMake(0, -70.0f);
+    self.navigationBarLabel.center = CGPointMake(self.navigationBarLabel.center.x, self.navigationBarLabel.center.y - 70.0f);
+    self.backButton.center = CGPointMake(self.backButton.center.x, self.backButton.center.y - 70.0f);
+}
+
 -(void)showCollectionView
 {
+    [self prepareViewsForAnimation];
     /* Intro animations */
-    self.collectionView.contentOffset = CGPointMake(0, -70.0f);
-    [UIView animateWithDuration:0.6f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+    [UIView animateWithDuration:0.6f delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.collectionView.alpha = 1.0f;
         self.collectionView.contentOffset = CGPointZero;
+        self.navigationBarLabel.center = CGPointMake(self.navigationBarLabel.center.x, self.navigationBarLabel.center.y + 70.0f);
+        self.backButton.center = CGPointMake(self.backButton.center.x, self.backButton.center.y + 70.0f);
+        self.activityIndicator.alpha = 0;
     }completion:^(BOOL finished){
         if (finished) {
-            [UIView animateWithDuration:0.5f animations:^{
-                self.backButton.alpha = 1.0f;
-            }completion:nil];
+            [self.activityIndicator stopAnimating];
+            [self.activityIndicator removeFromSuperview];
         }
     }];
 }
@@ -78,6 +97,37 @@
 {
     /* For now, 'simulates' fetching images */
     [self.fetchedImages addObjectsFromArray:@[[UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"3.jpg"], [UIImage imageNamed:@"1.jpg"], [UIImage imageNamed:@"2.jpg"], [UIImage imageNamed:@"15.jpg"], [UIImage imageNamed:@"4.jpg"], [UIImage imageNamed:@"16.jpg"], [UIImage imageNamed:@"17.jpg"], [UIImage imageNamed:@"18.jpg"], [UIImage imageNamed:@"19.jpg"], [UIImage imageNamed:@"20.jpg"], [UIImage imageNamed:@"21.jpg"]]];
+}
+
+-(UILabel *)navigationBarLabel
+{
+    if (!_navigationBarLabel) {
+        _navigationBarLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100.0f, 25.0f)];
+        _navigationBarLabel.center = CGPointMake(self.view.center.x, _backButton.center.y);
+        _navigationBarLabel.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:16.0f];
+        _navigationBarLabel.textAlignment = NSTextAlignmentCenter;
+        _navigationBarLabel.text = @"Gallery";
+        _navigationBarLabel.alpha = 1;
+    }
+    
+    return _navigationBarLabel;
+}
+
+-(UIActivityIndicatorView *)activityIndicator
+{
+    if (!_activityIndicator) {
+        _activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activityIndicator.center = self.view.center;
+    }
+    return _activityIndicator;
+}
+
+-(NSMutableArray *)fetchedImages
+{
+    if (!_fetchedImages) {
+        _fetchedImages = [NSMutableArray new];
+    }
+    return _fetchedImages;
 }
 
 #pragma mark - UICollectionViewDelegate
@@ -105,7 +155,6 @@
     [cell setImage: self.fetchedImages[indexPath.row]];
     cell.title = [NSString stringWithFormat:@"%d", i];
     i++;
-    //NSLog(@"hi %i", indexPath.row);
     
     return cell;
 }
@@ -122,7 +171,13 @@
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(50.0f, 5.0f, 50.0f, 5.0f);
+    return UIEdgeInsetsMake(70.0f, 5.0f, 50.0f, 5.0f);
+}
+
+-(void)removePreviouslySelectedImage
+{
+    ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:self.selectedCellIndexPath];
+    selectedCell.alpha = 0;
 }
 
 #pragma mark Button Action
@@ -140,7 +195,7 @@
     ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
     
     /* Create a dark UIView layer to darken the background */
-    UIView *darkView = [[UIView alloc]initWithFrame:self.collectionView.frame];
+    UIView *darkView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.collectionView.contentSize.width, (self.collectionView.contentSize.height > self.collectionView.frame.size.height) ? self.collectionView.contentSize.height: self.collectionView.frame.size.height)];
     [darkView addGestureRecognizer:[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(removeSelectedCellFromStagedViewAndGoBackToGridView:)]];
     darkView.backgroundColor = [UIColor blackColor];
     darkView.alpha = 0;
@@ -152,7 +207,7 @@
     self.selectedImage = selectedImageView;
     self.selectedCellIndexPath = indexPath;
     selectedImageView.transform = CGAffineTransformMakeScale(selectedCell.frame.size.width/selectedImageView.frame.size.width, selectedCell.frame.size.height/selectedImageView.frame.size.height);
-    selectedImageView.center = selectedCell.center;
+    selectedImageView.center = CGPointMake(selectedCell.center.x, selectedCell.center.y - self.collectionView.contentOffset.y);
     [self.view addSubview:selectedImageView];
     
     selectedCell.alpha = 0;
@@ -168,7 +223,7 @@
         useButton.center = CGPointMake(useButton.center.x, self.view.frame.size.height - 100.0f);
     }completion:^(BOOL finished){
         if (finished) {
-            //[self showSelectedCellControls];
+            self.collectionView.scrollEnabled = NO;
         }
     }];
 }
@@ -234,12 +289,13 @@
 -(void)useImageButtonPressed:(UITapGestureRecognizer *)gesture
 {
     /* Animate into TaskViewController */
+        ImageCollectionViewCell *selectedCell = (ImageCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:self.selectedCellIndexPath];
     [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
         self.collectionView.center = CGPointMake(self.collectionView.center.x, self.collectionView.center.y * 4.0f );
-        //self.selectedCellControls.alpha = 0;
         self.selectedCellControls.center = CGPointMake(self.selectedCellControls.center.x, self.selectedCellControls.center.y + (self.collectionView.center.y * 4.0f + (self.selectedCellControls.center.y - self.collectionView.center.y)));
     }completion:^(BOOL finished){
         if (finished) {
+            selectedCell.alpha = 1.0;
             /* Push task view controller with selected task */
             /* TaskViewController is instantiated through the storyboard because UIKit hates me */
             UIStoryboard *sb = self.storyboard;
@@ -250,6 +306,7 @@
             self.collectionView.alpha = 0;
             self.darkView.alpha = 0;
             [self.darkView removeFromSuperview];
+            self.collectionView.scrollEnabled = YES;
         }
     }];
 }
@@ -263,9 +320,7 @@
     self.selectedImage.layer.borderWidth = 0.5;
     self.selectedImage.layer.borderColor = [UIColor blackColor].CGColor;
     [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
-        self.selectedImage.center = selectedCell.center;
-        //self.selectedCellControls.center = selectedCell.center;
-        //self.selectedCellControls.alpha = 0;
+        self.selectedImage.center = CGPointMake(selectedCell.center.x, selectedCell.center.y - self.collectionView.contentOffset.y);
         self.selectedCellControls.center = CGPointMake(self.selectedCellControls.center.x, self.view.frame.size.height + self.selectedCellControls.frame.size.height);
         gesture.view.alpha = 0;
     }completion:^(BOOL finished){
@@ -277,8 +332,10 @@
             self.selectedImage = nil;
             self.selectedCellIndexPath = nil;
             self.selectedCellControls = nil;
+            self.collectionView.scrollEnabled = YES;
         }
     }];
 }
+
 
 @end

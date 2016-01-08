@@ -8,16 +8,19 @@
 
 #import "MathKeyboard.h"
 #import "MathKeyboardKey.h"
+#import "TaskViewController.h"
+//TaskViewController is necessary to handle the help button
+#import "CustomScrollView.h"
 
 const CGFloat kPortaitKeyboardHeight = 216.0f;
-const CGFloat kNormalButtonWidth = 30.f - 5.0f;
-const CGFloat kNormalButtonHeight = 36.f;
-const CGFloat kNormalButtonSpacing = 7.5f - 2.0f;
+const CGFloat kNormalButtonWidth = 25.0f;
+const CGFloat kNormalButtonHeight = 36.0f;
+const CGFloat kNormalButtonSpacing = 5.5f;
 const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 
 @interface MathKeyboard() <UIScrollViewDelegate>
 @property (strong, nonatomic) UITextView *textView;
-@property (strong, nonatomic) UIScrollView *scrollView;
+@property (strong, nonatomic) CustomScrollView *scrollView;
 @property (strong, nonatomic) NSArray *buttonCharcters;
 /* all characters on the keyboard */
 @property (strong, nonatomic) NSArray *operationButtonCharcters;
@@ -43,6 +46,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 /* Capital letters locked on enabled */
 @property (nonatomic) MathKeyboardKey *capKey;
 /* Capital key reference so that the selected state can be easily adjusted. */
+@property (nonatomic) BOOL uiGuideModeEnabled;
+/* UI guide is a feature in training mode where some UI elements are pointed out to the user. */
 @end
 
 @implementation MathKeyboard
@@ -56,9 +61,9 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         _textView = textView;
         _buttonCharcters = characters;
         if (!characters) {
-            _buttonCharcters = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"+", @"-", @"*", @"/", @"=", @"\u2260", @"<", @">", @"\u2264", @"\u2265", @"(", @")", @"[", @"]", @".", @"^", @"\u00B1", @"\u00B0", @"%", @"\u03C0", @"\u221E", @"!", @"\u221A", @"\u221B", @" \u207f\u2044x", @"x\u207f", @"logx", @"lnx", @"sinx", @"cosx", @"tanx", @"sin\u207B\u00B9x", @"cos\u207B\u00B9x", @"tan\u207B\u00B9x"];
-            _operationButtonCharcters = @[@"\u221A", @"\u221B", @" \u207f\u2044x", @"x\u207f", @"sinx", @"cosx", @"tanx", @"sin\u207B\u00B9x", @"cos\u207B\u00B9x", @"tan\u207B\u00B9x"];
-            _buttonValues = @{@"+" : @"+", @"-" : @"-", @"*" : @"*", @"/" : @"/", @"=" : @"=", @"." : @".", @"(" : @"(", @")" : @")", @"[" : @"[", @"]" : @"]", @"<" : @"<", @">" : @">", @"\u2264" : @"<=", @"\u2265" : @">=",@"^" : @"^",  @"\u00B0" : @"^circ", @"\u2260" : @"!=", @"\u221A" : @"sqrt() ", @"\u221B" : @"sqrt^3() ", @"%" : @"%", @"\u03C0" : @"pi", @"!" : @"!", @" \u207f\u2044x" : @"()/() ", @"\u221E" : @"infty", @"x\u207f" : @"()^() ", @"\u00B1" : @"+-", @"space" : @" ", @"return" : @"\n", @"sinx" : @"sin() ", @"cosx" : @"cos() ", @"tanx" : @"tan() ", @"sin\u207B\u00B9x" : @"sin^-1() ", @"cos\u207B\u00B9x" : @"cos^-1() ", @"tan\u207B\u00B9x" : @"tan^-1() "};
+            _buttonCharcters = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"+", @"-", @"*", @"/", @"=", @"\u2260", @"<", @">", @"\u2264", @"\u2265", @"(", @")", @"[", @"]", @"^", @"_", @"\u00B1", @"\u00B0", @"%", @".", @"\u03C0", @"\u221E", @"!", @"\u221A", @"\u221B", @" \u207f\u2044x", @"x\u207f", @"logx", @"lnx", @"sinx", @"cosx", @"tanx", @"sin\u207B\u00B9x", @"cos\u207B\u00B9x", @"tan\u207B\u00B9x", @"sin\u00B2x", @"cos\u00B2x", @"tan\u00B2x", @"cscx", @"secx", @"cotx"];
+            _operationButtonCharcters = @[@"\u221A", @"\u221B", @" \u207f\u2044x", @"x\u207f", @"sinx", @"cosx", @"tanx", @"sin\u207B\u00B9x", @"cos\u207B\u00B9x", @"tan\u207B\u00B9x", @"logx", @"lnx", @"cscx", @"secx", @"cotx", @"sin\u00B2x", @"cos\u00B2x", @"tan\u00B2x"];
+            _buttonValues = @{@"+" : @"+", @"-" : @"-", @"*" : @"*", @"/" : @"/", @"=" : @"=", @"." : @".", @"(" : @"(", @")" : @")", @"[" : @"[", @"]" : @"]", @"<" : @"<", @">" : @">", @"\u2264" : @"<=", @"\u2265" : @">=",@"^" : @"^",  @"\u00B0" : @"^circ", @"\u2260" : @"!=", @"\u221A" : @"sqrt() ", @"\u221B" : @"sqrt^3() ", @"%" : @"%", @"\u03C0" : @"pi", @"!" : @"!", @" \u207f\u2044x" : @"()/() ", @"\u221E" : @"infty", @"x\u207f" : @"()^() ", @"\u00B1" : @"+-", @"space" : @" ", @"return" : @"\n", @"sinx" : @"sin() ", @"cosx" : @"cos() ", @"tanx" : @"tan() ", @"sin\u207B\u00B9x" : @"sin^-1() ", @"cos\u207B\u00B9x" : @"cos^-1() ", @"tan\u207B\u00B9x" : @"tan^-1() ", @"_" : @"_", @"logx" : @"log() ", @"lnx" : @"ln() ", @"cscx" : @"csc() ", @"secx" : @"sec() ", @"cotx" : @"cot() ", @"sin\u00B2x" : @"sin^2() ", @"cos\u00B2x" : @"cos^2() ", @"tan\u00B2x" : @"tan^2() "};
         }
         [self setUpKeyboard];
     }
@@ -74,10 +79,10 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
 
 -(void)setUpKeyboard
 {
-    /* This is pretty messy, but it's just for testing the button layout. It will be improved once keyboard specifications are solidified over time */
+    /* Messy keyboard view construction */
     
     self.frame = CGRectMake(0, [[UIScreen mainScreen] bounds].size.height - kPortaitKeyboardHeight, [[UIScreen mainScreen] bounds].size.width, kPortaitKeyboardHeight);
-    _scrollView = [UIScrollView new];
+    _scrollView = [CustomScrollView new];
     _scrollView.frame = CGRectMake(0, 0, self.frame.size.width, kPortaitKeyboardHeight - 50.0f);
     _scrollView.contentSize = CGSizeMake(self.frame.size.width * 3.0f, self.frame.size.height - kNormalButtonHeight * 2.0f);
     _scrollView.delegate = self;
@@ -101,10 +106,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     NSArray *test = @[@"Q", @"W", @"E", @"R", @"T", @"Y", @"U", @"I", @"O", @"P", @"A", @"S", @"D", @"F", @"G", @"H", @"J", @"K", @"L", @"Z", @"X", @"C", @"V", @"B", @"N", @"M"];
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [button setTitle:test[i] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self.scrollView addSubview:button];
@@ -114,9 +116,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row++;
     for (int i = 0; i<9; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:test[10+i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -127,9 +126,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row++;
     for (int i = 1; i<8; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(24.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:test[20+(i-2)] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -137,10 +133,8 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     }
     
     MathKeyboardKey *capitalizeKey = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeCapitalizeKey andFrame:CGRectMake(11.0f, (kNormalButtonHeight * (row - 1)) + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonHeight, kNormalButtonHeight)];
-    capitalizeKey.backgroundColor = [UIColor whiteColor];
     [capitalizeKey setBackgroundImage:[UIImage imageNamed:@"capitalizeKeyImage.png"] forState:UIControlStateNormal];
     [capitalizeKey setBackgroundImage:[UIImage imageNamed:@"capitalizeKeyHighlightedImage.png"] forState:UIControlStateSelected];
-    capitalizeKey.layer.cornerRadius = 4.0f;
     [capitalizeKey addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self.buttons addObject:capitalizeKey];
     self.capKey = capitalizeKey;
@@ -153,10 +147,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row = 1;
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeAlphanumeric andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), (row * 17.0f) + ((row-1) * 10.0f), kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [button setTitle:self.buttonCharcters[i] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
         [self.scrollView addSubview:button];
@@ -166,9 +157,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row++;
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:self.buttonCharcters[10+i] forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -180,9 +168,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     for (int i = 0; i<10; i++) {
         NSString *currentKeyCharcter = self.buttonCharcters[20 + i];
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(self.frame.size.width + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
         [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
         [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.buttons addObject:button];
@@ -193,23 +178,20 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     
     /* Row 1 */
     row = 1;
-    for (int i = 0; i<15; i++) {
+    for (int i = 0; i<21; i++) {
         if (30 + i < [self.buttonCharcters count]) {
-            if (i < 8) {
+            if (i < 9) {
                 /* Row 1 */
                 NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
                 MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol)
-                andFrame: CGRectMake((self.frame.size.width * 2) + 11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i),(row * 12.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
+                andFrame: CGRectMake((self.frame.size.width * 2) + ((kNormalButtonWidth+kNormalButtonSpacing)*i) - 5.0f,(row * 12.0f) + 5.0f, kNormalButtonWidth, kNormalButtonHeight)];
                 //adjust button position so the row is centered horizontally
                 button.center = CGPointMake(button.center.x + kNormalButtonWidth, button.center.y);
-                button.backgroundColor = [UIColor whiteColor];
-                [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-                button.layer.cornerRadius = 4.0f;
                 [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
                 if ([button.titleLabel.text isEqualToString:@"logx"]) {
                     //The string 'logn' is a bit longer than the other charcters, so make the key a little bigger
                     button.frame = CGRectMake(button.frame.origin.x, button.frame.origin.y, button.frame.size.width + 12.0f, button.frame.size.height);
-                }else if (i == 7){
+                }else if (i == 8){
                     button.frame = CGRectMake(button.frame.origin.x + 12.0f, button.frame.origin.y, button.frame.size.width, button.frame.size.height);
                 }else if ([button.titleLabel.text isEqualToString:@" \u207f\u2044x"]){
                     NSMutableAttributedString *fractionButtonText = [[NSMutableAttributedString alloc]initWithAttributedString:button.titleLabel.attributedText];
@@ -221,18 +203,22 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
                 [self.buttons addObject:button];
                 [self.scrollView addSubview:button];
 
-            }else{
+            }else if (i < 15){
                 /* Row 2 */
                 NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
-                MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 4.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-8) + ([currentKeyCharcter isEqualToString:@"tan\u207B\u00B9x"] ? 2.0f : 0)), kNormalButtonHeight + (2 * 12.0f) + 5.0f + 5.0f,([currentKeyCharcter isEqualToString:@"cos\u207B\u00B9x"] ? kBigButtonWidth + 3.0f : kBigButtonWidth), kNormalButtonHeight)];
-                button.backgroundColor = [UIColor whiteColor];
-                [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-                button.layer.cornerRadius = 4.0f;
+                MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 4.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-9) + ([currentKeyCharcter isEqualToString:@"tan\u207B\u00B9x"] ? 2.0f : 0)), kNormalButtonHeight + (2 * 12.0f) + 5.0f + 5.0f,([currentKeyCharcter isEqualToString:@"cos\u207B\u00B9x"] ? kBigButtonWidth + 3.0f : kBigButtonWidth), kNormalButtonHeight)];
                 [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
                 [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
                 [self.buttons addObject:button];
                 [self.scrollView addSubview:button];
 
+            }else{
+                 NSString *currentKeyCharcter = self.buttonCharcters[30 + i];
+                MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:([self.operationButtonCharcters containsObject:currentKeyCharcter] ? MathKeyboardKeyTypeOperation : MathKeyboardKeyTypeSymbol) andFrame: CGRectMake((self.frame.size.width * 2) + 4.0f + ((kBigButtonWidth+kNormalButtonSpacing)*(i-15) + 2.0f),kNormalButtonHeight + kNormalButtonHeight + (3 * 12.0f) + ((3-1) * 5.0f) + 5.0f,kBigButtonWidth, kNormalButtonHeight)];
+                [button setTitle:currentKeyCharcter forState:UIControlStateNormal];
+                [button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+                [self.buttons addObject:button];
+                [self.scrollView addSubview:button];
             }
 
         }
@@ -243,9 +229,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     row = 4;
     for (int i = 0; i<10; i++) {
         MathKeyboardKey *button = [[MathKeyboardKey alloc]initWithKeyType:MathKeyboardKeyTypeSymbol andFrame:CGRectMake(11.0f + ((kNormalButtonWidth+kNormalButtonSpacing)*i), kNormalButtonHeight + kNormalButtonHeight + kNormalButtonHeight + (row * 12.0f) + ((row-1) * 5.0f), kNormalButtonWidth, kNormalButtonHeight)];
-        button.backgroundColor = [UIColor whiteColor];
-        [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        button.layer.cornerRadius = 4.0f;
 
         if (i == 0) {
             /* help button */
@@ -280,16 +263,16 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     }
         [self addSubview:_pageControl];
     
-    
     /* Add cursor buttons in the inputAccessoryView */
     _cursorControlView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, 30.0f)];
     _cursorControlView.backgroundColor = [UIColor clearColor];
     
     UIButton *leftButton = [[UIButton alloc]initWithFrame:CGRectMake(-5.0f, -2.0f, 35.0f, 33.0f)];
     leftButton.backgroundColor = [UIColor whiteColor];
+    UIImageView *leftArrowImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"leftArrow.png"]];
+    leftArrowImage.center = CGPointMake((leftButton.frame.size.width/2)+1, leftButton.frame.size.height/2);
+    [leftButton addSubview:leftArrowImage];
     leftButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:25.0f];
-    [leftButton setTitle:@"<" forState:UIControlStateNormal];
-    [leftButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
     leftButton.layer.cornerRadius = 4.0f;
     leftButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
     leftButton.layer.borderWidth = 1.5f;
@@ -300,13 +283,12 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     
     UIButton *rightButton = [[UIButton alloc]initWithFrame:CGRectMake(_cursorControlView.frame.size.width - 30.0f, -2.0f, 35.0f, 33.0f)];
     rightButton.backgroundColor = [UIColor whiteColor];
-    rightButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue" size:25.0f];
-    [rightButton setTitle:@">" forState:UIControlStateNormal];
-    [rightButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+    UIImageView *rightArrowImage = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"rightArrow.png"]];
+    rightArrowImage.center = CGPointMake((rightButton.frame.size.width/2)-1, rightButton.frame.size.height/2);
+    [rightButton addSubview:rightArrowImage];
     rightButton.layer.cornerRadius = 4.0f;
     rightButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
     rightButton.layer.borderWidth = 1.5f;
-    rightButton.layer.cornerRadius = 4.0f;
     rightButton.showsTouchWhenHighlighted = YES;
     [rightButton addTarget:self action:@selector(rightCursorButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     _rightCursorButton = rightButton;
@@ -317,7 +299,6 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(resetCursorButtonPositionsAfterKeyboardIsOffScreen:) name:UIKeyboardDidHideNotification object:nil];
     
     _cursorKeyAnimationEnabled = YES;
-
    
 }
 
@@ -371,7 +352,16 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
             self.capKey.selected = NO;
         }
     }else if ([button.titleLabel.text isEqualToString:@"help"]){
-        //prevents crashing because this button doens't do anything yet
+        /* Get a reference to the parent TaskViewController */
+        /* Old:
+        TaskViewController *taskViewController = (TaskViewController *)[self.textView.superview nextResponder];
+        if ([taskViewController isKindOfClass:[TaskViewController class]]) {
+            [taskViewController handleHelpButtonPressed];
+        }else{
+            //...shouldn't ever happen
+        }
+         */
+        [[NSNotificationCenter defaultCenter]postNotificationName:@"helpButtonPressed" object:nil];
     }else
         [self.textView insertText:[self.buttonValues objectForKey:button.titleLabel.text]];
     
@@ -380,6 +370,7 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
         [self changeSelectedRangeforOperation:button.titleLabel.text];
         [self enableGuidanceModeForOperation:button.titleLabel.text];
     }
+
 }
 
 -(void)leftCursorButtonPressed:(id)sender
@@ -465,13 +456,12 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     [self.textView.textStorage addAttribute:NSBackgroundColorAttributeName value:[UIColor colorWithRed:1.0f green:256/255.0f blue:0 alpha:0.5f] range:NSMakeRange(self.textView.selectedRange.location-1, 2)];
     self.leftCursorButton.enabled = NO;
     
-    [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-        [self.leftCursorButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-        [self.rightCursorButton setTitleColor:[UIColor colorWithRed:0 green:0.5f blue:1.0f alpha:1.0f] forState:UIControlStateNormal];
-        self.rightCursorButton.layer.borderColor = ([UIColor colorWithRed:0 green:0.5f blue:1.0f alpha:1.0f].CGColor);
-        
-        //self.cursorControlView.center = CGPointMake(self.cursorControlView.center.x, self.cursorControlView.center.y - 50.0f);
-    }completion:nil];
+    //Swap arrow key's images
+    UIImageView *leftArrowImage = self.leftCursorButton.subviews[0];
+    leftArrowImage.image = [UIImage imageNamed:@"leftArrowDisabled.png"];
+    UIImageView *rightArrowImage = self.rightCursorButton.subviews[0];
+    rightArrowImage.image = [UIImage imageNamed:@"rightArrowHighlighted"];
+    self.rightCursorButton.layer.borderColor = ([UIColor colorWithRed:0 green:0.5f blue:1.0f alpha:1.0f].CGColor);
 }
 
 -(void)guidanceModeButtonPressed:(UIButton *)button
@@ -512,12 +502,139 @@ const CGFloat kBigButtonWidth = kNormalButtonWidth + 22.0f;
     self.inOperationGuidanceMode = 0;
     [self.textView.textStorage removeAttribute:NSBackgroundColorAttributeName range:NSMakeRange(0, [self.textView.text length])];
     
-    [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-        [self.leftCursorButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        [self.rightCursorButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-        self.rightCursorButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
-        //self.cursorControlView.center = CGPointMake(self.cursorControlView.center.x, self.cursorControlView.center.y + 50.0f);
+    //Swap arrow key's images
+    UIImageView *leftArrowImage = self.leftCursorButton.subviews[0];
+    leftArrowImage.image = [UIImage imageNamed:@"leftArrow.png"];
+    UIImageView *rightArrowImage = self.rightCursorButton.subviews[0];
+    rightArrowImage.image = [UIImage imageNamed:@"rightArrow"];
+    self.rightCursorButton.layer.borderColor = ([UIColor lightGrayColor].CGColor);
+}
+
+#pragma mark UI Guide Mode
+
+-(void)enableUIGuideMode
+{
+    self.uiGuideModeEnabled = YES;
+    self.userInteractionEnabled = NO;
+    
+    /* This view creates a yellow outline around the keyboard. I could of just used the keyboard view's 
+     .layer.borderColor property, but then I can't animate it. */
+    UIView *borderView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+    borderView.center = CGPointMake(self.frame.size.width/2.0f, self.frame.size.height/2.0f);
+    borderView.backgroundColor = [UIColor clearColor];
+    borderView.layer.borderWidth = 5.0f;
+    borderView.layer.borderColor = [UIColor yellowColor].CGColor;
+    borderView.alpha = 0;
+    borderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    [self addSubview:borderView];
+    
+
+    /* Keyboard animations */
+    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        borderView.alpha = 1.0f;
+        borderView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    }completion:^(BOOL finished){
+        [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                    self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
+                }completion:^(BOOL finished){
+                    if (finished) {
+                        [UIView animateWithDuration:0.6f delay:0.3f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                            self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x + self.frame.size.width, self.scrollView.contentOffset.y);
+                        }completion:^(BOOL finished){
+                            if (finished) {
+                                [UIView animateWithDuration:0.6f delay:0.4f usingSpringWithDamping:0.7f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseInOut animations:^{
+                                    self.scrollView.contentOffset = CGPointMake(self.scrollView.contentOffset.x - self.frame.size.width, self.scrollView.contentOffset.y);
+                                }completion:^(BOOL finished){
+                                    if (finished) {
+                                        self.userInteractionEnabled = YES;
+                                    }
+                                }];
+                            }
+                        }];
+                    }
+                }];
+            }
+        }];
+    }];
+}
+
+-(void)disableUIGuideMode
+{
+    self.uiGuideModeEnabled = NO;
+}
+
+-(void)removeYellowBorderForUIGuide
+{
+    UIView *borderView = [self.subviews objectAtIndex:([self.subviews count]-1)];
+    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        borderView.alpha = 0;
+        borderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    }completion:^(BOOL finished){
+        [borderView removeFromSuperview];
+        
+        /* The next step in the UI Guide is pointing out the arrow keys. So we'll highlight those. */
+        [self makeYellowBorderOnArrowKeysForUIGuide];
+    }];
+}
+
+-(void)makeYellowBorderOnArrowKeysForUIGuide
+{
+    UIView *leftArrowButtonBorderView = [[UIView alloc]initWithFrame:self.leftCursorButton.frame];
+    UIView *rightArrowButtonBorderView = [[UIView alloc]initWithFrame:self.rightCursorButton.frame];
+    leftArrowButtonBorderView.center = CGPointMake(self.leftCursorButton.frame.size.width/2.0f, self.leftCursorButton.frame.size.height/2.0f);
+    rightArrowButtonBorderView.center = CGPointMake(self.rightCursorButton.frame.size.width/2.0f, self.rightCursorButton.frame.size.height/2.0f);
+    leftArrowButtonBorderView.backgroundColor = [UIColor clearColor];
+    rightArrowButtonBorderView.backgroundColor = [UIColor clearColor];
+    leftArrowButtonBorderView.layer.borderWidth = 5.0f;
+    rightArrowButtonBorderView.layer.borderWidth = 5.0f;
+    leftArrowButtonBorderView.layer.cornerRadius = 4.0f;
+    rightArrowButtonBorderView.layer.cornerRadius = 4.0f;
+    leftArrowButtonBorderView.layer.borderColor = [UIColor yellowColor].CGColor;
+    rightArrowButtonBorderView.layer.borderColor = [UIColor yellowColor].CGColor;
+    leftArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    rightArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    leftArrowButtonBorderView.alpha = 0;
+    rightArrowButtonBorderView.alpha = 0;
+    [self.leftCursorButton addSubview:leftArrowButtonBorderView];
+    [self.rightCursorButton addSubview:rightArrowButtonBorderView];
+    
+    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        leftArrowButtonBorderView.alpha = 1.0f;
+        rightArrowButtonBorderView.alpha = 1.0f;
+        leftArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+        rightArrowButtonBorderView.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
     }completion:nil];
+    
+}
+
+-(void)removeCursorKeysYellowBorderForUIGuide
+{
+    UIView *leftArrowButtonBorderView = [self.leftCursorButton.subviews objectAtIndex:([self.leftCursorButton.subviews count]-1)];
+    UIView *rightArrowButtonBorderView = [self.rightCursorButton.subviews objectAtIndex:([self.rightCursorButton.subviews count]-1)];
+    [leftArrowButtonBorderView removeFromSuperview];
+    [rightArrowButtonBorderView removeFromSuperview];
+}
+
+-(void)animateCursorButtonsForUIGuide
+{
+    /* Arrow key animation */
+    if (self.uiGuideModeEnabled) {
+        [UIView animateWithDuration:0.3f delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
+            self.leftCursorButton.transform = CGAffineTransformMakeScale(1.4f, 1.4f);
+            self.rightCursorButton.transform = CGAffineTransformMakeScale(1.4f, 1.4f);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.6f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                    self.leftCursorButton.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+                    self.rightCursorButton.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+                }completion:nil];
+            }
+        }];
+    }
 }
 
 #pragma mark ScrollView Delegate

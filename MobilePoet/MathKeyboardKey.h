@@ -28,9 +28,6 @@ typedef NS_ENUM(NSInteger, MathKeyboardKeyType){
 };
 
 @interface MathKeyboardKey : UIButton
-
 @property(nonatomic, assign) MathKeyboardKeyType type;
-
 -(instancetype)initWithKeyType:(MathKeyboardKeyType)type andFrame:(CGRect)frame;
-
 @end

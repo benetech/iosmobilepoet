@@ -9,5 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface GalleryViewController : UIViewController
-
+-(void)removePreviouslySelectedImage;
+/* Used for demo/no-servers purposes. TaskViewController calls this when a user submits a previously selected image */
 @end

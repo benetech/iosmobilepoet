@@ -17,9 +17,9 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dhk-Nw-8HI">
-                                <rect key="frame" x="135" y="154" width="50" height="30"/>
+                                <rect key="frame" x="130" y="154" width="61" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="19"/>
+                                <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="21"/>
                                 <state key="normal" title="Begin">
                                     <color key="titleColor" red="0.098039224743843079" green="0.10588236153125763" blue="0.60784316062927246" alpha="1" colorSpace="deviceRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -30,9 +30,9 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mhd-Jd-hjD">
-                                <rect key="frame" x="96" y="214" width="129" height="30"/>
+                                <rect key="frame" x="88" y="215" width="144" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="19"/>
+                                <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="21"/>
                                 <state key="normal" title="Training Mode">
                                     <color key="titleColor" red="0.098039224743843079" green="0.10588236153125763" blue="0.60784316062927246" alpha="1" colorSpace="deviceRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -43,39 +43,29 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="cGF-nj-44N">
-                                <rect key="frame" x="138" y="279" width="45" height="30"/>
+                                <rect key="frame" x="137" y="278" width="47" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="19"/>
+                                <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="21"/>
                                 <state key="normal" title="Help">
                                     <color key="titleColor" red="0.098039224743843079" green="0.10588236153125763" blue="0.60784316062927246" alpha="1" colorSpace="deviceRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="helpButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="kDu-ED-csk"/>
+                                    <segue destination="1JE-ig-phs" kind="push" id="zPq-fg-9w2"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dQ6-DA-dtC">
                                 <rect key="frame" x="124" y="342" width="72" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="19"/>
+                                <fontDescription key="fontDescription" name="Avenir-Roman" family="Avenir" pointSize="21"/>
                                 <state key="normal" title="About">
                                     <color key="titleColor" red="0.1098039299" green="0.1098039299" blue="0.6549019814" alpha="1" colorSpace="deviceRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="aboutButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="hK1-QG-kFy"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YBm-QL-CcM">
-                                <rect key="frame" x="120" y="502" width="81" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="19"/>
-                                <state key="normal" title="Sign In">
-                                    <color key="titleColor" red="0.09803922474" green="0.10588236149999999" blue="0.60784316059999999" alpha="1" colorSpace="deviceRGB"/>
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="signInButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="2Or-f5-0ep"/>
+                                    <segue destination="OGu-7M-vBw" kind="push" id="64w-Vi-3l1"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -86,7 +76,6 @@
                         <outlet property="aboutButton" destination="dQ6-DA-dtC" id="KF7-sG-A1Z"/>
                         <outlet property="beginButton" destination="dhk-Nw-8HI" id="c54-Zl-9O6"/>
                         <outlet property="helpButton" destination="cGF-nj-44N" id="JeX-1n-MUL"/>
-                        <outlet property="signInButton" destination="YBm-QL-CcM" id="G0f-Qt-WtY"/>
                         <outlet property="trainingModeButton" destination="mhd-Jd-hjD" id="6BH-mG-uGG"/>
                     </connections>
                 </viewController>
@@ -190,7 +179,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="20"/>
                                 <state key="normal" title="Source">
-                                    <color key="titleColor" red="0.1098039299" green="0.1098039299" blue="0.6549019814" alpha="1" colorSpace="deviceRGB"/>
+                                    <color key="titleColor" red="0.52253952240000001" green="0.55353906829999999" blue="0.62859517340000004" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
@@ -241,7 +230,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" name="Avenir-Medium" family="Avenir" pointSize="20"/>
                                 <state key="normal" title="Review and Revise">
-                                    <color key="titleColor" red="0.098039224743843079" green="0.10588236153125763" blue="0.60784316062927246" alpha="1" colorSpace="deviceRGB"/>
+                                    <color key="titleColor" red="0.52253952241373214" green="0.55353906826348598" blue="0.62859517335891724" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                             </button>
@@ -270,10 +259,39 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" id="XBI-p7-g8f"/>
+                    <connections>
+                        <outlet property="galleryButton" destination="wwj-U1-HBz" id="GH9-tb-3Kg"/>
+                        <outlet property="galleryLabel" destination="MP7-rc-QrM" id="UKj-Gy-miZ"/>
+                        <outlet property="randomButton" destination="SyB-Xb-M7U" id="Eea-1O-7PF"/>
+                        <outlet property="randomLabel" destination="YFE-CK-Zxv" id="uQI-76-L2J"/>
+                        <outlet property="reviewButton" destination="blK-FR-0dh" id="Dss-8Z-o3z"/>
+                        <outlet property="reviewLabel" destination="XYP-fb-wsS" id="aSo-iw-u51"/>
+                        <outlet property="sourceButton" destination="lNF-Eu-8Gv" id="4Kb-hE-gNi"/>
+                        <outlet property="sourceLabel" destination="Ba9-8Q-e5Z" id="ZR7-G2-SL7"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="i0D-mf-fav" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="363" y="60"/>
+        </scene>
+        <!--About View Controller-->
+        <scene sceneID="OKV-8a-jDh">
+            <objects>
+                <viewController id="OGu-7M-vBw" customClass="AboutViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="tBo-Oq-8WJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="wyB-C0-ph1"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="o6l-At-SaS">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="TJh-Tf-IGA"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xf1-Ha-v3L" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-228" y="759"/>
         </scene>
         <!--Training Mode View Controller-->
         <scene sceneID="75P-WH-wyV">
@@ -293,6 +311,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Bag-uv-rYe" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="229" y="772"/>
+        </scene>
+        <!--Help View Controller-->
+        <scene sceneID="qdm-ov-opJ">
+            <objects>
+                <viewController storyboardIdentifier="help" id="1JE-ig-phs" customClass="HelpViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="6ei-B1-RGe"/>
+                        <viewControllerLayoutGuide type="bottom" id="5eR-hQ-9Yn"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="JAn-E8-hcQ">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="iCl-N1-6M6"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Aoy-bu-YUo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="708" y="740"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

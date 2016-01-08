@@ -8,6 +8,8 @@
 
 #import "TaskViewController.h"
 #import "MathKeyboard.h"
+#import "HelpViewController.h"
+#import "GalleryViewController.h"
 
 typedef NS_ENUM(NSInteger, ImageSelectionMode){
     ImageSelectionModeRandom,
@@ -19,12 +21,16 @@ typedef NS_ENUM(NSInteger, ImageSelectionMode){
 NSString * const HTMLFileName = @"asciimathhtml.html";
 const CGFloat kImageCenterYPostion = 110.0f;
 const CGFloat kPreviewCenterYPostion = 220.0f;
+/* Adjusted constants for iPhone 4 and 4s 3.5 inch screens */
+const CGFloat kImageCenterYPostionForThreePointFiveInchScreen = 90.0f;
+const CGFloat kPreviewCenterYPostionForThreePointFiveInchScreen = 168.0f;
 
 @interface TaskViewController () <UITextViewDelegate, UIAlertViewDelegate>
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, strong) UIButton *backButton;
 @property (nonatomic, strong) UIButton *submitButton;
 @property (nonatomic, strong) UITextView *textInputView;
+/* Main textview that the user types in their ASCIIMath in */
 @property (nonatomic, strong) UIWebView *previewView;
 @property (nonatomic) BOOL imageIsEnlarged;
 /* used for the tap gesture to make the fetched image bigger */
@@ -39,7 +45,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 /* To restrict the textview's user interaction during guidance mode, the bool is required to know if its enabled */
 @property (nonatomic) MathKeyboard *mathKeyboard;
 @property (strong, nonatomic) UILabel *previewViewLabel;
-/* This label identifies the preview view as a preview view before the user begins typing */
+/* This label identifies the preview view as a preview view before the user begins typing - says (Preview) */
+@property (strong, nonatomic) NSMutableArray *randomImages;
+@property (nonatomic) BOOL presentedHelpViewController;
+/* Keeps track on of the HelpViewController was just presented/dismissed. */
 @end
 
 @implementation TaskViewController
@@ -72,11 +81,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     submitButton.showsTouchWhenHighlighted = YES;
     self.submitButton = submitButton;
     [self.view addSubview:self.submitButton];
-    NSLog(@" hi %f %f", self.backButton.frame.size.width ,self.backButton.frame.size.height);
     
     
     /* text view */
-    self.textInputView = [[UITextView alloc]initWithFrame:(CGRect){CGPointZero, self.view.frame.size.width, 80.0f}];
+    self.textInputView = [[UITextView alloc]initWithFrame:(CGRect){CGPointZero, self.view.frame.size.width, [self deviceHasThreePointFiveInchScreen] ? 65.0f : 80.0f }];
     [MathKeyboard addMathKeyboardToTextView:self.textInputView];
     self.textInputView.font = [UIFont systemFontOfSize:15.0f];
     self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
@@ -89,8 +97,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [self.view addSubview:self.textInputView];
     
     /* preview view */
-    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 65.0f)];
-    /* center is calculated after image is fetched */
+    self.previewView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, ([self deviceHasThreePointFiveInchScreen] ? 58.0f : 65.0f))];
+    self.previewView.center = CGPointMake(self.view.frame.size.width/2.0f, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
     self.previewView.backgroundColor = [UIColor blackColor];
     self.previewView.layer.shadowOpacity = 0;
     self.previewView.layer.shadowOffset = CGSizeMake(0,0);
@@ -99,17 +107,22 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.previewView.userInteractionEnabled = NO;
     [self.view addSubview:self.previewView];
     
-    self.activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
     [self.view addSubview:self.activityIndicator];
     
-    
     self.mode = ImageSelectionModeRandom;
+    
+    /* Displaying the help menu when 'help' is pressed on the keyboard is handled by here, triggered by a notification */
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(handleHelpButtonPressed:) name:@"helpButtonPressed" object:nil];
 }
 
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    if (self.presentedHelpViewController) {
+        self.presentedHelpViewController = NO;
+        [self.textInputView becomeFirstResponder];
+        return;
+    }
     if (self.mode == ImageSelectionModeRandom) {
         [self.activityIndicator startAnimating];
         /* Fake delay to simulate server fetch of image */
@@ -139,6 +152,15 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.mode = ImageSelectionModeSpecificImage;
 }
 
+-(void)reloadRandomImages
+{
+    for (int i = 1; i < 14; i++) {
+        if (i != 5) {
+            [self.randomImages addObject:[UIImage imageNamed:[NSString stringWithFormat:@"randomImage%d.jpg", i]]];
+        }
+    }
+}
+
 -(MathKeyboard *)mathKeyboard
 {
     if (!_mathKeyboard) {
@@ -147,7 +169,8 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     return _mathKeyboard;
 }
 
--(UILabel *)previewViewLabel{
+-(UILabel *)previewViewLabel
+{
     if (!_previewViewLabel) {
         _previewViewLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 100.0f, 20.0f)];
         _previewViewLabel.backgroundColor = [UIColor clearColor];
@@ -159,6 +182,26 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         [_previewView addSubview:_previewViewLabel];
     }
     return _previewViewLabel;
+}
+
+-(UIActivityIndicatorView *)activityIndicator
+{
+    if (!_activityIndicator) {
+        _activityIndicator = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activityIndicator.center = CGPointMake(self.view.frame.size.width/2, self.view.frame.size.height/2);
+    }
+    return _activityIndicator;
+}
+
+-(NSMutableArray *)randomImages
+{
+    if (!_randomImages) {
+        _randomImages = [NSMutableArray new];
+        for (int i = 1; i < 14; i++) {
+            [_randomImages addObject:[UIImage imageNamed:[NSString stringWithFormat:@"randomImage%d.jpg", i]]];
+        }
+    }
+    return _randomImages;
 }
 
 #pragma mark Button actions
@@ -201,7 +244,22 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     if (buttonIndex == 1) {
         MathKeyboard *keyboard = (MathKeyboard *)self.textInputView.inputView;
         [keyboard disableCursorKeyHorizontalAnimationForNextKeyboardDismissal];
-        [self.navigationController popViewControllerAnimated:YES];
+        if (self.mode == ImageSelectionModeSpecificImage) {
+            [self.textInputView resignFirstResponder];
+            [UIView animateWithDuration:0.3f delay:0 options:0 animations:^{
+                self.textInputView.alpha = 0;
+                self.previewView.alpha = 0;
+                self.backButton.alpha = 0;
+                self.submitButton.alpha = 0;
+                self.currentImage.alpha = 0;
+            }completion:^(BOOL finished){
+                if (finished) {
+                    [self.navigationController popViewControllerAnimated:NO];
+                }
+            }];
+        }else
+            [self.textInputView resignFirstResponder];
+            [self.navigationController popViewControllerAnimated:YES];
     }
 }
 
@@ -217,24 +275,24 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     if (!self.submissionViewSubviews) {
         self.submissionViewSubviews = [NSMutableArray new];
     }
-    UILabel *confirmInstructionTextView = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
-    confirmInstructionTextView.center = CGPointMake(self.view.frame.size.width/2.0f, -(confirmInstructionTextView.frame.size.height/2.0f) + 20.0f);
-    confirmInstructionTextView.numberOfLines = 0;
-    confirmInstructionTextView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    UILabel *confirmInstructionLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+    confirmInstructionLabel.center = CGPointMake(self.view.frame.size.width/2.0f, -(confirmInstructionLabel.frame.size.height/2.0f) + 20.0f);
+    confirmInstructionLabel.numberOfLines = 0;
+    confirmInstructionLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     //confirmInstructionTextView.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:18.0f];
-    confirmInstructionTextView.textAlignment = NSTextAlignmentCenter;
-    confirmInstructionTextView.text = @"Is your translation identical to the image?";
+    confirmInstructionLabel.textAlignment = NSTextAlignmentCenter;
+    confirmInstructionLabel.text = @"Is your translation identical to the image?";
     [self.submissionViewSubviews removeAllObjects];
-    [self.submissionViewSubviews addObject:confirmInstructionTextView];
-    [self.view addSubview:confirmInstructionTextView];
+    [self.submissionViewSubviews addObject:confirmInstructionLabel];
+    [self.view addSubview:confirmInstructionLabel];
     
     UILabel *imageLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 20.0f)];
     imageLabel.backgroundColor = [UIColor blueColor];
     
     //Buttons (as UILabels)
     const CGFloat decisionButtonHeight = 45.0f;
-    const CGFloat yesButtonYCenterPosition = self.view.frame.size.height - decisionButtonHeight;
-    const CGFloat noButtonYCenterPosition = self.view.frame.size.height - (decisionButtonHeight *  2.5f);
+    const CGFloat noButtonYCenterPosition = self.view.frame.size.height - decisionButtonHeight;
+    const CGFloat yesButtonYCenterPosition = self.view.frame.size.height - (decisionButtonHeight *  2.5f);
     
     UILabel *yesButton = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, decisionButtonHeight)];
     yesButton.center = CGPointMake(self.view.frame.size.width/2.0f, noButtonYCenterPosition + 150.0f);
@@ -261,10 +319,17 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [self.view addSubview:yesButton];
     [self.view addSubview:noButton];
     
+    /* Make scale for images */
+    CGAffineTransform scale = CGAffineTransformScale(self.currentImage.transform, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width);
+    if ((self.currentImage.frame.size.height/self.currentImage.transform.a) * scale.a > 200.0f) {
+        /* If the height of the image is still too big, make the height 200 points, which is the maximum height limit for the image in a submission view */
+        scale = CGAffineTransformScale(self.currentImage.transform, 200.0f/self.currentImage.frame.size.height, 200.0f/self.currentImage.frame.size.height);
+    }
+    
     /* Animate in submission view */
     [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
         /* animate existing task subviews */
-        self.currentImage.transform = CGAffineTransformScale(self.currentImage.transform, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width, (self.view.frame.size.width- 50.0f)/self.currentImage.frame.size.width);
+        self.currentImage.transform = scale;
         self.currentImage.center = CGPointMake(self.currentImage.center.x, self.currentImage.center.y + 100.0f);
         self.previewView.center = CGPointMake(self.previewView.center.x, self.previewView.center.y + 130.0f);
         self.textInputView.center = CGPointMake(self.textInputView.center.x, self.textInputView.center.y + 300.0f);
@@ -274,7 +339,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         self.backButton.alpha = 0;
         
         /* animate in new submission subviews */
-        confirmInstructionTextView.center = CGPointMake(confirmInstructionTextView.center.x, confirmInstructionTextView.center.y + confirmInstructionTextView.frame.size.height);
+        confirmInstructionLabel.center = CGPointMake(confirmInstructionLabel.center.x, confirmInstructionLabel.center.y + confirmInstructionLabel.frame.size.height);
         yesButton.center = CGPointMake(yesButton.center.x, yesButtonYCenterPosition);
         noButton.center = CGPointMake(noButton.center.x, noButtonYCenterPosition);
 
@@ -310,10 +375,10 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.submitButton.enabled = YES;
     
     /* Animate out submission view subviews and animate task view subviews back into place */
-    [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-        self.previewView.center = CGPointMake(self.previewView.center.x, kPreviewCenterYPostion);
+    [UIView animateWithDuration:([self deviceHasThreePointFiveInchScreen] ? 0.7f : 0.6f) delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+        self.previewView.center = CGPointMake(self.previewView.center.x, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
         self.currentImage.transform = imageTransform;
-        self.currentImage.center = CGPointMake(self.currentImage.center.x, kImageCenterYPostion);
+        self.currentImage.center = CGPointMake(self.currentImage.center.x, ([self deviceHasThreePointFiveInchScreen] ? kImageCenterYPostionForThreePointFiveInchScreen : kImageCenterYPostion));
         self.textInputView.center = CGPointMake(self.textInputView.center.x, self.textInputView.center.y - 300.0f);
         self.textInputView.alpha = 1.0f;
         self.backButton.alpha = 1.0f;
@@ -390,9 +455,9 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     
 }
 
-#pragma mark Gestures
+#pragma mark Image Gestures
 
--(void)enlargeImage:(UIGestureRecognizer *)gesture
+-(void)enlargeImage:(UITapGestureRecognizer *)gesture
 {
     UIView *image = gesture.view;
     [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
@@ -418,49 +483,62 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
             /* Image is not enlarged (aka tapped), so scale the image to its original size if its current
              size is less than its original */
-            CGAffineTransform originalScale = [self scaleTransformForTaskImage:gesture.view];
-        //NSLog(@"if %f < %f", gesture.view.frame.size.width, gesture.view.frame.size.width * originalScale.a);
-        NSLog(@"%f %f %f %f %f %f", originalScale.a, originalScale.b, originalScale.c, originalScale.d, originalScale.tx, originalScale.ty);
-            if (gesture.view.frame.size.width < (gesture.view.frame.size.width * originalScale.a)) {
-                /* If image width is less than its ideal width, scale it up */
-                [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
-                    gesture.view.transform = originalScale;
-                    NSLog(@"%f", gesture.view.frame.size.width * originalScale.a);
-                }completion:^(BOOL finished){
-                    if (finished) {
-                        if (self.imageIsEnlarged) {
-                            self.imageIsEnlarged = NO;
-                        }
+        CGAffineTransform originalScale = [self scaleTransformForTaskImageThatTheUserScaledViaThePinchGesture:gesture.view];
+        if (gesture.view.frame.size.width < (gesture.view.frame.size.width * originalScale.a)) {
+            /* If image width is less than its ideal width, scale it up */
+            originalScale = [self scaleTransformForTaskImage:gesture.view];
+            [UIView animateWithDuration:0.3f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                gesture.view.transform = originalScale;
+            }completion:^(BOOL finished){
+                if (finished) {
+                    if (self.imageIsEnlarged) {
+                        self.imageIsEnlarged = NO;
                     }
-                }];
-            }
+                }
+            }];
         }
+    }
     
 }
 
 -(void)dragImage:(UIPanGestureRecognizer *)gesture
 {
+    /* Drags along the Y axis always animate back to the original Y center when the gesture ends */
     static int originalImageCenterY;
-    
     if (gesture.state == UIGestureRecognizerStateBegan) {
         originalImageCenterY = gesture.view.center.y;
     }else if (gesture.state == UIGestureRecognizerStateChanged) {
-        gesture.view.center = CGPointMake(gesture.view.center.x, gesture.view.center.y + [gesture translationInView:self.view].y);
+        gesture.view.center = CGPointMake(gesture.view.center.x + [gesture translationInView:self.view].x, gesture.view.center.y + [gesture translationInView:self.view].y);
         [gesture setTranslation:CGPointZero inView:self.view];
     }else if (gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled){
-        [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        /* Drags along the X axis won't animate back to the screens center when the gesture ends, except when less than 50 points of the image are on screen */
+        if ((gesture.view.frame.origin.x >= (self.view.frame.size.width - 50.0f)) || ((gesture.view.frame.origin.x + gesture.view.frame.size.width) <= 50.0f)) {
+            [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+                gesture.view.center = CGPointMake(self.view.center.x, originalImageCenterY);
+            }completion:nil];
+        }else{
+            [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:1.0f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
             gesture.view.center = CGPointMake(gesture.view.center.x, originalImageCenterY);
-        }completion:nil];
+            }completion:nil];
+        }
     }
 }
 
-#pragma mark System
+#pragma mark Image/Task Loading and Fetching
 
 -(void)fetchPic:(id)sender
 {
+    /* For ImageSelectionModeRandom type only */
     [self resetSubviewsForNewImageFetch];
     /* This will evetually handle fetching pictures from the mathml cloud servers. For now this will simulate that using local pics */
-    UIImageView *image = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"testimg1.jpg"]];
+    if ([self.randomImages count] == 0) {
+        /* If all the random images have been described, reload them all again */
+        [self reloadRandomImages];
+    }
+    /* choose random image */
+    NSInteger randomIndex = arc4random_uniform((int)[self.randomImages count]);
+    UIImageView *image = [[UIImageView alloc]initWithImage:[self.randomImages objectAtIndex:randomIndex]];
+    [self.randomImages removeObjectAtIndex:randomIndex];
     self.currentImage = image;
     
     /* prepare image for animation */
@@ -479,8 +557,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
         if (finished) {
             [self.activityIndicator stopAnimating];
             [self.activityIndicator removeFromSuperview];
-            self.activityIndicator.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
-            self.activityIndicator.alpha = 1.0f;
+            [self resetActivityIndicatorScale];
             
             /* animate in image */
             [UIView animateWithDuration:0.8f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.f options:UIViewAnimationOptionCurveEaseInOut animations:^{
@@ -491,11 +568,16 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                     
                     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
                     CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
- 
+                    /* If the image is scaled up a lot, reduce shadow size becuase its also scaled up */
+                    if (imageTransform.a > 2.0f) {
+                        image.layer.shadowOpacity = 0.25f;
+                        image.layer.shadowRadius = 2.5f;
+                    }
+                    
                     /* animate image to the top */
                     [UIView animateWithDuration:0.9f delay:0.2f usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
                         image.transform = imageTransform;
-                        image.center = CGPointMake(image.center.x, kImageCenterYPostion);
+                        image.center = CGPointMake(image.center.x,([self deviceHasThreePointFiveInchScreen] ? kImageCenterYPostionForThreePointFiveInchScreen : kImageCenterYPostion));
                         self.backButton.alpha = 1.0f;
                         self.textInputView.alpha = 1.0f;
                         self.submitButton.alpha = 1.0f;
@@ -504,7 +586,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
                         if (finished) {
                             /* calculate position of the preview view. It's y position in the ui is predefined and constant. */
                             //self.previewView.center = CGPointMake(self.view.frame.size.width/2, (image.frame.origin.y + image.frame.size.height + self.previewView.frame.size.height/2 + 50.0f));
-                            self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
+                            self.previewView.center = CGPointMake(self.view.frame.size.width/2, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
                             self.previewView.hidden = NO;
                             
                             [self.textInputView becomeFirstResponder];
@@ -544,8 +626,13 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     UIImageView *image = self.currentImage;
     /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
     CGAffineTransform imageTransform = [self scaleTransformForTaskImage:image];
+    /* If the image is scaled up a lot, reduce shadow size becuase its also scaled up */
+    if (imageTransform.a > 2.0f) {
+        image.layer.shadowOpacity = 0.25f;
+        image.layer.shadowRadius = 2.5f;
+    }
     
-    self.previewView.center = CGPointMake(self.view.frame.size.width/2, kPreviewCenterYPostion);
+    self.previewView.center = CGPointMake(self.view.frame.size.width/2, ([self deviceHasThreePointFiveInchScreen] ? kPreviewCenterYPostionForThreePointFiveInchScreen : kPreviewCenterYPostion));
     self.previewView.hidden = NO;
     self.previewView.alpha = 1.0f;
     [self.textInputView becomeFirstResponder];
@@ -553,7 +640,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     /* animate image to the top */
     [UIView animateWithDuration:0.7f delay:0 usingSpringWithDamping:0.9f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
         image.transform = imageTransform;
-        image.center = CGPointMake(image.center.x, kImageCenterYPostion);
+        image.center = CGPointMake(image.center.x,([self deviceHasThreePointFiveInchScreen] ? kImageCenterYPostionForThreePointFiveInchScreen : kImageCenterYPostion));
         self.backButton.alpha = 1.0f;
         self.textInputView.alpha = 1.0f;
         self.submitButton.alpha = 1.0f;
@@ -563,7 +650,6 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
             [image addGestureRecognizer:[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(dragImage:)]];
             [image addGestureRecognizer:[[UIPinchGestureRecognizer alloc]initWithTarget:self action:@selector(pinchImage:)]];
             image.userInteractionEnabled = YES;
-            
         }
     }];
     
@@ -581,46 +667,7 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     [UIView animateWithDuration:0.5f animations:^{
         self.previewViewLabel.alpha = 1.0f;
     }completion:nil];
-
     
-}
-
--(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
-{
-    /* Calculate proper image scaling so the image fits properly in the UI. Assuming any image size is possible */
-    /* The max height of an image before it's too big for the ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
-    CGAffineTransform imageTransform;
-    if (image.frame.size.height > 100.0f){
-        // Image is too big
-        imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
-    }else{
-        // Image is an ideal size, meaning it's below the max height
-        imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
-        
-        if ((image.frame.size.height * imageTransform.a) > 100.0f){
-            // if the previous transform makes the height too big, scale it down
-            imageTransform = CGAffineTransformScale(image.transform, 100.0f/image.frame.size.height, 100.0f/image.frame.size.height);
-        }
-    }
-    
-    return imageTransform;
-
-}
-
--(void)submitImageAndMathmlToCloud
-{
-    /* This will eventually give the user feedback when the image is or is not submitted */
-    [self.view addSubview:self.activityIndicator];
-    [self.activityIndicator startAnimating];
-    
-    /* For now if we're in random mode, just gonna load another image */
-    if (self.mode == ImageSelectionModeRandom) {
-        [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
-    }else{
-        /* Specific Image */
-        [self.activityIndicator stopAnimating];
-        [self.navigationController popViewControllerAnimated:NO];
-    }
     
 }
 
@@ -639,6 +686,213 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     self.textInputView.center = CGPointMake(self.textInputView.center.x, self.view.frame.size.height - self.textInputView.inputView.frame.size.height - self.textInputView.frame.size.height/2);
     self.backButton.enabled = YES;
     self.submitButton.enabled = YES;
+}
+
+#pragma mark Description Submiting
+
+-(void)submitImageAndMathmlToCloud
+{
+    /* This will eventually give the user feedback when the image is or is not submitted */
+    [self showActivityIndicator];
+    /* Fake network activty timer */
+    [NSTimer scheduledTimerWithTimeInterval:0.3 target:self selector:@selector(showSubmitSuccessfulView:) userInfo:nil repeats:NO];
+    
+}
+
+-(void)showSubmitSuccessfulView:(NSTimer *)timer
+{
+    UIImageView *checkmark = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"submitSuccessfulCheck2.png"]];
+    /* prepare for animation */
+    checkmark.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+    checkmark.center = self.view.center;
+    
+    UILabel *submitSuccessfulLabel = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 100.0f)];
+    submitSuccessfulLabel.center = CGPointMake(self.view.frame.size.width/2.0f, -(submitSuccessfulLabel.frame.size.height/2.0f) + 20.0f);
+    submitSuccessfulLabel.numberOfLines = 0;
+    submitSuccessfulLabel.font = [UIFont fontWithName:@"HelveticaNeue-Medium" size:17.0f];
+    submitSuccessfulLabel.textAlignment = NSTextAlignmentCenter;
+    submitSuccessfulLabel.text = @"Description Submitted Successfully";
+    [self.view addSubview:submitSuccessfulLabel];
+    
+    [UIView animateWithDuration:0.2f animations:^{
+        self.activityIndicator.alpha = 0;
+        self.activityIndicator.transform = CGAffineTransformMakeScale(0.5f, 0.5f);
+    }completion:^(BOOL finished){
+        [self.activityIndicator removeFromSuperview];
+        [self resetActivityIndicatorScale];
+        
+        /* Animate in label */
+        [UIView animateWithDuration:0.5f delay:0 usingSpringWithDamping:0.8f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+            submitSuccessfulLabel.center = CGPointMake(submitSuccessfulLabel.center.x, checkmark.center.y/2.0f);
+        }completion:nil];
+        
+        /* Animate in checkmark simultaneously */
+        [self.view addSubview:checkmark];
+        [UIView animateWithDuration:0.4f delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseOut animations:^{
+            checkmark.transform = CGAffineTransformMakeScale(1.3f, 1.3f);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [UIView animateWithDuration:0.6f delay:0 usingSpringWithDamping:0.45f initialSpringVelocity:1.0f options:UIViewAnimationOptionCurveEaseIn animations:^{
+                    checkmark.transform = CGAffineTransformMakeScale( 1.0f, 1.0f);
+                }completion:^(BOOL finished){
+                    if (finished) {
+                        [self removeSubmitSuccessfulViewWithImage:checkmark andTextLabel:submitSuccessfulLabel];
+                    }
+                }];
+            }
+        }];
+        
+    }];
+}
+
+-(void)removeSubmitSuccessfulViewWithImage:(UIImageView *)image andTextLabel:(UILabel *)label
+{
+    /* image == checkmark image */
+    [UIView animateWithDuration:0.2f delay:0.6f options:UIViewAnimationOptionCurveEaseOut animations:^{
+        image.transform = CGAffineTransformMakeScale(1.2f, 1.2f);
+    }completion:^(BOOL finished){
+        [UIView animateWithDuration:0.25f delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+            image.transform = CGAffineTransformMakeScale(0.1f, 0.1f);
+            label.center = CGPointMake(label.center.x, -(label.frame.size.height/2.0f) + 20.0f);
+        }completion:^(BOOL finished){
+            if (finished) {
+                [image removeFromSuperview];
+                [label removeFromSuperview];
+                [self redirectToNextImageFetchAfterSubmitSuccessViewWasShown];
+            }
+        }];
+    }];
+    
+}
+
+-(void)redirectToNextImageFetchAfterSubmitSuccessViewWasShown
+{
+    /* What happens next is determined by the mode */
+    /* For now if we're in random mode, just gonna load another image */
+    if (self.mode == ImageSelectionModeRandom) {
+        [self showActivityIndicator];
+        [self performSelector:@selector(fetchPic:) withObject:nil afterDelay:0.5];
+    }else{
+        /* Specific Image */
+        UIViewController *superViewController = [[self.navigationController viewControllers]objectAtIndex:[[self.navigationController viewControllers]count]-2];
+        if ([superViewController isMemberOfClass:[GalleryViewController class]]) {
+            GalleryViewController *gallery = (GalleryViewController *)superViewController;
+            [gallery removePreviouslySelectedImage];
+        }
+        [self.navigationController popViewControllerAnimated:NO];
+    }
+}
+
+#pragma mark Helpers
+
+-(void)showActivityIndicator
+{
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator startAnimating];
+}
+
+-(void)resetActivityIndicatorScale
+{
+    [self.activityIndicator stopAnimating];
+    self.activityIndicator.transform = CGAffineTransformMakeScale(1.0f, 1.0f);
+    self.activityIndicator.alpha = 1.0f;
+}
+
+-(BOOL)deviceHasThreePointFiveInchScreen
+{
+    return !([UIScreen mainScreen].bounds.size.height == 568.0);
+}
+
+-(CGAffineTransform)scaleTransformForTaskImage:(UIView *)image
+{
+    /* Calculate proper image scaling so the image fits properly in the main UI. Assuming any image size is possible */
+    /* The max height of an image before it's too big for the 4 inch screen ui is 100.0. If It's bigger than that, then it will be scaled smaller until it is at most 100 points in height. */
+    /* The max height for 3.5 inch screens is 85 */
+    CGAffineTransform imageTransform;
+    
+    if ([self deviceHasThreePointFiveInchScreen]) {
+        const CGFloat maxImageHeight = 70.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+            
+            if (((image.frame.size.height/image.transform.a) * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
+        }
+    }else{
+        const CGFloat maxImageHeight = 100.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformScale(image.transform, (self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+
+            if (((image.frame.size.height/image.transform.a) * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformScale(image.transform, maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
+        }
+    }
+    return imageTransform;
+
+}
+
+-(CGAffineTransform)scaleTransformForTaskImageThatTheUserScaledViaThePinchGesture:(UIView *)image
+{
+    /* Same as the above method, except scales are based of the images current transform. Basicly 'CGAffineTransformMakeScale' instead of 'CGAffineTransformScale' */
+
+    CGAffineTransform imageTransform;
+    
+    if ([self deviceHasThreePointFiveInchScreen]) {
+        const CGFloat maxImageHeight = 70.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformMakeScale((self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+            
+            if ((image.frame.size.height * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
+        }
+
+    }else{
+        const CGFloat maxImageHeight = 100.0f;
+        if (image.frame.size.height > maxImageHeight){
+            // Image is too big
+            imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+        }else{
+            // Image is an ideal size, meaning it's below the max height
+            imageTransform = CGAffineTransformMakeScale((self.view.frame.size.width- 50.0f)/image.frame.size.width, (self.view.frame.size.width- 50.0f)/image.frame.size.width);
+            
+            if ((image.frame.size.height * imageTransform.a) > maxImageHeight){
+                // if the previous transform makes the height too big, scale it down
+                imageTransform = CGAffineTransformMakeScale(maxImageHeight/image.frame.size.height, maxImageHeight/image.frame.size.height);
+            }
+        }
+    }
+    
+    return imageTransform;
+    
+}
+
+-(void)handleHelpButtonPressed:(NSNotification *)notification
+{
+    /* Presents the helpviewcontroller if the help button is pressed, because a view (the keyboard) can not do this */
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    HelpViewController *helpViewController = (HelpViewController *)[storyboard instantiateViewControllerWithIdentifier:@"help"];
+    [helpViewController adjustForModalPresentation];
+
+    [self presentViewController:helpViewController animated:YES completion:nil];
+    self.presentedHelpViewController = YES;
 }
 
 #pragma mark TextView and Preview View
@@ -691,7 +945,9 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
 
 -(NSString *)makeHtmlFromAsciimath:(NSString *)asciimath
 {
-    NSString *html1 = @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
+    NSString *html1 = [self deviceHasThreePointFiveInchScreen] ?
+    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 110%; text-align: center;'>" :
+    @"<html><head><script type='text/x-mathjax-config'>MathJax.Hub.Config({messageStyle: 'none'});</script><script type='text/javascript' src = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_HTMLorMML-full'></script></head><body><div style='font-size: 130%; text-align: center;'>";
         
     /*The following string is the same HTML as above except it sets the 'scale' in a mathjax configuration.*/
     /* It works, but the scaling takes about a second to take effect. If I use a div CSS (as done in the above string) then it takes effect immediately.
@@ -704,6 +960,12 @@ const CGFloat kPreviewCenterYPostion = 220.0f;
     return fullHtmlString;
 }
 
+/* Guidance mode occurs when a 'MathKeyboardKeyTypeOperation' type key is pressed on the MathKeyboard.
+ * These keys are like functions and require input (such as the square root key - sqrt(input)).
+ * When guidance mode occurs, a yellow highlight is shown inside the parenthesis of the 'MathKeyboardKeyTypeOperation' value
+ * The cursor arrow keys on the MathKeyboard are restricted to exiting the "function". When the user moves the cursor out of the
+ * "functions" parenthesis, guidance mode ends, removing the highlight and allowing the arrow keys to freely move the cursor again
+ */
 -(void)enableGuidanceMode
 {
     self.guidanceModeEnabled = YES;
